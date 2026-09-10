@@ -1,0 +1,12 @@
+{
+  "name": "healix-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Healix Healthcare Monorepo",
+  "scripts": {
+    "backend:dev": "pnpm --filter healix-backend dev",
+    "backend:build": "pnpm --filter healix-backend build",
+    "backend:start": "pnpm --filter healix-backend start",
+    "mobile:start": "pnpm --filter healix-mobile start"
+  }
+}

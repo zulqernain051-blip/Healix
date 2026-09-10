@@ -1,0 +1,1264 @@
+Exactly. Since **organizations are out of the FYP scope for now**, I would keep the model generic:
+
+```text
+Healix
+ ├── Patients
+ ├── Nurses
+ ├── Doctors
+ └── Admin
+```
+
+No hospital/organization dependency in the current implementation. We can design the system so organizations can be added later without making them a prerequisite.
+
+And for the current risk engine, I agree with your approach:
+
+```text
+Vitals + Symptoms + Clinical Data
+              ↓
+       Rule/Formula Engine
+              ↓
+         Risk Score
+              ↓
+        Risk Category
+              ↓
+     Doctor/Escalation Flow
+```
+
+Later:
+
+```text
+Rule/Formula Engine
+        ↓
+      AI/ML
+```
+
+The rest of the workflow shouldn't need to change.
+
+---
+
+# Now: What happens AFTER the doctor gets the case?
+
+This is the next major piece we need to design.
+
+I would **not** make:
+
+```text
+Doctor reviews
+ ↓
+Prescription
+ ↓
+Case ends
+```
+
+the default model.
+
+A doctor case should be treated as a **clinical episode**, and the doctor decides what happens next.
+
+---
+
+# 1. The Doctor Case Lifecycle
+
+I'd structure it roughly like:
+
+```text
+Clinical Event
+      ↓
+Risk Assessment
+      ↓
+Doctor Required
+      ↓
+Doctor Case Created
+      ↓
+Doctor Assigned
+      ↓
+Doctor Reviews Case
+      ↓
+Clinical Decision
+      ↓
+┌─────────────────────────────────────┐
+│                                     │
+│ What should happen next?            │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+Then there are several possible outcomes.
+
+---
+
+# 2. Scenario A — No Treatment Required
+
+This is an important case people often forget.
+
+Example:
+
+```text
+Patient
+ ↓
+Abnormal but non-dangerous vitals
+ ↓
+Doctor reviews
+ ↓
+Determines patient is stable
+ ↓
+No treatment required
+```
+
+Doctor can write:
+
+> Continue monitoring. No medication required.
+
+Then:
+
+```text
+Doctor resolves case
+ ↓
+Case CLOSED
+```
+
+The Visit can continue/complete normally.
+
+### Requirement
+
+Doctor needs:
+
+* Clinical assessment
+* Doctor remarks
+* Resolution
+* Case closure
+
+---
+
+# 3. Scenario B — Prescription Only
+
+This is the one you mentioned.
+
+```text
+Doctor reviews
+ ↓
+Diagnosis / assessment
+ ↓
+Prescription
+ ↓
+Patient receives medication instructions
+ ↓
+Case resolved
+```
+
+For example:
+
+```text
+Diagnosis:
+Mild infection
+
+Prescription:
+Medication X
+Dose
+Frequency
+Duration
+```
+
+Then:
+
+```text
+Case
+ ↓
+RESOLVED
+```
+
+### But there is an important distinction:
+
+**Prescription does not necessarily mean case ends immediately.**
+
+The doctor might say:
+
+> Start medication and monitor for 3 days.
+
+That becomes a follow-up case.
+
+---
+
+# 4. Scenario C — Prescription + Follow-up
+
+Very realistic.
+
+```text
+Doctor
+ ↓
+Prescription
+ ↓
+Follow-up required
+ ↓
+Follow-up date
+ ↓
+Patient monitored
+ ↓
+Doctor reviews again
+ ↓
+Resolved
+```
+
+Example:
+
+```text
+Day 1
+Nurse visit
+ ↓
+Vitals abnormal
+ ↓
+Doctor
+ ↓
+Prescription
+ ↓
+Follow-up in 3 days
+```
+
+Then:
+
+```text
+Day 4
+ ↓
+Nurse visit
+ ↓
+Vitals
+ ↓
+Doctor review
+ ↓
+Improved
+ ↓
+Case resolved
+```
+
+This means our system needs some concept of **follow-up**, not just prescription.
+
+---
+
+# 5. Scenario D — Doctor Creates a Care Plan
+
+This is probably one of the most important Healix workflows.
+
+For example:
+
+```text
+Doctor
+ ↓
+Assesses patient
+ ↓
+Creates Care Plan
+```
+
+Care Plan could contain:
+
+```text
+Goal
+ ↓
+Interventions
+ ↓
+Medications
+ ↓
+Monitoring requirements
+ ↓
+Nursing requirements
+ ↓
+Visit schedule
+ ↓
+Follow-up
+```
+
+For example:
+
+```text
+Care Plan:
+Post-surgery recovery
+
+Duration:
+14 days
+
+Nursing:
+Daily wound care
+
+Monitoring:
+Temperature
+Blood pressure
+Pain level
+
+Visits:
+Daily × 7
+Then every 2 days × 7
+```
+
+---
+
+# 6. Your Idea: Existing Nurse Continues
+
+Yes — I think this is very important.
+
+Suppose:
+
+```text
+Patient
+ ↓
+Original Care Request
+ ↓
+Nurse A
+```
+
+Then:
+
+```text
+Doctor
+ ↓
+Creates Care Plan
+ ↓
+Requires continued nursing
+```
+
+We shouldn't necessarily throw away Nurse A and start a completely new relationship.
+
+Instead:
+
+```text
+Care Plan
+   │
+   ├── Nurse A
+   │
+   ├── Visit #1
+   ├── Visit #2
+   ├── Visit #3
+   └── Visit #4
+```
+
+This provides **continuity of care**.
+
+---
+
+# 7. Scenario E — Care Plan Requires New Nurse
+
+But sometimes the current nurse isn't suitable.
+
+Example:
+
+```text
+Patient requires:
+IV therapy
+```
+
+Current nurse:
+
+```text
+Not qualified
+```
+
+Doctor creates care plan:
+
+```text
+Specialized nursing required
+```
+
+Then Healix can initiate:
+
+```text
+Care Plan
+ ↓
+New Care Request
+ ↓
+Marketplace
+ ↓
+Qualified Nurse
+ ↓
+Offer
+ ↓
+Contract
+ ↓
+Visits
+```
+
+This is a very useful connection between the Doctor and Care Request modules.
+
+---
+
+# 8. Scenario F — Care Plan Requires Multiple Visits
+
+This is where your existing recurring system becomes extremely valuable.
+
+Doctor:
+
+```text
+Create Care Plan
+```
+
+Then:
+
+```text
+Care Plan
+ ↓
+Nursing schedule
+ ↓
+Recurring Visits
+```
+
+For example:
+
+```text
+Daily
+× 7 days
+```
+
+could result in:
+
+```text
+Visit #1
+Visit #2
+Visit #3
+Visit #4
+Visit #5
+Visit #6
+Visit #7
+```
+
+This can reuse your existing recurring Visit infrastructure rather than creating another scheduling system.
+
+---
+
+# 9. Scenario G — Doctor Orders Monitoring Only
+
+No prescription.
+
+No major treatment.
+
+Example:
+
+```text
+Doctor
+ ↓
+Patient stable but requires monitoring
+```
+
+Doctor could order:
+
+```text
+Monitor BP
+Monitor SpO₂
+Monitor temperature
+```
+
+Then:
+
+```text
+Nurse
+ ↓
+Collects vitals
+ ↓
+System tracks trend
+ ↓
+Doctor reviews later
+```
+
+This is different from a normal care plan because the primary purpose is **clinical monitoring**.
+
+---
+
+# 10. Scenario H — Doctor Requests Another Assessment
+
+Sometimes the doctor doesn't have enough information.
+
+Example:
+
+```text
+Vitals
+ ↓
+Doctor review
+ ↓
+Insufficient information
+```
+
+Doctor might request:
+
+```text
+Additional vitals
+```
+
+or:
+
+```text
+Additional symptoms
+```
+
+or:
+
+```text
+Nurse assessment
+```
+
+Then:
+
+```text
+Doctor
+ ↓
+Request additional clinical data
+ ↓
+Nurse
+ ↓
+Collects data
+ ↓
+Doctor reviews again
+```
+
+This means the case should remain:
+
+```text
+AWAITING_INFORMATION
+```
+
+rather than being closed.
+
+---
+
+# 11. Scenario I — Doctor Requests Emergency Evaluation
+
+Suppose:
+
+```text
+Doctor reviews
+ ↓
+Condition is more serious than initially thought
+```
+
+Doctor can escalate:
+
+```text
+Doctor
+ ↓
+Emergency escalation
+ ↓
+Emergency service / ambulance
+```
+
+The case shouldn't be closed.
+
+Instead:
+
+```text
+Case
+ ↓
+ESCALATED
+```
+
+Then potentially:
+
+```text
+Hospital / Emergency Care
+```
+
+This can later connect to your emergency module.
+
+---
+
+# 12. Scenario J — Doctor Recommends Hospital Visit
+
+Not every emergency needs an ambulance.
+
+Example:
+
+```text
+Doctor
+ ↓
+Patient should visit hospital
+```
+
+Then:
+
+```text
+Doctor recommendation
+ ↓
+Patient informed
+ ↓
+Case status = REFERRED
+```
+
+This is a **referral** workflow.
+
+Very useful for Healix.
+
+---
+
+# 13. Scenario K — Doctor Requests Specialist
+
+Suppose the assigned doctor is a general physician.
+
+They review:
+
+```text
+Patient
+ ↓
+Possible cardiac problem
+```
+
+They need:
+
+```text
+Cardiologist
+```
+
+So:
+
+```text
+Doctor A
+ ↓
+Specialist referral
+ ↓
+Doctor B
+ ↓
+Review
+```
+
+This can eventually reuse the same doctor assignment mechanism.
+
+---
+
+# 14. Scenario L — Doctor Rejects/Returns Case
+
+Sometimes the case gets assigned to the wrong doctor.
+
+For example:
+
+```text
+Doctor
+ ↓
+Reviews case
+ ↓
+Not my specialty
+```
+
+They should be able to:
+
+```text
+Return / Reassign
+```
+
+Then:
+
+```text
+Doctor Assignment Engine
+ ↓
+Another eligible doctor
+```
+
+This should be tracked.
+
+---
+
+# 15. Scenario M — Doctor Needs Nurse Action
+
+This is another important interaction.
+
+Doctor:
+
+```text
+Review
+ ↓
+Instruction:
+"Check wound and upload image"
+```
+
+Then:
+
+```text
+Doctor
+ ↓
+Clinical Task
+ ↓
+Nurse
+ ↓
+Completes task
+ ↓
+Doctor notified
+ ↓
+Review
+```
+
+This turns Healix into a **care coordination system**, rather than simply:
+
+> Nurse enters data → Doctor reads it.
+
+---
+
+# 16. Scenario N — Patient Needs Ongoing Care
+
+Sometimes the patient isn't "sick" in a single event.
+
+Example:
+
+```text
+Chronic condition
+```
+
+Doctor might create:
+
+```text
+Long-term Care Plan
+```
+
+Containing:
+
+```text
+Medication
+Monitoring
+Nursing visits
+Doctor follow-ups
+Health goals
+```
+
+Then the case isn't really:
+
+```text
+OPEN → CLOSED
+```
+
+Instead:
+
+```text
+Clinical Case
+ ↓
+Care Plan
+ ↓
+Ongoing management
+```
+
+The individual **case** can be resolved while the **Care Plan remains active**.
+
+This distinction is important.
+
+---
+
+# 17. Scenario O — Patient Improves
+
+Eventually:
+
+```text
+Care Plan
+ ↓
+Nurse visits
+ ↓
+Monitoring
+ ↓
+Patient improves
+ ↓
+Doctor review
+ ↓
+Care goals achieved
+```
+
+Then:
+
+```text
+Care Plan → COMPLETED
+Clinical Case → RESOLVED
+```
+
+This is your example of:
+
+> Patient is okay and case ends.
+
+---
+
+# 18. Scenario P — Patient Does NOT Improve
+
+This is also critical.
+
+```text
+Care Plan
+ ↓
+Nurse visits
+ ↓
+Vitals remain abnormal
+ ↓
+Doctor review
+```
+
+Doctor can decide:
+
+```text
+Modify treatment
+```
+
+or:
+
+```text
+Extend care plan
+```
+
+or:
+
+```text
+Increase visit frequency
+```
+
+or:
+
+```text
+Refer specialist
+```
+
+or:
+
+```text
+Hospital referral
+```
+
+or:
+
+```text
+Emergency escalation
+```
+
+So:
+
+```text
+Care Plan
+       ↓
+Monitoring
+       ↓
+Not improving
+       ↓
+Doctor reassessment
+       ↓
+New clinical decision
+```
+
+---
+
+# 19. Scenario Q — Patient Gets Worse During Care Plan
+
+This is where the earlier risk system comes back.
+
+```text
+Care Plan
+ ↓
+Nurse Visit
+ ↓
+Vitals
+ ↓
+Risk = HIGH
+ ↓
+Doctor Case
+```
+
+Then:
+
+```text
+Doctor
+ ↓
+Review
+ ↓
+Emergency escalation
+```
+
+So the system forms a **loop**:
+
+```text
+Care Plan
+   ↓
+Visit
+   ↓
+Vitals
+   ↓
+Risk
+   ↓
+Doctor
+   ↓
+Care Plan updated
+   ↓
+Visit
+   ↓
+...
+```
+
+This is exactly the kind of continuous-care workflow that makes Healix more than a booking application.
+
+---
+
+# 20. Scenario R — Medication Side Effects
+
+Very practical.
+
+```text
+Patient receives prescription
+ ↓
+Nurse visits
+ ↓
+Patient reports side effects
+ ↓
+Clinical data submitted
+ ↓
+Doctor reviews
+```
+
+Doctor could:
+
+```text
+Modify prescription
+```
+
+or:
+
+```text
+Stop medication
+```
+
+or:
+
+```text
+Prescribe alternative
+```
+
+or:
+
+```text
+Escalate
+```
+
+Therefore, prescriptions should be **modifiable/versioned**, rather than treated as a one-time static record.
+
+---
+
+# 21. Scenario S — Doctor Closes Case With Advice
+
+Sometimes:
+
+```text
+Doctor review
+ ↓
+No prescription
+ ↓
+Advice
+ ↓
+Case resolved
+```
+
+Example:
+
+> Rest, hydration, monitor temperature, return if symptoms worsen.
+
+So we need:
+
+```text
+Clinical Advice / Doctor Recommendation
+```
+
+as a possible outcome.
+
+---
+
+# 22. Scenario T — Patient Doesn't Follow the Plan
+
+This is another realistic situation.
+
+```text
+Care Plan
+ ↓
+Nurse visits
+ ↓
+Patient refuses treatment
+```
+
+or:
+
+```text
+Patient repeatedly misses visits
+```
+
+Then:
+
+```text
+Nurse
+ ↓
+Reports non-compliance
+ ↓
+Doctor notified
+```
+
+Doctor decides:
+
+```text
+Continue
+Modify
+Contact patient
+Close
+Escalate
+```
+
+We don't necessarily need a giant compliance module for the FYP, but the workflow should allow the event.
+
+---
+
+# 23. The Big Picture
+
+So I wouldn't model Doctor Case as:
+
+```text
+Doctor
+ ↓
+Prescription
+ ↓
+END
+```
+
+I'd model it as:
+
+```text
+                    DOCTOR CASE
+                         │
+                         ▼
+                  Doctor Review
+                         │
+        ┌────────────────┼────────────────┐
+        │                │                │
+        ▼                ▼                ▼
+    No Action       Treatment        More Information
+        │                │                │
+        ▼                ▼                ▼
+     Resolve       Prescription      Nurse Task
+                         │                │
+                         │                ▼
+                         │          Doctor Review
+                         │
+              ┌──────────┼───────────┐
+              ▼          ▼           ▼
+          Follow-up   Care Plan   Specialist
+              │          │          Referral
+              │          │
+              │          ▼
+              │       Visits
+              │          │
+              └──────────┤
+                         ▼
+                    Monitoring
+                         │
+              ┌──────────┴──────────┐
+              ▼                     ▼
+           Improved              Worse
+              │                     │
+              ▼                     ▼
+          Resolve              Reassess
+                                    │
+                          ┌─────────┼─────────┐
+                          ▼         ▼         ▼
+                       Modify    Refer     Emergency
+                       Plan
+```
+
+---
+
+# 24. The Status Model Is Going to Be Important
+
+I'd recommend we eventually distinguish **Case status** from **Care Plan status** and **Visit status**.
+
+For example:
+
+### Clinical Case
+
+```text
+OPEN
+ASSIGNED
+IN_REVIEW
+AWAITING_INFORMATION
+TREATMENT_ACTIVE
+REFERRED
+ESCALATED
+RESOLVED
+CLOSED
+```
+
+### Care Plan
+
+```text
+DRAFT
+ACTIVE
+PAUSED
+COMPLETED
+CANCELLED
+```
+
+### Visit
+
+You already have:
+
+```text
+SCHEDULED
+ACCEPTED
+IN_PROGRESS
+COMPLETED
+```
+
+Don't merge these into one status.
+
+That's important because:
+
+```text
+Case = RESOLVED
+Care Plan = ACTIVE
+Visit = COMPLETED
+```
+
+can legitimately happen simultaneously.
+
+---
+
+# 25. The Most Important Relationship
+
+I think the eventual model should conceptually look like:
+
+```text
+Patient
+   │
+   ├──────────── CareRequest
+   │                  │
+   │                  └── Visits
+   │
+   ├──────────── Clinical Case
+   │                  │
+   │                  ├── Risk Assessment
+   │                  ├── Doctor Assignment
+   │                  ├── Doctor Decisions
+   │                  └── Referrals
+   │
+   ├──────────── Care Plan
+   │                  │
+   │                  ├── Goals
+   │                  ├── Prescriptions
+   │                  ├── Monitoring
+   │                  └── Visits
+   │
+   └──────────── Medical Records
+```
+
+And these shouldn't become one giant entity.
+
+---
+
+# 26. What I Would Include in the FYP
+
+We don't need to implement every hospital-grade scenario I listed.
+
+I'd prioritize these **8 doctor outcomes**:
+
+| # | Doctor outcome                         | FYP priority  |
+| - | -------------------------------------- | ------------- |
+| 1 | Resolve with no treatment              | **Essential** |
+| 2 | Prescription                           | **Essential** |
+| 3 | Prescription + follow-up               | **Essential** |
+| 4 | Create Care Plan                       | **Essential** |
+| 5 | Care Plan → recurring nurse visits     | **Essential** |
+| 6 | Request additional nurse/clinical data | **Important** |
+| 7 | Specialist / doctor referral           | **Important** |
+| 8 | Emergency escalation                   | **Essential** |
+
+Then optionally:
+
+* Modify an existing care plan
+* Modify prescription
+* Nurse clinical tasks
+* Hospital referral
+* Patient non-compliance
+* Complex specialist workflows
+
+---
+
+# 27. And This Gives Healix a Very Strong Overall Workflow
+
+Ultimately, Healix becomes:
+
+```text
+PATIENT
+   ↓
+CARE REQUEST
+   ↓
+NURSE
+   ↓
+VISIT
+   ↓
+VITALS
+   ↓
+RISK ENGINE
+   ↓
+Does Doctor Need To Act?
+   │
+   ├── NO
+   │    ↓
+   │  Continue Visit
+   │
+   └── YES
+        ↓
+    CLINICAL CASE
+        ↓
+    AUTO DOCTOR ASSIGNMENT
+        ↓
+    DOCTOR REVIEW
+        ↓
+   Clinical Decision
+        │
+        ├── Resolve
+        │
+        ├── Prescription
+        │
+        ├── Follow-up
+        │
+        ├── Care Plan
+        │      ↓
+        │   Nurse Visits
+        │      ↓
+        │   Monitoring
+        │      ↓
+        │   Doctor Review
+        │
+        ├── Additional Data
+        │
+        ├── Specialist Referral
+        │
+        ├── Hospital Referral
+        │
+        └── Emergency Escalation
+```
+
+And the really nice part is that **your existing recurring Visit implementation becomes useful here** instead of us building another scheduling mechanism.
+
+---
+
+## One architectural decision I think we should make next
+
+Before giving Antigravity a prompt, I would settle one thing:
+
+### **Care Plan vs Clinical Case**
+
+I recommend:
+
+> **Clinical Case = a doctor's clinical problem/review episode.**
+
+> **Care Plan = the ongoing treatment/monitoring strategy created by the doctor.**
+
+So:
+
+```text
+Vitals abnormal
+ ↓
+Clinical Case
+ ↓
+Doctor reviews
+ ↓
+Creates Care Plan
+ ↓
+Clinical Case can be resolved
+ ↓
+Care Plan remains ACTIVE
+ ↓
+Nurse performs recurring Visits
+ ↓
+Monitoring
+ ↓
+Doctor follow-up
+ ↓
+Care Plan completed
+```
+
+That distinction will prevent a **lot of architectural confusion later**, especially when we connect prescriptions, recurring visits, risk assessments, follow-ups, and medical records.
