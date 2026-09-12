@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity, StyleSheet, Modal, Text } from 'reac
 import { COLORS, RADIUS, SPACING } from '../../theme';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-import { Audio } from 'expo-av';
+const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 interface ChatInputProps {
   onSend: (text: string, mediaPreview?: any) => void;

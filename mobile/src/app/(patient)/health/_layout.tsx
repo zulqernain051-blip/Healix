@@ -11,7 +11,7 @@ export default function HealthStack() {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen name="vitals" />
+      
       <Stack.Screen name="medical" />
       <Stack.Screen name="careplans" />
       <Stack.Screen name="prescriptions" />

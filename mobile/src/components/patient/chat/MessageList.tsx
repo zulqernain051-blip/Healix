@@ -8,7 +8,7 @@ interface MessageListProps {
 }
 
 import { API_URL } from '../../../api/client';
-import { Audio } from 'expo-av';
+const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 const PatientAudioBubble = ({ uri, isMe, durationMs }: { uri: string; isMe: boolean; durationMs?: number }) => {
   const [sound, setSound] = React.useState<Audio.Sound | null>(null);

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { MessageItem } from '../../api/messages.api';
 import { COLORS, RADIUS, TYPOGRAPHY } from '../../theme';
 import { API_URL } from '../../api/client';
-import { Audio } from 'expo-av';
+const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 interface ChatBubbleProps {
   message: MessageItem;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { RADIUS, SPACING } from '../../../theme';
 import { MediaPreview } from './types';
-import { Audio } from 'expo-av';
+const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 interface ChatInputProps {
   inputText: string;
