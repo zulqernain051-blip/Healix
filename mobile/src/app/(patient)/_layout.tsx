@@ -151,11 +151,11 @@ export default function PatientLayout() {
       />
 
       {/* Hide unused screens from bottom tabs */}
-      <Tabs.Screen name="health" options={{ href: null, tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }} />
-      <Tabs.Screen name="ai" options={{ href: null, tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }} />
-      <Tabs.Screen name="marketplace" options={{ href: null, tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }} />
-      <Tabs.Screen name="notifications" options={{ href: null, tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }} />
-      <Tabs.Screen name="visits" options={{ href: null, tabBarButton: () => null, tabBarItemStyle: { display: 'none' } }} />
+      <Tabs.Screen name="health" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
+      <Tabs.Screen name="ai" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
+      <Tabs.Screen name="marketplace" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
+      <Tabs.Screen name="notifications" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
+      <Tabs.Screen name="visits" options={{ href: null, tabBarItemStyle: { display: 'none' } }} />
     </Tabs>
     </View>
   );
