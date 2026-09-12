@@ -117,24 +117,24 @@ export default function PatientLayout() {
         }}
       />
 
-      {/* Tab 3: Marketplace */}
+      {/* Tab 3: Records */}
       <Tabs.Screen
-        name="marketplace"
+        name="records"
         options={{
-          title: 'Marketplace',
+          title: 'Records',
           tabBarIcon: ({ color, focused }) => (
-            <Text style={{ fontSize: 20, color }}>{focused ? '🛒' : '🛒'}</Text>
+            <Text style={{ fontSize: 20, color }}>{focused ? '🗂️' : '📁'}</Text>
           ),
         }}
       />
 
-      {/* Tab 4: Visits */}
+      {/* Tab 4: Messages */}
       <Tabs.Screen
-        name="visits"
+        name="messages"
         options={{
-          title: 'Visits',
+          title: 'Messages',
           tabBarIcon: ({ color, focused }) => (
-            <Text style={{ fontSize: 20, color }}>{focused ? '🩺' : '🩺'}</Text>
+            <Text style={{ fontSize: 20, color }}>{focused ? '💬' : '💬'}</Text>
           ),
         }}
       />
@@ -153,9 +153,9 @@ export default function PatientLayout() {
       {/* Hide unused screens from bottom tabs */}
       <Tabs.Screen name="health" options={{ href: null }} />
       <Tabs.Screen name="ai" options={{ href: null }} />
-      <Tabs.Screen name="messages" options={{ href: null }} />
+      <Tabs.Screen name="marketplace" options={{ href: null }} />
       <Tabs.Screen name="notifications" options={{ href: null }} />
-      <Tabs.Screen name="records" options={{ href: null }} />
+      <Tabs.Screen name="visits" options={{ href: null }} />
     </Tabs>
     </View>
   );

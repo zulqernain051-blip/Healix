@@ -152,19 +152,19 @@ export default function NurseLayout() {
       <Tabs.Screen
         name="patients"
         options={{
-          tabBarButton: () => null,
+          href: null,
         }}
       />
       <Tabs.Screen
         name="schedule"
         options={{
-          tabBarButton: () => null,
+          href: null,
         }}
       />
       <Tabs.Screen
         name="sync"
         options={{
-          tabBarButton: () => null,
+          href: null,
         }}
       />
     </Tabs>
