@@ -888,6 +888,7 @@ model ChatThread {
   @@index([participantAId])
   @@index([participantBId])
   @@index([caseAssignmentId])
+  @@unique([participantAId, participantBId])
   @@map("chat_threads")
 }
 

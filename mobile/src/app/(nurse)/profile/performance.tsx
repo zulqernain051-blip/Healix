@@ -199,3 +199,5 @@ const styles = StyleSheet.create({
   badgeChip: { paddingHorizontal: 6, paddingVertical: 4 },
   emptyText: { color: COLORS.textMuted, fontSize: 13, textAlign: 'center', lineHeight: 18, paddingVertical: 10 }
 });
+
+

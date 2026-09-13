@@ -6,7 +6,7 @@ const recentDispatches = new Map<string, number>();
 
 export interface DispatchData {
   userId: string;
-  category: 'APPOINTMENT' | 'RISK' | 'PAYMENT' | 'EMERGENCY';
+  category: 'APPOINTMENT' | 'RISK' | 'PAYMENT' | 'EMERGENCY' | 'CHAT';
   title: string;
   body: string;
   channel?: 'PUSH' | 'SMS' | 'IN_APP';

@@ -158,3 +158,5 @@ const styles = StyleSheet.create({
   paymentBadge: { borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4 },
   paymentBadgeText: { fontSize: 11, fontWeight: '700' }
 });
+
+

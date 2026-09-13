@@ -145,6 +145,12 @@ export function useGetOrCreateThread() {
   });
 }
 
+export function useSearchUserByPhone() {
+  return useMutation({
+    mutationFn: (phone: string) => messagesApi.searchUserByPhone(phone),
+  });
+}
+
 export function useSendMessage() {
   const queryClient = useQueryClient();
   return useMutation({

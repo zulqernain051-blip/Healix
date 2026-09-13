@@ -22,11 +22,11 @@ export class PatientRepository {
     });
   }
 
-  public static async findUserByPhoneLike(phone: string) {
-    return prisma.user.findFirst({
+  public static async findUserByExactPhone(phones: string[]) {
+    return prisma.user.findMany({
       where: {
         phone: {
-          contains: phone,
+          in: phones,
         },
       },
       select: {
@@ -36,6 +36,7 @@ export class PatientRepository {
         role: true,
         status: true,
       },
+      take: 1,
     });
   }
 

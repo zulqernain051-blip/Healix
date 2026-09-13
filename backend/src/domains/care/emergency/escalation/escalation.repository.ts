@@ -39,11 +39,12 @@ export class EscalationRepository {
   }
 
   static async createNurseDoctorThread(nurseUserId: string, doctorUserId: string, caseAssignmentId: string) {
+    const [participantAId, participantBId] = nurseUserId < doctorUserId ? [nurseUserId, doctorUserId] : [doctorUserId, nurseUserId];
     return prisma.chatThread.create({
       data: {
         type: 'NURSE_DOCTOR',
-        participantAId: nurseUserId,
-        participantBId: doctorUserId,
+        participantAId,
+        participantBId,
         caseAssignmentId,
         readOnly: false
       }

@@ -119,6 +119,19 @@ export class ChatService {
     const { ChatSocketService } = require('./chat.socket');
     ChatSocketService.publishNewMessage(threadId, message);
 
+    // Dispatch offline push notification
+    const recipientId = thread.participantAId === senderId ? thread.participantBId : thread.participantAId;
+    const senderUser = thread.participantAId === senderId ? thread.participantA : thread.participantB;
+    
+    NotificationService.dispatchNotification({
+      userId: recipientId,
+      category: 'CHAT',
+      title: `New message from ${senderUser.fullName}`,
+      body: contentType === 'TEXT' ? contentUrlOrText : `Sent an attachment`,
+      channel: 'PUSH',
+      
+    }).catch(e => console.error('Failed to dispatch chat notification', e));
+
     return message;
   }
 

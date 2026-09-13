@@ -3,13 +3,21 @@ import { CreateVisitFromContractUseCase } from './lifecycle/create-visit-from-co
 import { VisitRepository } from './visit.repository';
 
 export function registerVisitListeners() {
-  AppEventBus.on(EVENTS.CONTRACT_ACTIVATED, async (payload: { contractId: string }) => {
+  AppEventBus.on(EVENTS.CONTRACT_ACTIVATED, async (payload: { contractId: string, patientId?: string, nurseId?: string }) => {
     try {
       const usecase = new CreateVisitFromContractUseCase();
       await usecase.execute(payload.contractId);
       console.log(`[Visit Domain] Successfully created visit for contract ${payload.contractId}.`);
     } catch (err: any) {
       console.error(`[Visit Domain] Failed to create visit for contract ${payload.contractId}:`, err.message);
+    }
+    
+    // Auto-create Chat Thread for Nurse Assignment
+    if (payload.patientId && payload.nurseId) {
+      try {
+        const { ChatAutoCreator } = require('../../communication/chat/chat.auto-creator');
+        await ChatAutoCreator.onNurseAssigned(payload.patientId, payload.nurseId);
+      } catch (e) {}
     }
   });
 

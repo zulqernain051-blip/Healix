@@ -19,18 +19,7 @@ export class ChatRepository {
     });
   }
 
-  static async createChatThread(type: string, participantAId: string, participantBId: string, caseAssignmentId?: string) {
-    return prisma.chatThread.create({
-      data: {
-        type,
-        participantAId,
-        participantBId,
-        caseAssignmentId,
-      },
-    });
-  }
-
-  static async findThreadsForUser(userId: string) {
+    static async findThreadsForUser(userId: string) {
     return prisma.chatThread.findMany({
       where: {
         OR: [{ participantAId: userId }, { participantBId: userId }],
@@ -67,15 +56,26 @@ export class ChatRepository {
     });
   }
 
-  static async findChatThreadBetweenParticipants(pAId: string, pBId: string, type?: string) {
+  static async findChatThreadBetweenParticipants(p1Id: string, p2Id: string, type?: string) {
+    const [pAId, pBId] = p1Id < p2Id ? [p1Id, p2Id] : [p2Id, p1Id];
     const where: any = {
-      OR: [
-        { participantAId: pAId, participantBId: pBId },
-        { participantAId: pBId, participantBId: pAId },
-      ],
+      participantAId: pAId,
+      participantBId: pBId,
     };
     if (type) where.type = type;
     return prisma.chatThread.findFirst({ where });
+  }
+
+  static async createChatThread(type: string, p1Id: string, p2Id: string, caseAssignmentId?: string) {
+    const [participantAId, participantBId] = p1Id < p2Id ? [p1Id, p2Id] : [p2Id, p1Id];
+    return prisma.chatThread.create({
+      data: {
+        type,
+        participantAId,
+        participantBId,
+        caseAssignmentId,
+      },
+    });
   }
 
   static async createChatMessage(

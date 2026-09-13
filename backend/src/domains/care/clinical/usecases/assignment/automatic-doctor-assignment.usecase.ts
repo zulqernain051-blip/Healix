@@ -124,6 +124,12 @@ export class AutomaticDoctorAssignmentUseCase {
           reason: `Automatically assigned based on lowest active workload (${selectedDoctor._count.caseAssignments} cases) and availability`
         }
       });
+      
+      // Auto-create Chat Thread for Normal Doctor Assignment
+      try {
+        const { ChatAutoCreator } = require('../../../../communication/chat/chat.auto-creator');
+        await ChatAutoCreator.onDoctorAssigned(caseId, doctorUser.userId);
+      } catch (e) {}
 
       return updatedCase;
     });

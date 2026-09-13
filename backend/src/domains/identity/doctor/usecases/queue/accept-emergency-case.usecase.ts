@@ -13,6 +13,17 @@ export class AcceptEmergencyCaseUseCase {
       throw new AppError('Case is no longer available or not broadcasted', HTTP_STATUS.BAD_REQUEST);
     }
     
+    // Auto-create Chat Thread for Doctor Assignment
+    try {
+      const { PrismaClient } = require('@prisma/client');
+      const prisma = new PrismaClient();
+      const doctor = await prisma.doctor.findUnique({ where: { id: doctorId }, select: { userId: true } });
+      if (doctor?.userId) {
+        const { ChatAutoCreator } = require('../../../../communication/chat/chat.auto-creator');
+        await ChatAutoCreator.onDoctorAssigned(caseId, doctor.userId);
+      }
+    } catch (e) {}
+    
     const io = getIo();
     if (io) {
       io.emit('emergency_case_removed', { caseId });

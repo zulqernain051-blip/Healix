@@ -54,3 +54,5 @@ const styles = StyleSheet.create({
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingText: { color: '#94A3B8', marginTop: 10, fontSize: 14 },
 });
+
+

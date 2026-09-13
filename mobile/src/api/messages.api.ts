@@ -44,6 +44,9 @@ export const messagesApi = {
   getConversations: () => 
     apiClient.get<ThreadConversation[]>(`/chat/threads`),
 
+  searchUserByPhone: (phone: string) => 
+    apiClient.get<any>(`/patients/users/search-phone?phone=${encodeURIComponent(phone)}`),
+
   getOrCreateThread: (participantId: string) => 
     apiClient.post<any>(`/chat/threads`, { participantId }),
   

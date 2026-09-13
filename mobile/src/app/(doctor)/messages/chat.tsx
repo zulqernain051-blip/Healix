@@ -191,3 +191,5 @@ const styles = StyleSheet.create({
   typingIndicatorContainer: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, backgroundColor: '#0A1628' },
   typingText: { color: '#0D9488', fontSize: 12, fontStyle: 'italic' },
 });
+
+
