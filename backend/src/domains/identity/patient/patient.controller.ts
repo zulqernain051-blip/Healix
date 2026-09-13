@@ -61,7 +61,7 @@ const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase();
  */
 const checkOwnership = async (req: Request, targetPatientId: string) => {
   const user = (req as any).user;
-  if (user.role === 'ADMIN') return;
+  if (['ADMIN', 'NURSE', 'DOCTOR', 'PARAMEDIC'].includes(user.role)) return;
 
   if (user.role === 'PATIENT') {
     const patient = await getProfileByUserIdUseCase.execute(user.id);
