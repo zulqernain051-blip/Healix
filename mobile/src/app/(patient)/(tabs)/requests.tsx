@@ -57,7 +57,7 @@ export default function RequestsScreen() {
               <RequestCard
                 key={req.id}
                 title={req.scheduleType === 'RECURRING' ? 'Recurring Care Request' : 'One-Time Care Request'}
-                type={req.type === 'NURSE_VISIT' ? 'Nurse Visit' : 'Doctor Visit'}
+                type={req.requirements || (req.type === 'NURSE_VISIT' ? 'Nurse Visit' : 'Doctor Visit')}
                 scheduledAt={req.preferredDate ? new Date(req.preferredDate).toLocaleString() : 'Date TBD'}
                 status={req.status}
                 onPress={() => navigate(`/(patient)/requests/${req.id}`)}

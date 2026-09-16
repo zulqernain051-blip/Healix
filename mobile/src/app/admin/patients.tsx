@@ -6,7 +6,7 @@ import { useAdminPatients, useUpdateUserStatus } from '../../hooks/useAdmin';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 export default function AdminPatients() {
-  const { data: users = [], isLoading } = useAdminPatients();
+  const { data: users_raw, isLoading  } = useAdminPatients(); const users = users_raw?.users || [];
   const { mutateAsync: updateUserStatus } = useUpdateUserStatus();
 
   const [search, setSearch] = useState('');

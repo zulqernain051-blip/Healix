@@ -63,11 +63,11 @@ export default function AdminCareOperations() {
         <Card key={req.id} style={styles.card}>
           <Card.Content>
             <View style={styles.row}>
-              <Text style={styles.cardTitle}>Req: {req.id.slice(0, 8)}</Text>
+              <Text style={styles.cardTitle}>Req: {req?.id?.slice(0, 8) || 'N/A'}</Text>
               <Chip textStyle={{ fontSize: 10 }}>{req.status}</Chip>
             </View>
             <Text style={styles.cardSub}>Service: {req.serviceType}</Text>
-            <Text style={styles.cardSub}>Patient ID: {req.patientId.slice(0, 8)}</Text>
+            <Text style={styles.cardSub}>Patient ID: {req?.patientId?.slice(0, 8) || 'N/A'}</Text>
             <Text style={styles.cardSub}>Date: {new Date(req.createdAt).toLocaleDateString()}</Text>
           </Card.Content>
         </Card>
@@ -81,10 +81,10 @@ export default function AdminCareOperations() {
         <Card key={off.id} style={styles.card}>
           <Card.Content>
             <View style={styles.row}>
-              <Text style={styles.cardTitle}>Offer: {off.id.slice(0, 8)}</Text>
+              <Text style={styles.cardTitle}>Offer: {off?.id?.slice(0, 8) || 'N/A'}</Text>
               <Chip textStyle={{ fontSize: 10 }}>{off.status}</Chip>
             </View>
-            <Text style={styles.cardSub}>Provider ID: {off.providerId.slice(0, 8)}</Text>
+            <Text style={styles.cardSub}>Provider ID: {off?.providerId?.slice(0, 8) || 'N/A'}</Text>
             <Text style={styles.cardSub}>Amount: Rs {off.amount}</Text>
           </Card.Content>
         </Card>
@@ -98,11 +98,11 @@ export default function AdminCareOperations() {
         <Card key={con.id} style={styles.card}>
           <Card.Content>
             <View style={styles.row}>
-              <Text style={styles.cardTitle}>Contract: {con.id.slice(0, 8)}</Text>
+              <Text style={styles.cardTitle}>Contract: {con?.id?.slice(0, 8)}</Text>
               <Chip textStyle={{ fontSize: 10 }}>{con.status}</Chip>
             </View>
-            <Text style={styles.cardSub}>Provider ID: {con.providerId.slice(0, 8)}</Text>
-            <Text style={styles.cardSub}>Patient ID: {con.patientId.slice(0, 8)}</Text>
+            <Text style={styles.cardSub}>Provider ID: {con?.providerId?.slice(0, 8) || 'N/A'}</Text>
+            <Text style={styles.cardSub}>Patient ID: {con?.patientId?.slice(0, 8) || 'N/A'}</Text>
           </Card.Content>
         </Card>
       ));
@@ -115,10 +115,10 @@ export default function AdminCareOperations() {
         <Card key={vis.id} style={styles.card}>
           <Card.Content>
             <View style={styles.row}>
-              <Text style={styles.cardTitle}>Visit: {vis.id.slice(0, 8)}</Text>
+              <Text style={styles.cardTitle}>Visit: {vis?.id?.slice(0, 8) || 'N/A'}</Text>
               <Chip textStyle={{ fontSize: 10 }}>{vis.status}</Chip>
             </View>
-            <Text style={styles.cardSub}>Contract ID: {vis.contractId.slice(0, 8)}</Text>
+            <Text style={styles.cardSub}>Contract ID: {vis?.contractId?.slice(0, 8) || 'N/A'}</Text>
             <Text style={styles.cardSub}>Scheduled: {new Date(vis.scheduledTime).toLocaleString()}</Text>
           </Card.Content>
         </Card>

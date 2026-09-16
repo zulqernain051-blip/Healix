@@ -11,7 +11,7 @@ export default function AdminClinicalOperations() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('UNASSIGNED');
 
-  const { data: cases, isLoading } = useAdminCases(activeTab);
+  const { data: cases, isLoading, isError } = useAdminCases(activeTab);
   const overrideMutation = useOverrideCaseAssignment();
 
   const [selectedCase, setSelectedCase] = useState<string | null>(null);
@@ -49,20 +49,21 @@ export default function AdminClinicalOperations() {
 
   const renderContent = () => {
     if (isLoading) return <ActivityIndicator color="#00E676" style={{ marginTop: 20 }} />;
+    if (isError) return <Text style={{ color: '#EF4444', textAlign: 'center', marginTop: 20 }}>Error loading clinical cases.</Text>;
     if (!cases?.length) return <Text style={styles.emptyText}>No cases found for {activeTab}</Text>;
     
     return cases.map(c => (
       <Card key={c.id} style={styles.card}>
         <Card.Content>
           <View style={styles.row}>
-            <Text style={styles.cardTitle}>Case: {c.id.slice(0, 8)}</Text>
+            <Text style={styles.cardTitle}>Case: {c.id?.slice(0, 8)}</Text>
             <Chip textStyle={{ fontSize: 10 }}>{c.status}</Chip>
           </View>
-          <Text style={styles.cardSub}>Patient ID: {c.patientId?.slice(0, 8)}</Text>
+          <Text style={styles.cardSub}>Patient ID: {c.visit?.request?.patientId?.slice(0, 8) || 'N/A'}</Text>
           <Text style={styles.cardSub}>Symptoms: {c.symptoms || 'N/A'}</Text>
           
-          {c.assignedDoctorId && (
-            <Text style={styles.cardSub}>Assigned Dr: {c.assignedDoctorId.slice(0, 8)}</Text>
+          {c.doctorId && (
+            <Text style={styles.cardSub}>Assigned Dr: {c.doctorId.slice(0, 8)}</Text>
           )}
 
           {activeTab === 'UNASSIGNED' && (

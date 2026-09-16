@@ -52,10 +52,10 @@ export default function DoctorActionScreen() {
       setShowResolveDialog(false);
       if (Platform.OS === 'web') {
         alert('You have successfully resolved this clinical case.');
-        navigate('/(doctor)/home');
+        navigate('/(doctor)/(tabs)/home');
       } else {
         Alert.alert('Case Resolved', 'You have successfully resolved this clinical case.', [
-          { text: 'OK', onPress: () => navigate('/(doctor)/home') }
+          { text: 'OK', onPress: () => navigate('/(doctor)/(tabs)/home') }
         ]);
       }
     } catch (err: any) {

@@ -87,7 +87,7 @@ export default function PatientHomeScreen() {
         <DashboardHeader
           userName={userName}
           greeting={greeting}
-          onProfilePress={() => navigate('/(patient)/profile')}
+          onProfilePress={() => navigate('/(patient)/(tabs)/profile')}
           onNotificationPress={() => navigate('/(patient)/notifications')}
         />
 
@@ -104,15 +104,15 @@ export default function PatientHomeScreen() {
           staffName={upcomingVisit?.nurse?.user?.fullName || upcomingVisit?.doctor?.user?.fullName || 'Assigned Staff'}
           scheduledAt={upcomingVisit?.scheduledAt ? new Date(upcomingVisit.scheduledAt).toLocaleString() : 'No upcoming visit'}
           status={upcomingVisit?.status || 'Scheduled'}
-          onPress={() => navigate('/(patient)/requests')}
-          onSeeAllPress={() => navigate('/(patient)/requests')}
+          onPress={() => navigate('/(patient)/(tabs)/requests')}
+          onSeeAllPress={() => navigate('/(patient)/(tabs)/requests')}
         />
 
         {/* Quick Actions Grid */}
         <View style={styles.sectionSpacer}>
           <QuickActionsGrid
             onRequestPress={() => navigate('/(patient)/requests/new')}
-            onRecordsPress={() => navigate('/(patient)/records')}
+            onRecordsPress={() => navigate('/(patient)/(tabs)/records')}
             onAIPress={() => navigate('/(patient)/ai')}
             onPrescriptionsPress={() => navigate('/(patient)/health/prescriptions')}
           />

@@ -7,13 +7,13 @@ export default function Index() {
   if (user) {
     switch (user.role) {
       case 'NURSE':
-        return <Redirect href="/(nurse)/home" />;
+        return <Redirect href="/(nurse)/(tabs)/home" />;
       case 'DOCTOR':
-        return <Redirect href="/(doctor)/home" />;
+        return <Redirect href="/(doctor)/(tabs)/home" />;
       case 'ADMIN':
         return <Redirect href="/admin" />;
       default:
-        return <Redirect href="/(patient)/home" />;
+        return <Redirect href="/(patient)/(tabs)/home" />;
     }
   }
 

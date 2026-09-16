@@ -49,7 +49,7 @@ export default function NotificationsScreen() {
 
     if (req.status === 'ASSIGNED') {
       title = 'Staff Assigned to Visit';
-      body = `Provider assigned for your ${req.type === 'NURSE_VISIT' ? 'Nurse' : 'Doctor'} visit on ${req.scheduledAt ? new Date(req.scheduledAt).toLocaleString() : 'TBD'}.`;
+      body = `Provider assigned for your  visit on ${req.scheduledAt ? new Date(req.scheduledAt).toLocaleString() : 'TBD'}.`;
       icon = '🩺';
       bgColor = 'rgba(0, 230, 118, 0.15)';
     } else if (req.status === 'IN_PROGRESS') {

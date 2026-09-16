@@ -281,13 +281,13 @@ export class AdminRepository {
   }
 
   // ─── Care Operations ──────────────────────────────────────────────────────────
-  static async getCareRequests(query: any) {
+  static async getCareRequests(_query?: any) {
     return prisma.careRequest.findMany({
       orderBy: { createdAt: 'desc' },
       include: { patient: { include: { user: { select: { fullName: true } } } } }
     });
   }
-  static async getContracts(query: any) {
+  static async getContracts(_query?: any) {
     return prisma.contract.findMany({
       orderBy: { createdAt: 'desc' },
       include: {
@@ -296,9 +296,9 @@ export class AdminRepository {
       }
     });
   }
-  static async getVisits(query: any) {
+  static async getVisits(_query?: any) {
     return prisma.visit.findMany({
-      orderBy: { createdAt: 'desc' },
+      // orderBy removed because Visit lacks createdAt
       include: {
         nurse: { include: { user: { select: { fullName: true } } } },
         doctor: { include: { user: { select: { fullName: true } } } },
@@ -325,15 +325,27 @@ export class AdminRepository {
 
   // ─── Emergency Center ─────────────────────────────────────────────────────────
   static async getEmergencies(slaStatus?: string) {
-    const where: any = {};
-    if (slaStatus) where.source = slaStatus; 
-    return prisma.emergencyEvent.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: { patient: { include: { user: { select: { fullName: true } } } } }
-    });
-  }
-  static async assignEmergencyDoctor(emergencyId: string, doctorId: string) {
+      const events = await prisma.emergencyEvent.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: { 
+          patient: { include: { user: { select: { fullName: true } } } },
+          visit: { include: { caseAssignment: true } }
+        }
+      });
+      
+      let mapped = events.map(e => ({
+        ...e,
+        status: e.visit?.caseAssignment?.status || 'PENDING',
+        assignedDoctorId: e.visit?.caseAssignment?.doctorId || null,
+        slaBreach: e.visit?.caseAssignment?.slaDeadline ? new Date() > new Date(e.visit.caseAssignment.slaDeadline) : false
+      }));
+      
+      if (slaStatus === 'active') {
+        mapped = mapped.filter(e => e.status !== 'RESOLVED');
+      }
+      return mapped;
+    }
+    static async assignEmergencyDoctor(emergencyId: string, doctorId: string) {
     const event = await prisma.emergencyEvent.findUnique({ where: { id: emergencyId } });
     if (event?.visitId) {
        await prisma.caseAssignment.updateMany({

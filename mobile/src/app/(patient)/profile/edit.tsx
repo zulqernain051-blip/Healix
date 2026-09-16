@@ -70,7 +70,7 @@ export default function ProfileEditScreen() {
       await updateProfile({ patientId, data: payload });
       await loadUser(); // Update global auth user name just in case
       Alert.alert('Success', 'Profile updated successfully.');
-      navigate('/(patient)/profile');
+      navigate('/(patient)/(tabs)/profile');
     } catch (err: any) {
       Alert.alert('Update Failed', err.message || 'Could not update profile.');
     }
@@ -211,7 +211,7 @@ export default function ProfileEditScreen() {
 
           <Button
             mode="outlined"
-            onPress={() => navigate('/(patient)/profile')}
+            onPress={() => navigate('/(patient)/(tabs)/profile')}
             style={styles.cancelBtn}
             textColor="#00E676"
           >

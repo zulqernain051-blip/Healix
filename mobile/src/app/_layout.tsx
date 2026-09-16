@@ -33,10 +33,10 @@ export default function RootLayout() {
   // Role-based dashboard routing
   const getDashboardRoute = (role: string): string => {
     switch (role) {
-      case 'NURSE':   return '/(nurse)/home';  
-      case 'DOCTOR':  return '/(doctor)/home'; 
+      case 'NURSE':   return '/(nurse)/(tabs)/home';  
+      case 'DOCTOR':  return '/(doctor)/(tabs)/home'; 
       case 'ADMIN':   return '/admin';
-      default:        return '/(patient)/home'; 
+      default:        return '/(patient)/(tabs)/home'; 
     }
   };
 

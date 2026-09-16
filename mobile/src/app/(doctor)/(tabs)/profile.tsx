@@ -47,7 +47,7 @@ export default function DoctorProfileScreen() {
       title: 'High-Risk Escalation Queue',
       subtitle: 'Review assigned nurse cases and AI fused scores',
       icon: '🚨',
-      onPress: () => navigate('/(doctor)/home'),
+      onPress: () => navigate('/(doctor)/(tabs)/home'),
     },
     {
       id: 'diagnosis',
@@ -61,7 +61,7 @@ export default function DoctorProfileScreen() {
       title: 'Messages & Tele-Consults',
       subtitle: 'HIPAA encrypted direct communication',
       icon: '💬',
-      onPress: () => navigate('/(doctor)/messages'),
+      onPress: () => navigate('/(doctor)/(tabs)/messages'),
     },
     {
       id: 'settings',

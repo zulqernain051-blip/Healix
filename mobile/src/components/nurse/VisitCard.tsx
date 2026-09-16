@@ -41,7 +41,7 @@ export const VisitCard: React.FC<VisitCardProps> = ({
       <View style={styles.headerRow}>
         <View style={styles.infoCol}>
           <Text style={styles.patientName}>{patientName}</Text>
-          <Text style={styles.visitType}>{visitType === 'NURSE_VISIT' ? '👩‍⚕️ Nurse Visit' : '👨‍⚕️ Doctor Visit'}</Text>
+          <Text style={styles.visitType}>{visitType === 'NURSE_VISIT' ? '????? Nurse Visit' : (visitType === 'DOCTOR_VISIT' ? '????? Doctor Visit' : '?? ' + visitType)}</Text>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: statusBg, borderColor: statusColor }]}>
           <Text style={[styles.statusText, { color: statusColor }]}>{status}</Text>

@@ -6,7 +6,7 @@ import { useAdminParamedics, useUpdateUserStatus } from '../../hooks/useAdmin';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 export default function AdminParamedics() {
-  const { data: users = [], isLoading } = useAdminParamedics();
+  const { data: users_raw, isLoading  } = useAdminParamedics(); const users = users_raw?.users || [];
   const { mutateAsync: updateUserStatus } = useUpdateUserStatus();
 
   const [search, setSearch] = useState('');
@@ -108,37 +108,6 @@ export default function AdminParamedics() {
           />
         )}
       </View>
-    
-        <TouchableOpacity style={styles.fab} onPress={() => setShowAddModal(true)}>
-          <Text style={styles.fabText}>+</Text>
-        </TouchableOpacity>
-        
-        <Portal>
-          <Dialog visible={showAddModal} onDismiss={() => setShowAddModal(false)} style={{ backgroundColor: COLORS.cardElevated }}>
-            <Dialog.Title style={{ color: COLORS.textPrimary }}>Add Paramedic</Dialog.Title>
-            <Dialog.Content>
-              <View style={{ flexDirection: 'row', gap: 10, marginBottom: 15 }}>
-                <Button mode={addMode === 'INVITE' ? 'contained' : 'outlined'} onPress={() => setAddMode('INVITE')}>Invite</Button>
-                <Button mode={addMode === 'DIRECT' ? 'contained' : 'outlined'} onPress={() => setAddMode('DIRECT')}>Direct Create</Button>
-              </View>
-              
-              <PaperTextInput label="Email" value={email} onChangeText={setEmail} style={{ marginBottom: 10 }} />
-              <PaperTextInput label="Phone" value={phone} onChangeText={setPhone} style={{ marginBottom: 10 }} />
-              
-              {addMode === 'DIRECT' && (
-                <>
-                  <PaperTextInput label="Full Name" value={fullName} onChangeText={setFullName} style={{ marginBottom: 10 }} />
-                  <PaperTextInput label="Password" value={password} onChangeText={setPassword} secureTextEntry style={{ marginBottom: 10 }} />
-                  <PaperTextInput label="License/Cert Number" value={license} onChangeText={setLicense} style={{ marginBottom: 10 }} />
-                </>
-              )}
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button onPress={() => setShowAddModal(false)}>Cancel</Button>
-              <Button onPress={handleAddSubmit} loading={createParamedic.isPending || inviteUser.isPending}>Submit</Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
 
     </SafeAreaView>
   );

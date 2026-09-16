@@ -42,12 +42,12 @@ export default function NurseHomeScreen() {
   };
 
   const quickActions = {
-    onCheckInPress: () => navigate('/(nurse)/visits'),
+    onCheckInPress: () => navigate('/(nurse)/(tabs)/visits'),
     onPatientsPress: () => navigate('/(nurse)/patients'),
-    onBidsPress: () => navigate('/(nurse)/marketplace'),
-    onMessagesPress: () => navigate('/(nurse)/messages'),
-    onEmergencyPress: () => navigate('/(nurse)/visits'),
-    onScanQRPress: () => navigate('/(nurse)/visits'),
+    onBidsPress: () => navigate('/(nurse)/(tabs)/marketplace'),
+    onMessagesPress: () => navigate('/(nurse)/(tabs)/messages'),
+    onEmergencyPress: () => navigate('/(nurse)/(tabs)/visits'),
+    onScanQRPress: () => navigate('/(nurse)/(tabs)/visits'),
   };
 
   const filteredVisits = visits.filter((v: any) => {
@@ -135,7 +135,7 @@ export default function NurseHomeScreen() {
                 visitId={v.id}
                 patientName={v.request?.patient?.user?.fullName || 'Assigned Patient'}
                 scheduledTime={v.request?.scheduledAt ? new Date(v.request.scheduledAt).toLocaleString() : 'Scheduled'}
-                visitType={v.request?.type || 'NURSE_VISIT'}
+                visitType={v.request?.requirements || v.request?.type || 'NURSE_VISIT'}
                 status={v.status}
                 address={v.request?.patient?.address || 'Patient Address'}
                 onPress={() => navigate(`/(nurse)/visits/${v.id}`)}

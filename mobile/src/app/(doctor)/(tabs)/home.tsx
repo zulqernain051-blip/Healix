@@ -83,7 +83,7 @@ export default function DoctorDashboard() {
             mode="outlined"
             textColor="#00E676"
             style={{ borderRadius: RADIUS.md, borderColor: '#00E676', flex: 0.48 }}
-            onPress={() => navigate('/(doctor)/messages')}
+            onPress={() => navigate('/(doctor)/(tabs)/messages')}
             labelStyle={{ fontWeight: '700' }}
           >
             💬 Messages

@@ -10,7 +10,7 @@ export default function AdminEmergencyCenter() {
   const router = useRouter();
 
   // Active emergencies automatically refetch every 5000ms as per hook definition
-  const { data: emergencies, isLoading } = useAdminEmergencies();
+  const { data: emergencies, isLoading, isError } = useAdminEmergencies();
   
   const escalateMutation = useEscalateEmergency();
   const assignMutation = useAssignEmergencyDoctor();
@@ -30,6 +30,7 @@ export default function AdminEmergencyCenter() {
 
   const renderContent = () => {
     if (isLoading && !emergencies) return <ActivityIndicator color="#EF4444" style={{ marginTop: 20 }} />;
+    if (isError) return <Text style={{ color: '#EF4444', textAlign: 'center', marginTop: 20 }}>Error loading emergencies.</Text>;
     if (!emergencies?.length) return <Text style={styles.emptyText}>No active emergencies</Text>;
     
     return emergencies.map(em => (

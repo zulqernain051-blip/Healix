@@ -83,7 +83,7 @@ export default function PatientVisitsScreen() {
             >
               <View style={styles.cardHeader}>
                 <View style={styles.cardInfo}>
-                  <Text style={styles.cardType}>{req.type === 'NURSE_VISIT' ? '👩‍⚕️ Nurse Visit' : '🏥 Care Visit'}</Text>
+                  <Text style={styles.cardType}>{req.requirements || (req.type === 'NURSE_VISIT' ? '????? Nurse Visit' : '?? Care Visit')}</Text>
                   <Text style={styles.cardDate}>🕐 {scheduledAt}</Text>
                 </View>
                 {status && <VisitStatusBadge status={status} />}

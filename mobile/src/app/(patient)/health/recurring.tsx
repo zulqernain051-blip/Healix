@@ -57,7 +57,7 @@ export default function RecurringVisitSetupScreen() {
           {
             text: 'OK',
             onPress: () => {
-              navigate('/(patient)/requests');
+              navigate('/(patient)/(tabs)/requests');
             }
           }
         ]

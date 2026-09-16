@@ -31,7 +31,7 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, style }) => {
 
         <View style={styles.row}>
           <Text style={styles.label}>Service Type:</Text>
-          <Text style={styles.value}>{req.type.replace(/_/g, ' ')}</Text>
+          <Text style={styles.value}>{req.requirements || req.type.replace(/_/g, ' ')}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Scheduled:</Text>

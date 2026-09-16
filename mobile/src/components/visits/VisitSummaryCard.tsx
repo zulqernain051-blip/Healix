@@ -15,7 +15,7 @@ export const VisitSummaryCard: React.FC<VisitSummaryCardProps> = ({ visit, onPre
   const scheduledAt = visit.request?.scheduledAt
     ? new Date(visit.request.scheduledAt).toLocaleString()
     : 'Pending';
-  const visitType = visit.request?.type === 'NURSE_VISIT' ? '👩‍⚕️ Nurse Visit' : '🏥 Care Visit';
+  const visitType = visit.request?.requirements || (visit.request?.type === 'NURSE_VISIT' ? '????? Nurse Visit' : '?? Care Visit');
   const address = visit.request?.location?.address;
 
   return (

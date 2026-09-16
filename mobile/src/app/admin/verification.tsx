@@ -6,8 +6,8 @@ import { useAdminPendingNurses, useAdminPendingDoctors, useApproveNurse, useReje
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 export default function AdminVerification() {
-  const { data: pendingNurses = [], isLoading: isLoadingNurses } = useAdminPendingNurses();
-  const { data: pendingDoctors = [], isLoading: isLoadingDoctors } = useAdminPendingDoctors();
+  const { data: pendingNurses_raw, isLoading: isLoadingNurses  } = useAdminPendingNurses(); const pendingNurses = pendingNurses_raw?.users || [];
+  const { data: pendingDoctors_raw, isLoading: isLoadingDoctors  } = useAdminPendingDoctors(); const pendingDoctors = pendingDoctors_raw?.users || [];
 
   const { mutateAsync: approveNurse } = useApproveNurse();
   const { mutateAsync: rejectNurse } = useRejectNurse();

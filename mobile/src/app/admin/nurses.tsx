@@ -6,8 +6,8 @@ import { useAdminNurses, useAdminPendingNurses, useApproveNurse, useRejectNurse,
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 export default function AdminNurses() {
-  const { data: pendingNurses = [], isLoading: isLoadingPending } = useAdminPendingNurses();
-  const { data: nurses = [], isLoading: isLoadingNurses } = useAdminNurses();
+  const { data: pendingNurses_raw, isLoading: isLoadingPending  } = useAdminPendingNurses(); const pendingNurses = pendingNurses_raw?.users || [];
+  const { data: nurses_raw, isLoading: isLoadingNurses  } = useAdminNurses(); const nurses = nurses_raw?.users || [];
 
   const { mutateAsync: approveNurse } = useApproveNurse();
   const { mutateAsync: rejectNurse } = useRejectNurse();

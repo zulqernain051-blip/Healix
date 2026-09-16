@@ -17,11 +17,11 @@ export default function PatientRootLayout() {
   // Responsive sidebar for Web / Tablet layout
   if (isLargeScreen) {
     const navItems = [
-      { name: 'Dashboard', path: '/(patient)/home', icon: 'home-outline' },
-      { name: 'Requests', path: '/(patient)/requests', icon: 'document-text-outline' },
-      { name: 'Records', path: '/(patient)/records', icon: 'folder-open-outline' },
-      { name: 'Messages', path: '/(patient)/messages', icon: 'chatbubbles-outline' },
-      { name: 'Profile', path: '/(patient)/profile', icon: 'person-outline' },
+      { name: 'Dashboard', path: '/(patient)/(tabs)/home', icon: 'home-outline' },
+      { name: 'Requests', path: '/(patient)/(tabs)/requests', icon: 'document-text-outline' },
+      { name: 'Records', path: '/(patient)/(tabs)/records', icon: 'folder-open-outline' },
+      { name: 'Messages', path: '/(patient)/(tabs)/messages', icon: 'chatbubbles-outline' },
+      { name: 'Profile', path: '/(patient)/(tabs)/profile', icon: 'person-outline' },
     ];
 
     const currentActive = pathname;
@@ -45,7 +45,7 @@ export default function PatientRootLayout() {
 
           <View style={styles.navMenu}>
             {navItems.map((item: any) => {
-              const isActive = currentActive.startsWith(item.path) || (item.path === '/(patient)/home' && (currentActive === '/' || currentActive === '/(patient)'));
+              const isActive = currentActive.startsWith(item.path) || (item.path === '/(patient)/(tabs)/home' && (currentActive === '/' || currentActive === '/(patient)'));
               return (
                 <TouchableOpacity
                   key={item.path}

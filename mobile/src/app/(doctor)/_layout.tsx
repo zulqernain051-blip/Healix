@@ -16,10 +16,10 @@ export default function DoctorRootLayout() {
 
   if (isLargeScreen) {
     const navItems = [
-      { name: 'Case Queue', path: '/(doctor)/home', icon: 'medkit-outline' },
+      { name: 'Case Queue', path: '/(doctor)/(tabs)/home', icon: 'medkit-outline' },
       { name: 'Diagnosis Engine', path: '/(doctor)/diagnosis', icon: 'bulb-outline' },
-      { name: 'Messages & Consults', path: '/(doctor)/messages', icon: 'chatbubbles-outline' },
-      { name: 'Profile & PMDC', path: '/(doctor)/profile', icon: 'person-outline' },
+      { name: 'Messages & Consults', path: '/(doctor)/(tabs)/messages', icon: 'chatbubbles-outline' },
+      { name: 'Profile & PMDC', path: '/(doctor)/(tabs)/profile', icon: 'person-outline' },
     ];
 
     const currentActive = pathname;
@@ -43,7 +43,7 @@ export default function DoctorRootLayout() {
 
           <View style={styles.navMenu}>
             {navItems.map((item: any) => {
-              const isActive = currentActive.startsWith(item.path) || (item.path === '/(doctor)/home' && (currentActive === '/' || currentActive === '/(doctor)'));
+              const isActive = currentActive.startsWith(item.path) || (item.path === '/(doctor)/(tabs)/home' && (currentActive === '/' || currentActive === '/(doctor)'));
               return (
                 <TouchableOpacity
                   key={item.path}

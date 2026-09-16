@@ -10,8 +10,14 @@ export class AdminService {
   }
 
   static async getClinicalCases(status?: string) {
-    const { prisma } = require('../../../../common/config/database');
-    const where = status ? { status } : {};
+    const { prisma } = require('../../../common/config/database');
+    const where: any = {};
+    if (status === 'UNASSIGNED') {
+      where.doctorId = null;
+      where.status = { not: 'RESOLVED' };
+    } else if (status) {
+      where.status = status;
+    }
     return prisma.caseAssignment.findMany({
       where,
       include: {

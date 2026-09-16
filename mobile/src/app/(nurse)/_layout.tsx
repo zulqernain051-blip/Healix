@@ -16,11 +16,11 @@ export default function NurseRootLayout() {
 
   if (isLargeScreen) {
     const navItems = [
-      { name: 'Dashboard', path: '/(nurse)/home', icon: 'home-outline' },
-      { name: 'My Visits', path: '/(nurse)/visits', icon: 'medkit-outline' },
-      { name: 'Marketplace', path: '/(nurse)/marketplace', icon: 'briefcase-outline' },
-      { name: 'Messages', path: '/(nurse)/messages', icon: 'chatbubbles-outline' },
-      { name: 'Profile', path: '/(nurse)/profile', icon: 'person-outline' },
+      { name: 'Dashboard', path: '/(nurse)/(tabs)/home', icon: 'home-outline' },
+      { name: 'My Visits', path: '/(nurse)/(tabs)/visits', icon: 'medkit-outline' },
+      { name: 'Marketplace', path: '/(nurse)/(tabs)/marketplace', icon: 'briefcase-outline' },
+      { name: 'Messages', path: '/(nurse)/(tabs)/messages', icon: 'chatbubbles-outline' },
+      { name: 'Profile', path: '/(nurse)/(tabs)/profile', icon: 'person-outline' },
     ];
 
     const currentActive = pathname;
@@ -43,7 +43,7 @@ export default function NurseRootLayout() {
 
           <View style={styles.navMenu}>
             {navItems.map((item: any) => {
-              const isActive = currentActive.startsWith(item.path) || (item.path === '/(nurse)/home' && (currentActive === '/' || currentActive === '/(nurse)'));
+              const isActive = currentActive.startsWith(item.path) || (item.path === '/(nurse)/(tabs)/home' && (currentActive === '/' || currentActive === '/(nurse)'));
               return (
                 <TouchableOpacity
                   key={item.path}
@@ -71,6 +71,7 @@ export default function NurseRootLayout() {
             <Stack.Screen name="schedule" />
             <Stack.Screen name="sync" />
             <Stack.Screen name="marketplace" />
+      <Stack.Screen name="ai" />
       <Stack.Screen name="messages" />
       <Stack.Screen name="profile" />
       <Stack.Screen name="visits" />
@@ -87,6 +88,7 @@ export default function NurseRootLayout() {
       <Stack.Screen name="schedule" />
       <Stack.Screen name="sync" />
       <Stack.Screen name="marketplace" />
+      <Stack.Screen name="ai" />
       <Stack.Screen name="messages" />
       <Stack.Screen name="profile" />
       <Stack.Screen name="visits" />

@@ -52,7 +52,7 @@ export default function HealthRecordsScreen() {
       subtitle: 'Your care requests and visit history',
       icon: '📋',
       bgColor: 'rgba(245, 158, 11, 0.12)',
-      route: '/(patient)/requests',
+      route: '/(patient)/(tabs)/requests',
     },
     {
       id: 'care-plans',

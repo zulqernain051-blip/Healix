@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 
 /**
  * Type-safe navigation helper that wraps Expo Router.
- * Usage: `navigate('/(nurse)/home')` or `navigate('/(nurse)/visits', { id: '123' })`.
+ * Usage: `navigate('/(nurse)/(tabs)/home')` or `navigate('/(nurse)/(tabs)/visits', { id: '123' })`.
  */
 export const navigate = (path: string, params?: Record<string, unknown>) => {
   if (params) {

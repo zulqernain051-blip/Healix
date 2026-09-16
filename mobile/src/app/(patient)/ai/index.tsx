@@ -133,7 +133,7 @@ export default function AIAssistantScreen() {
     Alert.alert(
       '🚨 Emergency SOS Dispatch Triggered',
       'Connecting immediate triage escalation to on-call doctors and emergency contacts.',
-      [{ text: 'Return to Home', onPress: () => navigate('/(patient)/home') }]
+      [{ text: 'Return to Home', onPress: () => navigate('/(patient)/(tabs)/home') }]
     );
   };
 
@@ -143,7 +143,7 @@ export default function AIAssistantScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.headerRow}>
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigate('/(patient)/home')}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => navigate('/(patient)/(tabs)/home')}>
             <Text style={styles.backIcon}>‹</Text>
           </TouchableOpacity>
           <View style={styles.headerTitleWrap}>
