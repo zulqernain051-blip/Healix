@@ -4,10 +4,7 @@ import { notificationsApi } from '../api/notifications.api';
 export function useNotifications() {
   return useQuery({
     queryKey: ['notifications'],
-    queryFn: async () => {
-      const res = await notificationsApi.getNotifications();
-      return res.data.data;
-    },
+    queryFn: notificationsApi.getNotifications,
     refetchInterval: 15000,
   });
 }

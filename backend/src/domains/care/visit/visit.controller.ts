@@ -1,8 +1,8 @@
-import { Request, Response } from 'express';
-import { VisitRepository } from './visit.repository';
+import { Request, Response, NextFunction } from 'express';
+import { GetVisitDetailUseCase } from './lifecycle/get-visit-detail.usecase';
+import { VisitAccessPolicy } from './shared/policies/visit-access.policy';
 import {
   GetNurseVisitsUseCase,
-  CompleteVisitUseCase,
   SaveNotesUseCase
 } from './lifecycle';
 
@@ -36,33 +36,30 @@ import {
 } from './visit.validation';
 
 export class VisitController {
-  public static async getNurseVisits(req: Request, res: Response) {
+  public static async getNurseVisits(req: Request, res: Response, next: NextFunction) {
     try {
       const { nurseId } = req.params;
       const useCase = new GetNurseVisitsUseCase();
+      VisitAccessPolicy.assertOwnNurse(nurseId, (req as any).user);
       const visits = await useCase.execute({ nurseId });
       res.json({ success: true, data: visits });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getVisitDetail(req: Request, res: Response) {
+  public static async getVisitDetail(req: Request, res: Response, next: NextFunction) {
     try {
       const { visitId } = req.params;
-      const visit = await VisitRepository.findVisitById(visitId);
-      if (!visit) {
-        res.status(404).json({ success: false, message: 'Visit not found' });
-        return;
-      }
+      const visit = await new GetVisitDetailUseCase().execute(visitId, (req as any).user);
       res.json({ success: true, data: visit });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
 
-  public static async completeVisit(req: Request, res: Response) {
+  public static async completeVisit(req: Request, res: Response, next: NextFunction) {
     try {
       const { visitId } = req.params;
       const nurseId = (req as any).user?.nurse?.id;
@@ -81,11 +78,11 @@ export class VisitController {
 
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async saveNotes(req: Request, res: Response) {
+  public static async saveNotes(req: Request, res: Response, next: NextFunction) {
     try {
       const { visitId } = req.params;
       const nurseId = (req as any).user?.nurse?.id;
@@ -94,17 +91,17 @@ export class VisitController {
         return;
       }
 
-      visitNotesSchema.parse(req.body);
+      const { notes } = visitNotesSchema.parse(req.body);
       const useCase = new SaveNotesUseCase();
-      const result = await useCase.execute({ visitId, nurseId, notes: req.body.notes });
+      const result = await useCase.execute({ visitId, nurseId, notes });
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
 
-  public static async submitVitals(req: Request, res: Response) {
+  public static async submitVitals(req: Request, res: Response, next: NextFunction) {
     try {
       const { visitId } = req.params;
       const nurseId = (req as any).user?.nurse?.id;
@@ -113,16 +110,16 @@ export class VisitController {
         return;
       }
 
-      vitalsSchema.parse(req.body);
+      const data = vitalsSchema.parse(req.body);
       const useCase = new SubmitVitalsUseCase();
-      const result = await useCase.execute({ visitId, nurseId, data: req.body });
+      const result = await useCase.execute({ visitId, nurseId, data });
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async submitSymptoms(req: Request, res: Response) {
+  public static async submitSymptoms(req: Request, res: Response, next: NextFunction) {
     try {
       const { visitId } = req.params;
       const nurseId = (req as any).user?.nurse?.id;
@@ -131,16 +128,16 @@ export class VisitController {
         return;
       }
 
-      symptomSchema.parse(req.body);
+      const { symptoms } = symptomSchema.parse(req.body);
       const useCase = new SubmitSymptomsUseCase();
-      const result = await useCase.execute({ visitId, nurseId, symptoms: req.body.symptoms });
+      const result = await useCase.execute({ visitId, nurseId, symptoms });
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async submitClinicalRemarks(req: Request, res: Response) {
+  public static async submitClinicalRemarks(req: Request, res: Response, next: NextFunction) {
     try {
       const { visitId } = req.params;
       const nurseId = (req as any).user?.nurse?.id;
@@ -149,21 +146,21 @@ export class VisitController {
         return;
       }
 
-      clinicalRemarkSchema.parse(req.body);
+      const { remarksText, confidenceLevel } = clinicalRemarkSchema.parse(req.body);
       const useCase = new SubmitClinicalRemarksUseCase();
-      const result = await useCase.execute({ 
-        visitId, 
-        nurseId, 
-        remarksText: req.body.remarksText, 
-        confidenceLevel: req.body.confidenceLevel 
+      const result = await useCase.execute({
+        visitId,
+        nurseId,
+        remarksText,
+        confidenceLevel
       });
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async submitReview(req: Request, res: Response) {
+  public static async submitReview(req: Request, res: Response, next: NextFunction) {
     try {
       const { visitId } = req.params;
       const patientId = (req as any).user?.patient?.id;
@@ -172,54 +169,54 @@ export class VisitController {
         return;
       }
 
-      ratingSchema.parse(req.body);
+      const { stars, reviewText, recommend } = ratingSchema.parse(req.body);
       const useCase = new SubmitReviewUseCase();
       const result = await useCase.execute({
-        visitId, 
-        patientId, 
-        stars: req.body.stars, 
-        reviewText: req.body.reviewText, 
-        recommend: req.body.recommend
+        visitId,
+        patientId,
+        stars,
+        reviewText,
+        recommend
       });
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getNurseReviews(req: Request, res: Response) {
+  public static async getNurseReviews(req: Request, res: Response, next: NextFunction) {
     try {
       const { nurseId } = req.params;
       const useCase = new GetNurseReviewsUseCase();
       const reviews = await useCase.execute({ nurseId });
       res.json({ success: true, data: reviews });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getNurseScore(req: Request, res: Response) {
+  public static async getNurseScore(req: Request, res: Response, next: NextFunction) {
     try {
       const { nurseId } = req.params;
       const useCase = new GetNurseScoreUseCase();
       const score = await useCase.execute({ nurseId });
       res.json({ success: true, data: score });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getNurseBadges(req: Request, res: Response) {
+  public static async getNurseBadges(req: Request, res: Response, next: NextFunction) {
     try {
       const { nurseId } = req.params;
       const useCase = new GetNurseBadgesUseCase();
       const badges = await useCase.execute({ nurseId });
       res.json({ success: true, data: badges });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
-  public static async createVacation(req: Request, res: Response) {
+  public static async createVacation(req: Request, res: Response, next: NextFunction) {
     try {
       const { nurseId } = req.params;
       const userNurseId = (req as any).user?.nurse?.id;
@@ -240,22 +237,23 @@ export class VisitController {
 
       res.json({ success: true, data: vacation });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getVacations(req: Request, res: Response) {
+  public static async getVacations(req: Request, res: Response, next: NextFunction) {
     try {
       const { nurseId } = req.params;
       const useCase = new GetVacationsUseCase();
+      VisitAccessPolicy.assertOwnNurse(nurseId, (req as any).user);
       const vacations = await useCase.execute({ nurseId });
       res.json({ success: true, data: vacations });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async deleteVacation(req: Request, res: Response) {
+  public static async deleteVacation(req: Request, res: Response, next: NextFunction) {
     try {
       const { nurseId, vacationId } = req.params;
       const userNurseId = (req as any).user?.nurse?.id;
@@ -269,7 +267,7 @@ export class VisitController {
 
       res.json({ success: true, message: 'Vacation deleted successfully' });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 }

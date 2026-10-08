@@ -1,3 +1,4 @@
+import { AssertPatientAccessUseCase } from './usecases/profile/assert-patient-access.usecase';
 import { GetClinicalOutcomesUseCase } from './usecases/clinical/get-clinical-outcomes.usecase';
 import { GetActiveEmergencyUseCase } from './usecases/emergency/get-active-emergency.usecase';
 import { Request, Response } from 'express';
@@ -60,8 +61,12 @@ const getDashboardSummaryUseCase = new GetDashboardSummaryUseCase();
  * Helper utility to enforce resource ownership and prevent cross-user data tampering.
  */
 const checkOwnership = async (req: Request, targetPatientId: string) => {
+  await AssertPatientAccessUseCase.execute(targetPatientId, (req as any).user);
+};
+
+const checkPatientSelfOrAdmin = async (req: Request, targetPatientId: string) => {
   const user = (req as any).user;
-  if (['ADMIN', 'NURSE', 'DOCTOR', 'PARAMEDIC'].includes(user.role)) return;
+  if (user.role === 'ADMIN') return;
 
   if (user.role === 'PATIENT') {
     const patient = await getProfileByUserIdUseCase.execute(user.id);
@@ -71,7 +76,7 @@ const checkOwnership = async (req: Request, targetPatientId: string) => {
     return;
   }
 
-  throw new AppError('Access denied.', HTTP_STATUS.FORBIDDEN);
+  throw new AppError('Access denied. Only the patient or an administrator can modify this profile.', HTTP_STATUS.FORBIDDEN);
 };
 
 export const getProfileController = asyncHandler(async (req: Request, res: Response) => {
@@ -89,7 +94,7 @@ export const searchUserByPhoneController = asyncHandler(async (req: Request, res
 
 export const updateProfileController = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  await checkOwnership(req, id);
+  await checkPatientSelfOrAdmin(req, id);
   const user = (req as any).user;
   const result = await updateProfileUseCase.execute(id, user.id, req.body);
   return sendSuccessResponse(res, 'Patient profile updated successfully.', result, HTTP_STATUS.OK);
@@ -97,14 +102,14 @@ export const updateProfileController = asyncHandler(async (req: Request, res: Re
 
 export const addEmergencyContactController = asyncHandler(async (req: Request, res: Response) => {
   const { id } = req.params;
-  await checkOwnership(req, id);
+  await checkPatientSelfOrAdmin(req, id);
   const result = await addEmergencyContactUseCase.execute(id, req.body);
   return sendSuccessResponse(res, 'Emergency contact added successfully.', result, HTTP_STATUS.CREATED);
 });
 
 export const deleteEmergencyContactController = asyncHandler(async (req: Request, res: Response) => {
   const { id, contactId } = req.params;
-  await checkOwnership(req, id);
+  await checkPatientSelfOrAdmin(req, id);
   await deleteEmergencyContactUseCase.execute(id, contactId);
   return sendSuccessResponse(res, 'Emergency contact deleted successfully.', null, HTTP_STATUS.OK);
 });

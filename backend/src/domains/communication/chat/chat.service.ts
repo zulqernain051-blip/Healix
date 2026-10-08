@@ -216,11 +216,27 @@ export class ChatService {
         where: {
           patientId,
           paramedicId,
-          status: { in: ['PENDING', 'IN_TRANSIT', 'ACCEPTED', 'DISPATCHED'] }
+          status: { in: ['PENDING', 'DISPATCHED', 'EN_ROUTE', 'ARRIVED'] }
         }
       });
       if (!dispatch) {
         throw new AppError('No active ambulance dispatch found', 403);
+      }
+    } else if (roles.has('NURSE') && roles.has('PARAMEDIC')) {
+      type = 'NURSE_PARAMEDIC';
+      const nurseId = user1.role === 'NURSE' ? user1.nurse?.id : user2.nurse?.id;
+      const paramedicId = user1.role === 'PARAMEDIC' ? user1.paramedic?.id : user2.paramedic?.id;
+      if (!nurseId || !paramedicId) throw new AppError('Invalid nurse/paramedic record', 400);
+
+      const { prisma } = require('../../../common/config/database');
+      const dispatch = await prisma.ambulanceDispatch.findFirst({
+        where: {
+          paramedicId,
+          status: { in: ['PENDING', 'DISPATCHED', 'EN_ROUTE', 'ARRIVED'] }
+        }
+      });
+      if (!dispatch) {
+        throw new AppError('No active ambulance dispatch found for this paramedic', 403);
       }
     } else {
       throw new AppError('Communication between these roles is not supported', HTTP_STATUS.BAD_REQUEST);

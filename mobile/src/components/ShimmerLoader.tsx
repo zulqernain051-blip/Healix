@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { Animated, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { COLORS } from '../theme';
 
 interface ShimmerLoaderProps {

@@ -1,66 +1,23 @@
-import { prisma } from '../../../../common/config/database';
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-
-
+import { AppError } from '../../../../common/errors/AppError';
+import { RegisterInvitedPayload } from '../auth.types';
+import { InvitationRepository } from '../invitation.repository';
 
 export class RegisterInvitedUseCase {
-  static async execute(data: any) {
+  static async execute(data: RegisterInvitedPayload) {
     const tokenHash = crypto.createHash('sha256').update(data.invitationToken).digest('hex');
-
-    const invitation = await prisma.invitation.findUnique({ where: { tokenHash } });
-    if (!invitation) throw { statusCode: 400, message: 'Invalid invitation token.' };
-    if (invitation.usedAt) throw { statusCode: 400, message: 'Invitation has already been used.' };
-    if (invitation.expiresAt < new Date()) throw { statusCode: 400, message: 'Invitation has expired.' };
-
-    if (invitation.email && data.email !== invitation.email) {
-      throw { statusCode: 400, message: 'Email does not match invitation.' };
+    const invitation = await InvitationRepository.findByTokenHash(tokenHash);
+    if (!invitation) throw new AppError('Invalid invitation token.', 400);
+    if (invitation.usedAt) throw new AppError('Invitation has already been used.', 400);
+    if (invitation.expiresAt <= new Date()) throw new AppError('Invitation has expired.', 400);
+    if (!['DOCTOR','PARAMEDIC','ADMIN','NURSE','PATIENT'].includes(invitation.role)) throw new AppError('Unsupported invitation role.', 400);
+    if (invitation.email && data.email.trim().toLowerCase() !== invitation.email.trim().toLowerCase()) {
+      throw new AppError('Email does not match invitation.', 400);
     }
-    if (invitation.phone && data.phone !== invitation.phone) {
-      throw { statusCode: 400, message: 'Phone does not match invitation.' };
-    }
-
+    if (invitation.phone && data.phone !== invitation.phone) throw new AppError('Phone does not match invitation.', 400);
+    if (['DOCTOR','PARAMEDIC','NURSE'].includes(invitation.role) && !data.professionalId) throw new AppError('Professional credential is required.', 400);
     const passwordHash = await bcrypt.hash(data.password, 12);
-
-    return await prisma.$transaction(async (tx: any) => {
-      const user = await tx.user.create({
-        data: {
-          email: data.email,
-          phone: data.phone,
-          fullName: data.fullName,
-          passwordHash,
-          role: invitation.role, // Enforced from invitation
-          status: 'PENDING_VERIFICATION', // Will need admin approval to activate credentials
-        }
-      });
-
-      if (invitation.role === 'DOCTOR') {
-        await tx.doctor.create({
-          data: {
-            userId: user.id,
-            pmdcNumber: data.professionalId || '',
-            specialization: data.specialization || 'General',
-            experienceYears: 0,
-            verificationStatus: 'PENDING',
-          }
-        });
-      } else if (invitation.role === 'PARAMEDIC') {
-        await tx.paramedic.create({
-          data: {
-            userId: user.id,
-            certificationNumber: data.professionalId || '',
-            verificationStatus: 'PENDING',
-            currentHospitalId: null,
-          }
-        });
-      }
-
-      await tx.invitation.update({
-        where: { id: invitation.id },
-        data: { usedAt: new Date() }
-      });
-
-      return { user };
-    });
+    return InvitationRepository.register(invitation.id, invitation.role, data, passwordHash);
   }
 }

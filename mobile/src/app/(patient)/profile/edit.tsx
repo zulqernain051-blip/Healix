@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { localDateTime } from '../../../utils/dates';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -11,7 +13,7 @@ import { TextInput, Button, Text, HelperText } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { usePatientProfile, useUpdatePatientProfile } from '../../../hooks/usePatient';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, COLORS } from '../../../theme';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
 
@@ -26,6 +28,7 @@ export default function ProfileEditScreen() {
   const [dob, setDob] = useState('');
   const [gender, setGender] = useState('');
   const [address, setAddress] = useState('');
+  const [city,setCity] = useState('');
   const [latitude, setLatitude] = useState('');
   const [longitude, setLongitude] = useState('');
 
@@ -35,6 +38,7 @@ export default function ProfileEditScreen() {
       setDob(patientProfile.dob ? new Date(patientProfile.dob).toISOString().split('T')[0] : '');
       setGender(patientProfile.gender || '');
       setAddress(patientProfile.address || '');
+      setCity(patientProfile.city || '');
       setLatitude(patientProfile.latitude?.toString() || '');
       setLongitude(patientProfile.longitude?.toString() || '');
     }
@@ -42,14 +46,14 @@ export default function ProfileEditScreen() {
 
   const isDobValid = (val: string) => {
     if (!val) return true;
-    return /^\d{4}-\d{2}-\d{2}$/.test(val);
+    const parsed = localDateTime(val); return !!parsed && parsed.getTime() <= Date.now();
   };
 
   const isFormValid = () => {
     if (fullName.trim().length < 3) return false;
     if (dob && !isDobValid(dob)) return false;
-    if (latitude && isNaN(Number(latitude))) return false;
-    if (longitude && isNaN(Number(longitude))) return false;
+    if (latitude && (!Number.isFinite(Number(latitude)) || Math.abs(Number(latitude)) > 90)) return false;
+    if (longitude && (!Number.isFinite(Number(longitude)) || Math.abs(Number(longitude)) > 180)) return false;
     return true;
   };
 
@@ -60,19 +64,21 @@ export default function ProfileEditScreen() {
       fullName: fullName.trim(),
       gender: gender.trim() || undefined,
       address: address.trim() || undefined,
+      city: city.trim() || null,
       dob: dob ? new Date(dob) : undefined,
     };
 
-    if (latitude.trim()) payload.latitude = Number(latitude);
-    if (longitude.trim()) payload.longitude = Number(longitude);
+    if (latitude.trim() && longitude.trim()) { payload.latitude=Number(latitude);payload.longitude=Number(longitude); }
+    else if (!latitude.trim() && !longitude.trim()) {payload.latitude=null;payload.longitude=null;}
+    else {appAlert('Location incomplete','Enter both coordinates or clear both.');return;}
 
     try {
       await updateProfile({ patientId, data: payload });
       await loadUser(); // Update global auth user name just in case
-      Alert.alert('Success', 'Profile updated successfully.');
+      appAlert('Success', 'Profile updated successfully.');
       navigate('/(patient)/(tabs)/profile');
     } catch (err: any) {
-      Alert.alert('Update Failed', err.message || 'Could not update profile.');
+      appAlert('Update Failed', err.message || 'Could not update profile.');
     }
   };
 
@@ -143,12 +149,13 @@ export default function ProfileEditScreen() {
             theme={{ colors: { onSurfaceVariant: '#94A3B8' } }}
           />
 
+          <TextInput mode="outlined" label="City (visible in the nurse marketplace)" value={city} onChangeText={setCity} textColor={COLORS.textPrimary} style={styles.input} />
           <TextInput
             label="Address"
             value={address}
             placeholder="e.g. House 12, Street 5, DHA Phase 6"
             placeholderTextColor="#6B8E8A"
-            onChangeText={setAddress}
+            onChangeText={value=>{setAddress(value);setLatitude('');setLongitude('');}}
             mode="outlined"
             multiline
             numberOfLines={2}

@@ -11,11 +11,15 @@ export async function seedAdmin() {
 
     if (adminCount === 0) {
       logger.info('[SEED] No admin user detected. Seeding default admin account...');
-      const passwordHash = await bcrypt.hash('Admin@1234', 10);
+      const password = process.env.ADMIN_BOOTSTRAP_PASSWORD;
+      const email = process.env.ADMIN_BOOTSTRAP_EMAIL;
+      if (!password || !email) { logger.warn('[SEED] Configure ADMIN_BOOTSTRAP_EMAIL and ADMIN_BOOTSTRAP_PASSWORD to create the first administrator.'); return; }
+      if (password.length < 12) throw new Error('Bootstrap administrator password must be at least 12 characters');
+      const passwordHash = await bcrypt.hash(password, 12);
       
       await prisma.user.create({
         data: {
-          email: 'admin@healix.pk',
+          email: email.trim().toLowerCase(),
           phone: '+923000000000',
           fullName: 'Healix System Administrator',
           passwordHash,
@@ -24,7 +28,7 @@ export async function seedAdmin() {
           admin: { create: {} }
         }
       });
-      logger.info('[SEED] Default admin seeded: admin@healix.pk (Admin@1234)');
+      logger.info('[SEED] Administrator created; credentials are not logged.');
     }
 
     // Seed default configs

@@ -34,6 +34,8 @@ model User {
   deactivationReason      String?
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
+  emailVerificationRequired Boolean                @default(false)
+  emailVerifiedAt          DateTime?
   mfaEnabled              Boolean                  @default(false)
   mfaSecret               String?
   auditLogsAsActor        AdminAuditLog[]          @relation("AuditActor")
@@ -66,6 +68,7 @@ model Patient {
   cnic                String               @unique
   dob                 DateTime?
   gender              String?
+  city String?
   address             String?
   latitude            Float?
   longitude           Float?
@@ -282,6 +285,7 @@ model Allergy {
 }
 
 model Medication {
+  scheduledDoses MedicationDose[]
   id             String          @id @default(uuid())
   patientId      String
   name           String
@@ -348,6 +352,7 @@ model CareRequest {
 model Visit {
   id               String              @id @default(uuid())
   requestId        String
+  sourceContractId String?
   nurseId          String?
   doctorId         String?
   notes            String?
@@ -357,6 +362,8 @@ model Visit {
   status           String              @default("SCHEDULED")
   nurseConfirmed   Boolean             @default(false)
   patientConfirmed Boolean             @default(false)
+  completionApprovedAt DateTime?
+  completionDisputeReason String?
   agreedStartTime  DateTime?
   assignmentLogs   AssignmentLog[]
   attendanceRecord AttendanceRecord?
@@ -412,6 +419,8 @@ model RiskAssessment {
 }
 
 model CarePlan {
+  version Int @default(1)
+  revisions CarePlanVersion[]
   id          String              @id @default(uuid())
   patientId   String
   title       String
@@ -473,6 +482,9 @@ model PrescriptionItem {
 }
 
 model Payment {
+  commissionAmount Float?
+  commissionRecordedAt DateTime?
+  commissionReference String?
   id        String      @id @default(uuid())
   requestId String      @unique
   amount    Float
@@ -497,6 +509,10 @@ model NurseQualification {
 }
 
 model NurseSpecialization {
+  proficiencyRating Int?
+  assessmentNotes String?
+  assessedBy String?
+  assessedAt DateTime?
   id             String   @id @default(uuid())
   nurseId        String
   specialization String
@@ -706,6 +722,8 @@ model AssignmentLog {
 }
 
 model MedicationLog {
+  scheduledDoseId String? @unique
+  scheduledDose MedicationDose? @relation(fields: [scheduledDoseId], references: [id], onDelete: SetNull)
   id           String     @id @default(uuid())
   medicationId String
   patientId    String
@@ -773,6 +791,7 @@ model Contract {
   nurseId         String
   sourceOfferId   String?            @unique
   careRequestId   String?            @unique
+  originalCareRequestId String?
   price           Float
   priceType       String             @default("HOURLY")
   scopeText       String
@@ -951,16 +970,37 @@ model DisputeCase {
 }
 
 model EmergencyEvent {
-  id        String   @id @default(uuid())
-  patientId String
-  visitId   String?
-  source    String
-  severity  String
-  createdAt DateTime @default(now())
-  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  visit     Visit?   @relation(fields: [visitId], references: [id])
+  id               String              @id @default(uuid())
+  patientId        String
+  visitId          String?
+  source           String              // 'DOCTOR', 'CHAT', 'EXTERNAL_1122'
+  severity         String              @default("CRITICAL")
+  status           String              @default("ACTIVE") // 'ACTIVE', 'RESOLVED', 'CANCELLED'
+  slaDeadline      DateTime?
+  assignedDoctorId String?
+  resolvedAt       DateTime?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @default(now()) @updatedAt
+  patient          Patient             @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  visit            Visit?              @relation(fields: [visitId], references: [id])
+  dispatches       AmbulanceDispatch[]
 
   @@map("emergency_events")
+}
+
+model Ambulance {
+  id            String              @id @default(uuid())
+  vehicleNumber String              @unique
+  plateNumber   String              @unique
+  type          String              @default("BASIC") // BASIC, ADVANCED, ICU
+  provider      String?             @default("Healix Fleet")
+  contactNumber String?
+  status        String              @default("AVAILABLE") // AVAILABLE, DISPATCHED, INACTIVE
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @default(now()) @updatedAt
+  dispatches    AmbulanceDispatch[]
+
+  @@map("ambulances")
 }
 
 model Hospital {
@@ -978,19 +1018,30 @@ model Hospital {
 }
 
 model AmbulanceDispatch {
-  id                String      @id @default(uuid())
+  id                String          @id @default(uuid())
+  emergencyEventId  String?
   patientId         String
   triggeredByUserId String
   hospitalId        String
+  ambulanceId       String?
   paramedicId       String?
-  status            String      @default("PENDING")
-  etaMinutes        Int         @default(15)
-  dispatchedAt      DateTime    @default(now())
+  status            String          @default("DISPATCHED") // PENDING, DISPATCHED, EN_ROUTE, ARRIVED, COMPLETED, CANCELLED
+  etaMinutes        Int             @default(15)
+  dispatchedAt      DateTime        @default(now())
+  arrivedAt         DateTime?
+  completedAt       DateTime?
+  notes             String?
+  latitude          Float?
+  longitude         Float?
+  locationUpdatedAt DateTime?
+  etaUpdatedAt      DateTime?
   admissions        Admission[]
-  hospital          Hospital    @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
-  paramedic         Paramedic?  @relation(fields: [paramedicId], references: [id])
-  patient           Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  triggeredByUser   User        @relation(fields: [triggeredByUserId], references: [id], onDelete: Cascade)
+  emergencyEvent    EmergencyEvent? @relation(fields: [emergencyEventId], references: [id], onDelete: SetNull)
+  ambulance         Ambulance?      @relation(fields: [ambulanceId], references: [id], onDelete: SetNull)
+  hospital          Hospital        @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  paramedic         Paramedic?      @relation(fields: [paramedicId], references: [id])
+  patient           Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  triggeredByUser   User            @relation(fields: [triggeredByUserId], references: [id], onDelete: Cascade)
 
   @@map("ambulance_dispatches")
 }
@@ -1116,4 +1167,58 @@ model Paramedic {
   ambulanceDispatches AmbulanceDispatch[]
 
   @@map("paramedics")
+}
+
+model CarePlanVersion {
+ id String @id @default(uuid())
+ carePlanId String
+ version Int
+ changedBy String
+ reason String
+ snapshot Json
+ createdAt DateTime @default(now())
+ carePlan CarePlan @relation(fields: [carePlanId], references: [id], onDelete: Cascade)
+ @@unique([carePlanId, version])
+ @@map("care_plan_versions")
+}
+model MedicationDose {
+ id String @id @default(uuid())
+ medicationId String
+ scheduledAt DateTime
+ status String @default("PENDING")
+ medication Medication @relation(fields: [medicationId], references: [id], onDelete: Cascade)
+ log MedicationLog?
+ @@unique([medicationId, scheduledAt])
+ @@map("medication_doses")
+}
+
+model SupportCase {
+ id String @id @default(uuid())
+ requestKey String @unique
+ patientId String
+ kind String
+ paymentId String?
+ visitId String?
+ amount Float?
+ status String @default("OPEN")
+ reason String
+ decisionNotes String?
+ externalReference String?
+ createdBy String
+ handledBy String?
+ resolvedAt DateTime?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ @@index([patientId,status])
+ @@map("support_cases")
+}
+model RolePermission {
+ role Role
+ feature String
+ operation String
+ allowed Boolean
+ updatedBy String
+ updatedAt DateTime @updatedAt
+ @@id([role,feature,operation])
+ @@map("role_permissions")
 }

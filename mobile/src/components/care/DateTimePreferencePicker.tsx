@@ -50,27 +50,28 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
 
   const webInputStyle = {
     padding: '12px',
-    borderRadius: '8px',
-    border: `1px solid ${COLORS.border}`,
-    backgroundColor: '#000000',
-    color: '#FFFFFF',
-    fontSize: '16px',
+    borderRadius: '12px',
+    border: `1px solid rgba(255, 255, 255, 0.60)`,
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    color: COLORS.textDark,
+    fontSize: '15px',
     width: '100%',
     fontFamily: 'inherit',
-    colorScheme: 'dark',
   };
+
+  const localDate = (date: Date) => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
 
   return (
     <View style={styles.container}>
-      {!isRecurring && (
+      {(
         <View style={styles.section}>
-          <Text style={styles.label}>Preferred Date *</Text>
+          <Text style={styles.label}>{isRecurring ? 'Start Date *' : 'Preferred Date *'}</Text>
           {Platform.OS === 'web' ? (
             <input 
               type="date" 
               style={webInputStyle}
-              min={new Date().toISOString().split('T')[0]}
-              value={selectedDate ? selectedDate.toISOString().split('T')[0] : ''}
+              min={localDate(new Date())}
+              value={selectedDate ? localDate(selectedDate) : ''}
               onChange={(e) => {
                 if (e.target.value) {
                   const [y, m, d] = e.target.value.split('-');
@@ -96,38 +97,6 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
       <View style={styles.section}>
         <Text style={styles.label}>Preferred Time (Choose One) *</Text>
         
-        {/* Specific Time Picker */}
-        {Platform.OS === 'web' ? (
-            <input 
-              type="time" 
-              style={webInputStyle}
-              value={selectedTime ? selectedTime.toTimeString().substring(0,5) : ''}
-              onChange={(e) => {
-                if (e.target.value) {
-                  const [h, m] = e.target.value.split(':');
-                  const d = new Date();
-                  d.setHours(parseInt(h), parseInt(m), 0, 0);
-                  handleConfirmTime(d);
-                }
-              }}
-            />
-        ) : (
-          <TouchableOpacity
-            style={[styles.pickerButton, selectedTime && styles.pickerButtonActive]}
-            onPress={() => setTimePickerVisibility(true)}
-            activeOpacity={0.7}
-          >
-            <Text style={selectedTime ? styles.pickerTextActive : styles.placeholderText}>
-              {selectedTime
-                ? `Specific Time: ${selectedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-                : 'Select a specific time'}
-            </Text>
-            <Text style={styles.icon}>🕒</Text>
-          </TouchableOpacity>
-        )}
-
-        <Text style={styles.orText}>- OR -</Text>
-
         {/* Time Windows */}
         <View style={styles.windowGrid}>
           {TIME_WINDOWS.map((win) => {
@@ -149,10 +118,7 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
       </View>
 
       {Platform.OS === 'web' ? (
-        <View style={{ display: 'none' }}>
-          {/* We use hidden inputs with refs or just inline on-change for Web if we were using raw HTML, but in React Native Web we can use createElement or just rely on native input types if we map them. 
-          Actually, React Native Web supports type="date" on TextInput! */}
-        </View>
+        <View style={{ display: 'none' }} />
       ) : (
         <>
           <DateTimePickerModal
@@ -186,46 +152,33 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   label: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
+    fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '600',
+    color: COLORS.textDark,
+    marginBottom: SPACING.xs,
   },
   pickerButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: 'rgba(255, 255, 255, 0.60)',
     borderRadius: RADIUS.md,
     padding: SPACING.md,
   },
-  pickerButtonActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '10',
-  },
   pickerText: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.text,
-  },
-  pickerTextActive: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.primary,
-    fontWeight: '600',
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: '400',
+    color: COLORS.textDark,
   },
   placeholderText: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textSecondary,
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: '400',
+    color: COLORS.textBody,
   },
   icon: {
     fontSize: 18,
-  },
-  orText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginVertical: SPACING.sm,
   },
   windowGrid: {
     flexDirection: 'row',
@@ -236,20 +189,21 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: RADIUS.round,
-    backgroundColor: '#000000',
+    backgroundColor: 'rgba(255, 255, 255, 0.40)',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.60)',
   },
   windowPillActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    backgroundColor: COLORS.accentBlue,
+    borderColor: COLORS.accentBlue,
   },
   windowText: {
-    ...TYPOGRAPHY.bodySmall,
-    color: '#FFFFFF',
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: '500',
+    color: COLORS.textDark,
   },
   windowTextActive: {
-    color: COLORS.background,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
 });

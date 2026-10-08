@@ -17,7 +17,7 @@ export class CreateParamedicUseCase {
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          email, phone, fullName, passwordHash, role: 'PARAMEDIC', status: 'ACTIVE',
+          email, phone, fullName, passwordHash, role: 'PARAMEDIC', status: 'ACTIVE', emailVerificationRequired: false,
           paramedic: {
             create: {
               cnic,

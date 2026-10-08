@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, ScrollView, StyleSheet, Alert, ActivityIndicator, Platform } from 'react-native';
 import { Card, Button, Text, Divider, Portal, Dialog } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
@@ -8,19 +8,16 @@ import { DiagnosisForm } from '../../../components/doctor/DiagnosisForm';
 import { PrescriptionForm } from '../../../components/doctor/PrescriptionForm';
 import { FollowUpForm } from '../../../components/doctor/FollowUpForm';
 import { CarePlanForm } from '../../../components/doctor/CarePlanForm';
+import { ClinicalDecisionForm } from '../../../components/doctor/ClinicalDecisionForm';
 
-const COLORS = {
-  bg: '#0A1628', card: '#111D35', border: '#1E2D4A', teal: '#0D9488',
-  emerald: '#10B981', amber: '#F59E0B', blue: '#3B82F6', red: '#EF4444',
-  textPrimary: '#F1F5F9', textSecondary: '#94A3B8', textMuted: '#475569'
-};
+import { COLORS } from '../../../theme';
 
 export default function DoctorActionScreen() {
   const { id, form } = useLocalSearchParams();
   const caseId = id as string;
   const initialForm = (form as string) || 'NONE';
 
-  const { data: caseReview, isLoading } = useCaseReview(caseId);
+  const { data: caseReview, isLoading, error, refetch } = useCaseReview(caseId);
   const { mutateAsync: resolveCase, isPending: isResolving } = useResolveCase();
 
   // Map the form query param to the correct form state
@@ -38,13 +35,16 @@ export default function DoctorActionScreen() {
   const [activeForm, setActiveForm] = useState<'NONE' | 'DIAGNOSIS' | 'PRESCRIPTION' | 'FOLLOWUP' | 'CAREPLAN' | 'DECISION'>(getInitialForm());
   const [showResolveDialog, setShowResolveDialog] = useState(false);
 
-  if (isLoading || !caseReview) {
+  if (isLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={COLORS.teal} />
+        <ActivityIndicator size="large" color={COLORS.navy} />
       </View>
     );
   }
+
+  if (!caseReview) return <View style={styles.container}><Text style={styles.value}>{(error as Error)?.message || 'Case unavailable'}</Text><Button onPress={() => void refetch()}>Retry</Button><Button onPress={goBack}>Back</Button></View>;
+  if (!caseReview.case.doctorId || !['ASSIGNED', 'IN_REVIEW'].includes(caseReview.case.status)) return <View style={styles.container}><Text style={styles.value}>Clinical actions require an active case assigned to you.</Text><Button onPress={() => navigate(`/(doctor)/reviews/${caseId}`)}>View case</Button></View>;
 
   const handleResolve = async () => {
     try {
@@ -65,17 +65,17 @@ export default function DoctorActionScreen() {
   };
 
   const patientName = caseReview.case.visit?.request?.patient?.user?.fullName || 'Unknown Patient';
-  
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button icon="arrow-left" labelStyle={{ color: COLORS.teal }} onPress={() => goBack()}>Back</Button>
+        <Button icon="arrow-left" labelStyle={{ color: COLORS.navy }} onPress={() => goBack()}>Back</Button>
         <Text style={styles.headerTitle}>Clinical Actions</Text>
         <View style={{ width: 60 }} />
       </View>
 
       <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 40 }}>
-        
+
         {/* Case Summary */}
         <Card style={styles.card}>
           <Card.Content>
@@ -99,41 +99,42 @@ export default function DoctorActionScreen() {
 
         {activeForm === 'NONE' && (
           <View style={styles.actionGrid}>
-            <Button 
-              mode="outlined" 
-              icon="stethoscope" 
-              style={styles.actionBtn} 
-              textColor={COLORS.teal} 
+            <Button mode="outlined" icon="ambulance" onPress={() => setActiveForm('DECISION')}>Clinical Decision / Emergency Dispatch</Button>
+            <Button
+              mode="outlined"
+              icon="stethoscope"
+              style={styles.actionBtn}
+              textColor={COLORS.navy}
               onPress={() => setActiveForm('DIAGNOSIS')}
             >
               Add Diagnosis
             </Button>
-            
-            <Button 
-              mode="outlined" 
-              icon="pill" 
-              style={styles.actionBtn} 
-              textColor={COLORS.teal} 
+
+            <Button
+              mode="outlined"
+              icon="pill"
+              style={styles.actionBtn}
+              textColor={COLORS.navy}
               onPress={() => setActiveForm('PRESCRIPTION')}
             >
               Add Prescription
             </Button>
-            
-            <Button 
-              mode="outlined" 
-              icon="clipboard-pulse" 
-              style={styles.actionBtn} 
-              textColor={COLORS.teal} 
+
+            <Button
+              mode="outlined"
+              icon="clipboard-pulse"
+              style={styles.actionBtn}
+              textColor={COLORS.navy}
               onPress={() => setActiveForm('CAREPLAN')}
             >
               Create Care Plan
             </Button>
 
-            <Button 
-              mode="outlined" 
-              icon="calendar-plus" 
-              style={styles.actionBtn} 
-              textColor={COLORS.teal} 
+            <Button
+              mode="outlined"
+              icon="calendar-plus"
+              style={styles.actionBtn}
+              textColor={COLORS.navy}
               onPress={() => setActiveForm('FOLLOWUP')}
             >
               Schedule Follow-up
@@ -143,55 +144,40 @@ export default function DoctorActionScreen() {
 
         {/* Dynamic Forms */}
         {activeForm === 'DIAGNOSIS' && (
-          <DiagnosisForm 
-            caseId={caseId} 
-            onComplete={() => setActiveForm('NONE')} 
-            onCancel={() => setActiveForm('NONE')} 
+          <DiagnosisForm
+            caseId={caseId}
+            onComplete={() => setActiveForm('NONE')}
+            onCancel={() => setActiveForm('NONE')}
           />
         )}
 
         {activeForm === 'FOLLOWUP' && (
-          <FollowUpForm 
-            caseId={caseId} 
+          <FollowUpForm
+            caseId={caseId}
             hasCurrentNurse={false}
-            onComplete={() => setActiveForm('NONE')} 
-            onCancel={() => setActiveForm('NONE')} 
+            onComplete={() => setActiveForm('NONE')}
+            onCancel={() => setActiveForm('NONE')}
           />
         )}
-  
+
 
         {activeForm === 'PRESCRIPTION' && (
-          <PrescriptionForm 
-            caseId={caseId} 
-            onComplete={() => setActiveForm('NONE')} 
-            onCancel={() => setActiveForm('NONE')} 
+          <PrescriptionForm
+            caseId={caseId}
+            onComplete={() => setActiveForm('NONE')}
+            onCancel={() => setActiveForm('NONE')}
           />
         )}
 
         {activeForm === 'CAREPLAN' && (
-          <CarePlanForm 
-            caseId={caseId} 
-            onComplete={() => setActiveForm('NONE')} 
-            onCancel={() => setActiveForm('NONE')} 
+          <CarePlanForm
+            caseId={caseId}
+            onComplete={() => setActiveForm('NONE')}
+            onCancel={() => setActiveForm('NONE')}
           />
         )}
 
-        {activeForm === 'DECISION' && (
-          <Card style={{ backgroundColor: COLORS.card, borderColor: COLORS.border, borderWidth: 1, marginBottom: 16 }}>
-            <Card.Content>
-              <Text style={{ color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', marginBottom: 12 }}>Final Clinical Decision</Text>
-              <Text style={{ color: COLORS.textSecondary, fontSize: 13, lineHeight: 20, marginBottom: 16 }}>
-                Once you have completed all diagnoses, prescriptions, and care plans, use the "Resolve Case" button below to close this case from your active queue.
-              </Text>
-              <Button mode="contained" buttonColor={COLORS.emerald} onPress={() => setShowResolveDialog(true)}>
-                Resolve Case
-              </Button>
-              <Button mode="text" onPress={() => setActiveForm('NONE')} textColor={COLORS.textSecondary} style={{ marginTop: 8 }}>
-                Back to Actions
-              </Button>
-            </Card.Content>
-          </Card>
-        )}
+        {activeForm === 'DECISION' && <ClinicalDecisionForm caseId={caseId} patient={caseReview.case.visit.request.patient} onCancel={() => setActiveForm('NONE')} />}
 
         {activeForm === 'NONE' && (
           <View style={styles.resolveSection}>
@@ -199,9 +185,9 @@ export default function DoctorActionScreen() {
             <Text style={styles.helperText}>
               Once you have finished adding diagnoses, prescriptions, or care plans, resolve the case to remove it from your active queue.
             </Text>
-            <Button 
-              mode="contained" 
-              buttonColor={COLORS.emerald} 
+            <Button
+              mode="contained"
+              buttonColor={COLORS.emerald}
               style={styles.resolveBtn}
               onPress={() => setShowResolveDialog(true)}
             >
@@ -214,16 +200,16 @@ export default function DoctorActionScreen() {
 
       {/* Confirmation Dialog */}
       <Portal>
-        <Dialog visible={showResolveDialog} onDismiss={() => setShowResolveDialog(false)} style={{ backgroundColor: COLORS.card }}>
-          <Dialog.Title style={{ color: COLORS.textPrimary }}>Resolve Clinical Case?</Dialog.Title>
+        <Dialog visible={showResolveDialog} onDismiss={() => setShowResolveDialog(false)} style={{ backgroundColor: COLORS.surfaceCard }}>
+          <Dialog.Title style={{ color: COLORS.textDark }}>Resolve Clinical Case?</Dialog.Title>
           <Dialog.Content>
-            <Text style={{ color: COLORS.textSecondary }}>
+            <Text style={{ color: COLORS.textBody }}>
               You have completed your review and clinical actions.
               Resolving this case will remove it from your active queue.
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowResolveDialog(false)} textColor={COLORS.textSecondary} disabled={isResolving}>Cancel</Button>
+            <Button onPress={() => setShowResolveDialog(false)} textColor={COLORS.textBody} disabled={isResolving}>Cancel</Button>
             <Button onPress={handleResolve} textColor={COLORS.emerald} loading={isResolving} disabled={isResolving}>Resolve Case</Button>
           </Dialog.Actions>
         </Dialog>
@@ -234,19 +220,19 @@ export default function DoctorActionScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: COLORS.card, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  headerTitle: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: COLORS.surface },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: COLORS.surfaceCard, borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder },
+  headerTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold' },
   scrollContent: { padding: 16 },
-  sectionTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: 12 },
-  card: { backgroundColor: COLORS.card, marginBottom: 16, borderColor: COLORS.border, borderWidth: 1 },
+  sectionTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '600', marginBottom: 12 },
+  card: { backgroundColor: COLORS.surfaceCard, marginBottom: 16, borderColor: COLORS.inputBorder, borderWidth: 1 },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  label: { color: COLORS.textSecondary, fontSize: 14 },
-  value: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '500' },
+  label: { color: COLORS.textBody, fontSize: 14 },
+  value: { color: COLORS.textDark, fontSize: 14, fontWeight: '500' },
   actionGrid: { gap: 12, marginBottom: 24 },
-  actionBtn: { borderColor: COLORS.teal, borderWidth: 1, paddingVertical: 4 },
+  actionBtn: { borderColor: COLORS.navy, borderWidth: 1, paddingVertical: 4 },
   resolveSection: { marginTop: 16 },
-  divider: { backgroundColor: COLORS.border, marginBottom: 16 },
+  divider: { backgroundColor: COLORS.inputBorder, marginBottom: 16 },
   helperText: { color: COLORS.textMuted, fontSize: 12, textAlign: 'center', marginBottom: 16 },
   resolveBtn: { paddingVertical: 6 }
 });

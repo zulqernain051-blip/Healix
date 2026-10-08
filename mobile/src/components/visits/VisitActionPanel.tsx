@@ -27,7 +27,7 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
     return (
       <Card style={styles.card}>
         <Card.Content>
-          <Text style={styles.sectionHeader}>🛡️ Identity Verification Required</Text>
+          <Text style={styles.sectionHeader}>Identity Verification Required</Text>
           <Divider style={styles.divider} />
           <Text style={styles.description}>
             Verify patient identity using QR Code scan, GPS proximity, or manual verification before recording clinical data.
@@ -55,7 +55,7 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
     return (
       <Card style={styles.card}>
         <Card.Content>
-          <Text style={styles.sectionHeader}>🩺 Clinical Workflow</Text>
+          <Text style={styles.sectionHeader}>Clinical Workflow</Text>
           <Divider style={styles.divider} />
           <Text style={styles.description}>
             Record vitals, document symptoms, and submit clinical remarks to complete the visit.
@@ -68,7 +68,7 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
               onPress={onRecordVitals}
               labelStyle={styles.btnLabel}
             >
-              {hasVitals ? '✓ Vitals Recorded' : '1. Record Vitals'}
+              {hasVitals ? 'Vitals Recorded' : '1. Record Vitals'}
             </Button>
             <Button
               mode="contained"
@@ -77,7 +77,7 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
               onPress={onRecordSymptoms}
               labelStyle={styles.btnLabel}
             >
-              {hasSymptoms ? '✓ Symptoms Logged' : '2. Symptoms Checklist'}
+              {hasSymptoms ? 'Symptoms Logged' : '2. Symptoms Checklist'}
             </Button>
             <Button
               mode="contained"
@@ -86,7 +86,7 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
               onPress={onRecordRemarks}
               labelStyle={styles.btnLabel}
             >
-              {hasRemarks ? '✓ Remarks Submitted' : '3. Clinical Remarks'}
+              {hasRemarks ? 'Remarks Submitted' : '3. Clinical Remarks'}
             </Button>
             <Button
               mode="contained"
@@ -98,7 +98,7 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
               style={{ marginTop: 8 }}
               labelStyle={styles.btnLabel}
             >
-              ✓ Complete Visit
+              Complete Visit
             </Button>
           </View>
         </Card.Content>
@@ -110,12 +110,12 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
     return (
       <Card style={styles.card}>
         <Card.Content>
-          <Text style={styles.sectionHeader}>✅ Visit Completed</Text>
+          <Text style={styles.sectionHeader}>Visit Completed</Text>
           <Divider style={styles.divider} />
-          <Text style={styles.summaryText}>✓ Patient Identity Verified</Text>
-          {(visit.vitals?.length ?? 0) > 0 && <Text style={styles.summaryText}>✓ Vitals Recorded</Text>}
-          {(visit.symptoms?.length ?? 0) > 0 && <Text style={styles.summaryText}>✓ Symptoms Logged</Text>}
-          {visit.clinicalRemark && <Text style={styles.summaryText}>✓ Clinical Remarks Submitted</Text>}
+          <Text style={styles.summaryText}>Patient Identity Verified</Text>
+          {(visit.vitals?.length ?? 0) > 0 && <Text style={styles.summaryText}>Vitals Recorded</Text>}
+          {(visit.symptoms?.length ?? 0) > 0 && <Text style={styles.summaryText}>Symptoms Logged</Text>}
+          {visit.clinicalRemark && <Text style={styles.summaryText}>Clinical Remarks Submitted</Text>}
           {visit.completedAt && (
             <Text style={styles.completedAt}>
               Completed: {new Date(visit.completedAt).toLocaleString()}

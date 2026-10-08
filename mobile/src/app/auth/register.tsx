@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView, Platform } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
@@ -21,7 +21,6 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [cnic, setCnic] = useState('');
   const [pncNumber, setPncNumber] = useState('');
-  const [pmdcNumber, setPmdcNumber] = useState('');
   
   const [secureTextEntry, setSecureTextEntry] = useState(true);
   const registerMutation = useRegister();
@@ -77,6 +76,7 @@ export default function RegisterScreen() {
   };
 
   const isFormValid = () => {
+    if (!['PATIENT', 'NURSE'].includes(role)) return false;
     if (!fullName.trim() || fullName.trim().length < 3) return false;
     if (!isEmailValid(email)) return false;
     if (!isPhoneValid(phone)) return false;
@@ -87,9 +87,6 @@ export default function RegisterScreen() {
     }
     if (role === 'NURSE') {
       if (!pncNumber.trim()) return false;
-    }
-    if (role === 'DOCTOR') {
-      if (!pmdcNumber.trim()) return false;
     }
     
     return true;
@@ -112,10 +109,6 @@ export default function RegisterScreen() {
     if (role === 'NURSE') {
       payload.pncNumber = pncNumber.trim();
     }
-    if (role === 'DOCTOR') {
-      payload.pmdcNumber = pmdcNumber.trim();
-    }
-
     registerMutation.mutate(payload, {
       onSuccess: () => {
         navigate('/auth/verify-otp', { emailOrPhone: email.trim() });
@@ -249,26 +242,6 @@ export default function RegisterScreen() {
             {pncNumber.length > 0 && !pncNumber.trim() && (
               <HelperText type="error" visible={true} style={styles.fieldError}>
                 PNC registration number is required
-              </HelperText>
-            )}
-          </>
-        )}
-
-        {role === 'DOCTOR' && (
-          <>
-            <TextInput
-              label="PMDC Registration Number"
-              value={pmdcNumber}
-              onChangeText={(val) => { setPmdcNumber(val); if (error) registerMutation.reset(); }}
-              mode="outlined"
-              error={pmdcNumber.length > 0 && !pmdcNumber.trim()}
-              style={styles.input}
-              outlineColor="#E5E7EB"
-              activeOutlineColor="#0D9488"
-            />
-            {pmdcNumber.length > 0 && !pmdcNumber.trim() && (
-              <HelperText type="error" visible={true} style={styles.fieldError}>
-                PMDC registration number is required
               </HelperText>
             )}
           </>

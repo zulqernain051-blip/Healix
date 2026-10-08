@@ -1,44 +1,30 @@
-import { CareRepository } from '../../../requests/care.repository';
-import { ClinicalRepository } from '../../clinical.repository';
-import { CompliancePolicy } from '../../policies/compliance.policy';
-
+import { prisma } from '../../../../../common/config/database';
+import { AssertPatientAccessUseCase, PatientActor } from '../../../../identity/patient/usecases/profile/assert-patient-access.usecase';
+const DAY = 86400000;
 export class GetComplianceMetricsUseCase {
-  constructor(private readonly careRepository = CareRepository,
-    private readonly clinicalRepository = ClinicalRepository) {}
-
-  async execute(patientId: string) {
-    const trailing30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-
-    const scheduledRequests = await this.careRepository.countCareRequests({
-      patientId,
-      scheduledAt: { gt: trailing30Days },
-      status: { in: ['ASSIGNED', 'IN_PROGRESS', 'COMPLETED'] }
-    });
-
-    const completedRequests = await this.careRepository.countCareRequests({
-      patientId,
-      scheduledAt: { gt: trailing30Days },
-      status: 'COMPLETED'
-    });
-
-    const visitCompliance = CompliancePolicy.calculateVisitCompliance(scheduledRequests, completedRequests);
-    const complianceFlag = CompliancePolicy.determineComplianceFlag(visitCompliance);
-
-    const activeMedications = await this.clinicalRepository.findActiveMedications(patientId);
-    const medicationLogs = await this.clinicalRepository.findMedicationLogsInRange(patientId, trailing30Days);
-
-    const activeMedsCount = activeMedications.length;
-    const uniqueLoggedMedsCount = new Set(medicationLogs.map((l: any) => l.medicationId)).size;
-    
-    const medicationCompliance = CompliancePolicy.calculateMedicationCompliance(activeMedsCount, uniqueLoggedMedsCount);
-
-    return {
-      visitCompliance: Math.round(visitCompliance),
-      medicationCompliance: Math.round(medicationCompliance),
-      complianceFlag,
-      trend: CompliancePolicy.determineTrend(visitCompliance)
-    };
-  }
+ async execute(patientId: string, actor: PatientActor) {
+  await AssertPatientAccessUseCase.execute(patientId, actor);
+  const now = new Date(), since = new Date(now.getTime() - 30 * DAY), previous = new Date(now.getTime() - 60 * DAY);
+  const [visits, doses] = await Promise.all([
+   prisma.visit.findMany({ where: { request: { patientId }, status: { notIn: ['CANCELLED', 'DECLINED'] }, OR: [{ agreedStartTime: { gte: previous, lte: now } }, { agreedStartTime: null, request: { scheduledAt: { gte: previous, lte: now } } }] }, select: { status: true, agreedStartTime: true, request: { select: { scheduledAt: true } } } }),
+   prisma.medicationDose.findMany({ where: { medication: { patientId }, scheduledAt: { gte: since, lte: now } }, include: { log: true } })
+  ]);
+  const currentVisits = visits.filter(visit => (visit.agreedStartTime || visit.request.scheduledAt)!.getTime() >= since.getTime());
+  const priorVisits = visits.filter(visit => (visit.agreedStartTime || visit.request.scheduledAt)!.getTime() < since.getTime());
+  const completedVisits = currentVisits.filter(visit => visit.status === 'COMPLETED').length;
+  const ratio = (done: number, total: number) => total ? Math.round(done / total * 100) : null;
+  const visitCompliance = ratio(completedVisits, currentVisits.length);
+  const priorRatio = ratio(priorVisits.filter(visit => visit.status === 'COMPLETED').length, priorVisits.length);
+  const takenDoses = doses.filter(dose => dose.status === 'TAKEN' && dose.log).length;
+  const timelyDoses = doses.filter(dose => dose.log && Math.abs(dose.log.takenAt.getTime() - dose.scheduledAt.getTime()) <= 2 * 3600000).length;
+  return {
+   visitCompliance, medicationCompliance: ratio(takenDoses, doses.length), medicationTimingCompliance: ratio(timelyDoses, doses.length),
+   completedVisits, dueVisits: currentVisits.length, takenDoses, dueDoses: doses.length,
+   medicationTimingBasis: 'Recorded within two hours of the scheduled time; an informational measure, not a clinical dosing recommendation',
+   unscheduledMedications: await prisma.medication.count({ where: { patientId, active: true, scheduledDoses: { none: {} } } }),
+   complianceFlag: visitCompliance == null ? 'NO_DATA' : visitCompliance < 70 ? 'AT_RISK' : 'ON_TRACK',
+   trend: visitCompliance == null || priorRatio == null ? 'INSUFFICIENT_DATA' : visitCompliance - priorRatio > 5 ? 'UP' : priorRatio - visitCompliance > 5 ? 'DOWN' : 'STABLE',
+   period: { start: since.toISOString(), end: now.toISOString() }
+  };
+ }
 }
-
-

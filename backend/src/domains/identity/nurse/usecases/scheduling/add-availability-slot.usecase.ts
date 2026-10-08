@@ -9,6 +9,7 @@ export class AddAvailabilitySlotUseCase {
     dayOfWeek: number;
     startTime: string;
     endTime: string;
+    shiftType?: string;
   }) {
     const nurse = await NurseRepository.findNurseById(nurseId);
     if (!nurse) {

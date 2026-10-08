@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar, TextInput } from 'react-native';
 import { Card, Button } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
 import { useAdminConfig, useUpdateAdminConfig } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminConfig() {
   const { data: configs = [], isLoading } = useAdminConfig();

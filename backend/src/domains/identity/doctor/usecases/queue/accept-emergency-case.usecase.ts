@@ -1,8 +1,9 @@
+import { prisma } from '../../../../../common/config/database';
 import { DoctorRepository } from '../../doctor.repository';
 import { AppError } from '../../../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../../../common/constants/index';
 
-let getIo: any = () => undefined; try { const { ChatSocketService } = require("../../../../../communication/chat/chat.socket"); getIo = () => ChatSocketService.getIo(); } catch(e) {}
+let getIo: any = () => undefined; try { const { ChatSocketService } = require("../../../../communication/chat/chat.socket"); getIo = () => ChatSocketService.getIo(); } catch(e) {}
 
 export class AcceptEmergencyCaseUseCase {
   constructor(private readonly doctorRepository = DoctorRepository) {}
@@ -15,8 +16,6 @@ export class AcceptEmergencyCaseUseCase {
     
     // Auto-create Chat Thread for Doctor Assignment
     try {
-      const { PrismaClient } = require('@prisma/client');
-      const prisma = new PrismaClient();
       const doctor = await prisma.doctor.findUnique({ where: { id: doctorId }, select: { userId: true } });
       if (doctor?.userId) {
         const { ChatAutoCreator } = require('../../../../communication/chat/chat.auto-creator');

@@ -72,6 +72,7 @@ export const useResetPassword = () => {
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: authApi.changePassword,
+    onSuccess: () => useAuthStore.getState().clearSession(),
   });
 };
 

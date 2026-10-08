@@ -1,11 +1,14 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import { protect, restrictTo } from '../../../common/middleware/authMiddleware';
 import * as ctrl from './admin.controller';
+import { AmbulanceController } from '../../care/emergency/ambulance/ambulance.controller';
+import operationsRouter from './admin-operations.routes';
 
 const router = Router();
 
 // All admin routes require authentication and ADMIN role
 router.use(protect, restrictTo('ADMIN'));
+router.use(operationsRouter);
 
 // â”€â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 router.get('/stats', ctrl.getDashboardStats);
@@ -69,12 +72,23 @@ router.get('/cases/high-risk', ctrl.getHighRiskCases);
 // â”€â”€â”€ Emergency Center â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 router.get('/emergencies', ctrl.getEmergencies);
 router.post('/emergencies/:id/assign-doctor', ctrl.assignEmergencyDoctor);
+router.post('/emergencies/:id/assign-paramedic', ctrl.assignEmergencyParamedic);
+router.post('/emergencies/:id/assign-ambulance', ctrl.assignEmergencyAmbulance);
+router.put('/emergencies/:id/resolve', ctrl.resolveEmergency);
+router.put('/emergencies/:id/escalate', ctrl.escalateEmergency);
 
 // â”€â”€â”€ Healthcare Network â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 router.get('/hospitals', ctrl.getHospitals);
 router.post('/hospitals', ctrl.createHospital);
 router.put('/hospitals/:id', ctrl.updateHospital);
 router.delete('/hospitals/:id', ctrl.deleteHospital);
+
+// Ambulance Fleet Registry
+router.get('/ambulances', AmbulanceController.getAmbulances);
+router.post('/ambulances', AmbulanceController.createAmbulance);
+router.get('/ambulances/:id', AmbulanceController.getAmbulanceById);
+router.put('/ambulances/:id', AmbulanceController.updateAmbulance);
+router.delete('/ambulances/:id', AmbulanceController.deleteAmbulance);
 
 // â”€â”€â”€ Reviews / Moderation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 router.get('/reviews', ctrl.getNurseReviews);

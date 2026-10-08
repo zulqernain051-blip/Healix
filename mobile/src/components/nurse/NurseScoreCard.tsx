@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+
 
 interface NurseScoreCardProps {
+  skillAssessmentCount?: number;
   compositeScore: number;
   skillScore: number;
   experienceScore: number;
@@ -12,6 +13,7 @@ interface NurseScoreCardProps {
 }
 
 export const NurseScoreCard: React.FC<NurseScoreCardProps> = ({
+  skillAssessmentCount,
   compositeScore,
   skillScore,
   experienceScore,
@@ -19,7 +21,7 @@ export const NurseScoreCard: React.FC<NurseScoreCardProps> = ({
   performanceScore,
 }) => {
   const metrics = [
-    { label: 'Clinical Skill', score: skillScore, color: '#00E676' },
+    { label: 'Assessed Skill', score: skillScore, color: '#00E676' },
     { label: 'Experience', score: experienceScore, color: '#3B82F6' },
     { label: 'Reliability', score: reliabilityScore, color: '#F59E0B' },
     { label: 'Performance', score: performanceScore, color: '#A855F7' },
@@ -27,7 +29,7 @@ export const NurseScoreCard: React.FC<NurseScoreCardProps> = ({
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Skill Score Breakdown (Feature 3.8)</Text>
+      <Text style={styles.title}>Performance and assessed skills</Text>
 
       <View style={styles.compositeRow}>
         <View style={styles.scoreCircle}>
@@ -40,7 +42,7 @@ export const NurseScoreCard: React.FC<NurseScoreCardProps> = ({
             <View key={m.label} style={styles.barGroup}>
               <View style={styles.barLabelRow}>
                 <Text style={styles.barLabel}>{m.label}</Text>
-                <Text style={[styles.barValue, { color: m.color }]}>{Math.round(m.score)}</Text>
+                <Text style={[styles.barValue, { color: m.color }]}>{m.label === 'Assessed Skill' && !skillAssessmentCount ? 'Not assessed' : Math.round(m.score)}</Text>
               </View>
               <View style={styles.barTrack}>
                 <View style={[styles.barFill, { width: `${Math.min(Math.round(m.score), 100)}%` as any, backgroundColor: m.color }]} />

@@ -12,7 +12,9 @@ export interface User {
   patientId?: string;
   nurseId?: string;
   doctorId?: string;
+  doctor?: { pmdcNumber: string; verificationStatus: string; bio?: string | null; emergencyAvailable: boolean; isProfessional: boolean };
   adminId?: string;
+  paramedicId?: string;
 }
 
 export interface AuthTokens {

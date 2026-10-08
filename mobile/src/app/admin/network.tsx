@@ -1,131 +1,39 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
-import { Text, Card, Appbar, Button, Portal, Dialog, TextInput, IconButton, Switch } from 'react-native-paper';
-import { useRouter } from 'expo-router';
-import { 
-  useAdminHospitals, useCreateHospital, useUpdateHospital, useDeleteHospital
-} from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS } from '../../theme';
+import { useState } from 'react';
+import { ScrollView, View, StyleSheet } from 'react-native';
+import { Appbar, Button, Card, Chip, Dialog, Portal, Text, TextInput, Switch, Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { adminApi } from '../../api/admin.api';
+import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { goBack, navigate } from '../../utils/navigation';
 
+const empty = { name: '', latitude: '', longitude: '', capacityStatus: 'AVAILABLE', affordabilityTier: 'LOW', isCharity: false };
 export default function AdminNetworkOperations() {
-  const router = useRouter();
-
-  const { data: hospitals, isLoading: loadHosp } = useAdminHospitals();
-  const createHosp = useCreateHospital();
-  const updateHosp = useUpdateHospital();
-  const deleteHosp = useDeleteHospital();
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  
-  // Hospital Form
-  const [hName, setHName] = useState('');
-  const [hLat, setHLat] = useState('');
-  const [hLng, setHLng] = useState('');
-  const [hCapStatus, setHCapStatus] = useState('NORMAL');
-  const [hAffordability, setHAffordability] = useState('STANDARD');
-  const [hIsCharity, setHIsCharity] = useState(false);
-
-  const openModal = (item?: any) => {
-    if (item) {
-      setEditingId(item.id);
-      setHName(item.name);
-      setHLat(String(item.latitude || ''));
-      setHLng(String(item.longitude || ''));
-      setHCapStatus(item.capacityStatus || 'NORMAL');
-      setHAffordability(item.affordabilityTier || 'STANDARD');
-      setHIsCharity(!!item.isCharity);
-    } else {
-      setEditingId(null);
-      setHName(''); setHLat(''); setHLng('');
-      setHCapStatus('NORMAL'); setHAffordability('STANDARD'); setHIsCharity(false);
-    }
-    setModalVisible(true);
+  const client = useQueryClient();
+  const query = useQuery({ queryKey: ['admin', 'hospitals'], queryFn: adminApi.getHospitals });
+  const [edit, setEdit] = useState<any>(null);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [remove, setRemove] = useState<string | null>(null);
+  const save = async () => {
+    setBusy(true); setError('');
+    try {
+      if (!edit.name.trim() || !String(edit.latitude).trim() || !String(edit.longitude).trim()) throw new Error('Name and location are required');
+      const data = { name: edit.name, latitude: Number(edit.latitude), longitude: Number(edit.longitude), capacityStatus: edit.capacityStatus, affordabilityTier: edit.affordabilityTier, isCharity: edit.isCharity };
+      if (edit.id) await adminApi.updateHospital(edit.id, data); else await adminApi.createHospital(data);
+      await client.invalidateQueries({ queryKey: ['admin', 'hospitals'] }); setEdit(null);
+    } catch (e: any) { setError(e.message); } finally { setBusy(false); }
   };
-
-  const handleSave = () => {
-    const data = { 
-      name: hName, 
-      latitude: parseFloat(hLat) || 0, 
-      longitude: parseFloat(hLng) || 0,
-      capacityStatus: hCapStatus,
-      affordabilityTier: hAffordability,
-      isCharity: hIsCharity
-    };
-    if (editingId) updateHosp.mutate({ id: editingId, data });
-    else createHosp.mutate(data);
-    setModalVisible(false);
-  };
-
-  const renderContent = () => {
-    if (loadHosp) return <ActivityIndicator color="#00E676" style={{ marginTop: 20 }} />;
-    return hospitals?.map(h => (
-      <Card key={h.id} style={styles.card}>
-        <Card.Content>
-          <View style={styles.row}>
-            <Text style={styles.cardTitle}>{h.name}</Text>
-            <View style={{ flexDirection: 'row' }}>
-              <IconButton icon="pencil" size={20} iconColor="#3B82F6" onPress={() => openModal(h)} />
-              <IconButton icon="delete" size={20} iconColor="#EF4444" onPress={() => deleteHosp.mutate(h.id)} />
-            </View>
-          </View>
-          <Text style={styles.cardSub}>Location: {h.latitude}, {h.longitude}</Text>
-          <Text style={styles.cardSub}>Capacity Status: {h.capacityStatus}</Text>
-          <Text style={styles.cardSub}>Affordability: {h.affordabilityTier} {h.isCharity ? '(Charity)' : ''}</Text>
-        </Card.Content>
-      </Card>
-    ));
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <Appbar.Header style={{ backgroundColor: '#061C19' }}>
-        <Appbar.BackAction onPress={() => router.back()} color="#FFF" />
-        <Appbar.Content title="Healthcare Network" titleStyle={{ color: '#FFF' }} />
-        <Appbar.Action icon="plus" color="#00E676" onPress={() => openModal()} />
-      </Appbar.Header>
-      
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionTitle}>Hospitals & Medical Centers</Text>
-        {renderContent()}
-      </ScrollView>
-
-      <Portal>
-        <Dialog visible={modalVisible} onDismiss={() => setModalVisible(false)} style={{ backgroundColor: '#0A2D28' }}>
-          <Dialog.Title style={{ color: '#FFF' }}>
-            {editingId ? 'Edit Hospital' : 'Add Hospital'}
-          </Dialog.Title>
-          <Dialog.Content>
-            <ScrollView>
-              <TextInput label="Name" value={hName} onChangeText={setHName} style={styles.input} textColor="#FFF" theme={{ colors: { primary: '#00E676', text: '#FFF', placeholder: '#94A3B8' } }} />
-              <TextInput label="Latitude" value={hLat} onChangeText={setHLat} keyboardType="numeric" style={styles.input} textColor="#FFF" theme={{ colors: { primary: '#00E676', text: '#FFF', placeholder: '#94A3B8' } }} />
-              <TextInput label="Longitude" value={hLng} onChangeText={setHLng} keyboardType="numeric" style={styles.input} textColor="#FFF" theme={{ colors: { primary: '#00E676', text: '#FFF', placeholder: '#94A3B8' } }} />
-              <TextInput label="Capacity Status (e.g. NORMAL, FULL)" value={hCapStatus} onChangeText={setHCapStatus} style={styles.input} textColor="#FFF" theme={{ colors: { primary: '#00E676', text: '#FFF', placeholder: '#94A3B8' } }} />
-              <TextInput label="Affordability (e.g. STANDARD, PREMIUM)" value={hAffordability} onChangeText={setHAffordability} style={styles.input} textColor="#FFF" theme={{ colors: { primary: '#00E676', text: '#FFF', placeholder: '#94A3B8' } }} />
-              <View style={styles.switchRow}>
-                <Text style={{ color: '#FFF' }}>Is Charity Hospital?</Text>
-                <Switch value={hIsCharity} onValueChange={setHIsCharity} color="#00E676" />
-              </View>
-            </ScrollView>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={() => setModalVisible(false)} textColor="#94A3B8">Cancel</Button>
-            <Button onPress={handleSave} textColor="#00E676">Save</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Portal>
-    </SafeAreaView>
-  );
+  return <PaperProvider theme={{ ...MD3LightTheme, colors: { ...MD3LightTheme.colors, primary: COLORS.navy } }}><View style={styles.root}><Appbar.Header style={styles.header}><Appbar.BackAction color={COLORS.headerText} onPress={goBack} /><Appbar.Content title="Hospital Network" color={COLORS.headerText} /></Appbar.Header><ScrollView contentContainerStyle={styles.content}>
+    <Button onPress={() => navigate('/admin/ambulances')}>Open Ambulance Fleet & Dispatches</Button><Button mode="contained" onPress={() => { setError(''); setEdit({ ...empty }); }}>Add Hospital</Button>
+    {(error || query.error) && <Text accessibilityRole="alert" style={styles.error}>{error || (query.error as Error).message}</Text>}
+    {query.isLoading && <Text>Loading hospitals…</Text>}
+    {query.data?.map(h => <Card style={styles.card} key={h.id}><Card.Content><Text style={styles.title}>{h.name}</Text><Text>{h.latitude}, {h.longitude}</Text><Text>Capacity: {h.capacityStatus} · Budget: {h.affordabilityTier} {h.isCharity && '· Charity'}</Text><Text>Update capacity after confirming with the hospital.</Text></Card.Content><Card.Actions><Button onPress={() => { setError(''); setEdit({ ...h, latitude: String(h.latitude), longitude: String(h.longitude) }); }}>Edit / Capacity</Button><Button onPress={() => setRemove(h.id)}>Delete</Button></Card.Actions></Card>)}
+    {!query.isLoading && !query.data?.length && <Text>No hospitals registered.</Text>}
+  </ScrollView><Portal><Dialog visible={!!edit} onDismiss={() => !busy && setEdit(null)}><Dialog.Title>Hospital Details</Dialog.Title><Dialog.Content>
+    {['name', 'latitude', 'longitude'].map(key => <TextInput key={key} label={key} value={edit?.[key] || ''} onChangeText={value => setEdit((current: any) => ({ ...current, [key]: value }))} keyboardType={key === 'name' ? 'default' : 'numbers-and-punctuation'} style={styles.input} />)}
+    <Text>Capacity</Text><View style={styles.row}>{['AVAILABLE', 'LIMITED', 'FULL'].map(capacityStatus => <Chip key={capacityStatus} selected={edit?.capacityStatus === capacityStatus} onPress={() => setEdit((current: any) => ({ ...current, capacityStatus }))}>{capacityStatus}</Chip>)}</View>
+    <Text>Budget</Text><View style={styles.row}>{['LOW', 'MEDIUM', 'HIGH'].map(affordabilityTier => <Chip key={affordabilityTier} selected={edit?.affordabilityTier === affordabilityTier} onPress={() => setEdit((current: any) => ({ ...current, affordabilityTier }))}>{affordabilityTier}</Chip>)}</View><Text>Charity hospital</Text><Switch value={edit?.isCharity || false} onValueChange={isCharity => setEdit((current: any) => ({ ...current, isCharity }))} />{error && <Text style={styles.error}>{error}</Text>}
+  </Dialog.Content><Dialog.Actions><Button disabled={busy} onPress={() => setEdit(null)}>Cancel</Button><Button disabled={busy} loading={busy} onPress={() => void save()}>Save Capacity Update</Button></Dialog.Actions></Dialog>
+  <Dialog visible={!!remove} onDismiss={() => !busy && setRemove(null)}><Dialog.Title>Delete hospital?</Dialog.Title><Dialog.Content><Text>Hospitals with dispatch history must be retained.</Text>{error && <Text style={styles.error}>{error}</Text>}</Dialog.Content><Dialog.Actions><Button disabled={busy} onPress={() => setRemove(null)}>Cancel</Button><Button disabled={busy} loading={busy} onPress={async () => { setBusy(true); setError(''); try { await adminApi.deleteHospital(remove!); await query.refetch(); setRemove(null); } catch (e: any) { setError(e.message); } finally { setBusy(false); } }}>Delete</Button></Dialog.Actions></Dialog></Portal></View></PaperProvider>;
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
-  content: { padding: SPACING.md, gap: 12, paddingBottom: 40 },
-  sectionTitle: { color: '#00E676', fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingRight: 10 },
-  cardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  cardSub: { color: '#94A3B8', fontSize: 13, marginTop: 2 },
-  input: { backgroundColor: 'rgba(0,0,0,0.2)', marginBottom: 10 },
-});
+const styles = StyleSheet.create({ root: { flex: 1, backgroundColor: COLORS.surface }, header: { backgroundColor: COLORS.navy }, content: { padding: SPACING.lg, gap: SPACING.md }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold }, error: { color: COLORS.red }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginVertical: SPACING.md }, input: { marginBottom: SPACING.sm } });

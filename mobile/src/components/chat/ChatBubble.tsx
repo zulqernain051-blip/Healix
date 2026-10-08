@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useVoicePlayback } from '../../hooks/useVoicePlayback';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import { MessageItem } from '../../api/messages.api';
-import { COLORS, RADIUS, TYPOGRAPHY } from '../../theme';
+import { MessageItem } from '../patient/chat/types';
+import { RADIUS } from '../../theme';
 import { API_URL } from '../../api/client';
-const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 interface ChatBubbleProps {
   message: MessageItem;
@@ -11,55 +11,11 @@ interface ChatBubbleProps {
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, isMe }) => {
-  const [sound, setSound] = useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [position, setPosition] = useState(0);
-  const [duration, setDuration] = useState(message.fileMetadata?.durationMs || 0);
-
   const resolvedMediaUrl = message.mediaUrl?.startsWith('/') 
     ? `${API_URL.replace('/api/v1', '')}${message.mediaUrl}` 
     : message.mediaUrl;
 
-  useEffect(() => {
-    return sound ? () => { sound.unloadAsync(); } : undefined;
-  }, [sound]);
-
-  const togglePlayback = async () => {
-    if (!resolvedMediaUrl) return;
-
-    try {
-      if (sound) {
-        if (isPlaying) {
-          await sound.pauseAsync();
-        } else {
-          if (position >= duration && duration > 0) {
-            await sound.playFromPositionAsync(0);
-          } else {
-            await sound.playAsync();
-          }
-        }
-      } else {
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri: resolvedMediaUrl },
-          { shouldPlay: true },
-          (status) => {
-            if (status.isLoaded) {
-              setPosition(status.positionMillis);
-              if (status.durationMillis) setDuration(status.durationMillis);
-              setIsPlaying(status.isPlaying);
-              if (status.didJustFinish) {
-                setIsPlaying(false);
-                setPosition(status.durationMillis || 0);
-              }
-            }
-          }
-        );
-        setSound(newSound);
-      }
-    } catch (err) {
-      console.log('Error playing audio', err);
-    }
-  };
+  const { isPlaying, position, duration, togglePlayback } = useVoicePlayback(message.type === 'audio' ? resolvedMediaUrl : undefined, message.fileMetadata?.durationMs);
 
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -124,7 +80,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, isMe }) => {
         )}
       </View>
       <View style={styles.metaRow}>
-        <Text style={styles.timeText}>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+        <Text style={styles.timeText}>{message.time || (message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '')}</Text>
         {isMe && (
           <Text style={[styles.statusIcon, message.status === 'read' && styles.statusRead]}>
             {message.status === 'sent' ? '✓' : '✓✓'}

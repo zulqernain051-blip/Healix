@@ -1,121 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { useDoctorStore } from '../../store/doctor';
-import { AlertCircle, Clock, ShieldAlert } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { api } from '../../store/auth';
+import { Clock, ShieldAlert } from 'lucide-react';
 
 export default function Dashboard({ onSelectCase }: { onSelectCase: (caseId: string) => void }) {
-  const { queue, highRiskQueue, fetchQueue, fetchHighRiskQueue, acceptCase, isLoading } = useDoctorStore();
+  const [queue, setQueue] = useState<any[]>([]);
+  const [urgent, setUrgent] = useState<any[]>([]);
   const [filter, setFilter] = useState<'ALL' | 'HIGH'>('ALL');
-
-  useEffect(() => {
-    if (filter === 'ALL') {
-      fetchQueue().catch(() => {});
-    } else {
-      fetchHighRiskQueue().catch(() => {});
-    }
-  }, [filter]);
-
-  const activeQueue = filter === 'ALL' ? queue : highRiskQueue;
-
-  const handleAccept = async (caseId: string) => {
-    if (!window.confirm('Accept this clinical case escalation?')) return;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [pending, setPending] = useState<string | null>(null);
+  const [confirmCase, setConfirmCase] = useState<any>(null);
+  const refresh = useCallback(async () => {
     try {
-      await acceptCase(caseId);
-      alert('Case accepted successfully');
-      if (filter === 'ALL') fetchQueue().catch(() => {});
-      else fetchHighRiskQueue().catch(() => {});
-    } catch (e: any) {
-      alert(e.message || 'Action failed');
-    }
+      const [assigned, alerts] = await Promise.all([api('GET', '/doctors/queue'), api('GET', '/doctors/queue/high-risk')]);
+      setQueue(assigned); setUrgent(alerts); setError('');
+    } catch (e: any) { setError(e.message || 'Unable to load cases'); }
+    finally { setLoading(false); }
+  }, []);
+  useEffect(() => { void refresh(); const timer = setInterval(() => void refresh(), 10000); return () => clearInterval(timer); }, [refresh]);
+  const open = async (item: any) => {
+    setPending(item.id); setError('');
+    try {
+      if (item.status !== 'IN_REVIEW') await api('PUT', `/cases/${item.id}/start-review`, {});
+      setConfirmCase(null); onSelectCase(item.id);
+    } catch (e: any) { setConfirmCase(null); await refresh(); setError(e.message || 'This case is no longer available'); }
+    finally { setPending(null); }
   };
-
-  const getSlaClass = (remainingMinutes?: number) => {
-    if (remainingMinutes === undefined) return '';
-    if (remainingMinutes <= 5) return 'sla-critical';
-    return '';
-  };
-
-  return (
-    <div className="page">
-      <div className="page-header">
-        <h2 className="page-title">Clinical Escalation Queue</h2>
-        <p className="page-subtitle">Inspect patient telemetry, evaluate abnormal vitals, and approve diagnoses/careplans</p>
-      </div>
-
-      <div className="tab-bar">
-        <button className={`tab-btn ${filter === 'ALL' ? 'active' : ''}`} onClick={() => setFilter('ALL')}>
-          Active Cases Queue ({queue.length})
-        </button>
-        <button className={`tab-btn ${filter === 'HIGH' ? 'active' : ''}`} onClick={() => setFilter('HIGH')}>
-          High-Risk Alerts Only ({highRiskQueue.length})
-        </button>
-      </div>
-
-      <div className="card">
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Escalation Risk</th>
-                <th>SLA Deadline</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeQueue.map((item: any) => (
-                <tr key={item.id}>
-                  <td>
-                    <div style={{ fontWeight: '600' }}>{item.visit?.request?.patient?.user?.fullName || 'Patient'}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: {item.visit?.request?.patientId.slice(0, 8)}...</div>
-                  </td>
-                  <td>
-                    <span className={`badge ${item.riskTier === 'HIGH' ? 'badge-red' : 'badge-amber'}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      {item.riskTier === 'HIGH' && <ShieldAlert size={12} />}
-                      {item.riskTier}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={getSlaClass(item.remainingMinutes)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Clock size={14} />
-                      <span>{item.remainingMinutes !== undefined ? `${item.remainingMinutes} Mins Left` : new Date(item.slaDeadline).toLocaleTimeString()}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`badge ${item.status === 'ACCEPTED' ? 'badge-green' : 'badge-amber'}`}>
-                      {item.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      {item.status === 'PENDING' ? (
-                        <button className="btn btn-primary btn-sm" onClick={() => handleAccept(item.id)}>
-                          Accept Case
-                        </button>
-                      ) : (
-                        <button className="btn btn-success btn-sm" onClick={() => onSelectCase(item.id)}>
-                          Review & Action
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {activeQueue.length === 0 && (
-                <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '36px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                      <AlertCircle size={32} style={{ color: 'var(--text-muted)' }} />
-                      <div style={{ fontWeight: '600', color: 'var(--text-secondary)' }}>Clinical queue is clear</div>
-                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No home visits or patient assessments currently require doctor escalation.</div>
-                    </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
+  const activeQueue = filter === 'ALL' ? queue : urgent;
+  return <div className="page">
+    <div className="page-header"><h2 className="page-title">Doctor Dashboard</h2><p className="page-subtitle">Review assigned cases, respond to urgent broadcasts, and record clinical decisions.</p><button className="btn btn-ghost" disabled={!!pending} onClick={() => void refresh()}>Refresh cases</button></div>
+    <div className="tab-bar"><button className={`tab-btn ${filter === 'ALL' ? 'active' : ''}`} onClick={() => setFilter('ALL')}>My cases ({queue.length})</button><button className={`tab-btn ${filter === 'HIGH' ? 'active' : ''}`} onClick={() => setFilter('HIGH')}>High & critical risk ({urgent.length})</button></div>
+    {error && <div className="card" role="alert" style={{ color: 'var(--red)' }}>{error}<button className="btn btn-ghost" onClick={() => void refresh()}>Retry</button></div>}
+    {loading ? <div className="loading-page"><div className="spinner" /><p>Loading clinical cases…</p></div> : <div className="card"><div className="table-container"><table><thead><tr><th>Patient</th><th>Risk</th><th>Response deadline</th><th>Status</th><th>Actions</th></tr></thead><tbody>{activeQueue.map(item => {
+      const broadcast = ['PROFESSIONAL_BROADCAST', 'GENERAL_BROADCAST', 'ADMIN_ESCALATED'].includes(item.status);
+      const mins = Math.ceil((Date.parse(item.slaDeadline) - Date.now()) / 60000);
+      return <tr key={item.id}><td><strong>{item.visit?.request?.patient?.user?.fullName || 'Patient'}</strong></td><td><span className={`badge ${['HIGH', 'CRITICAL'].includes(item.riskTier) ? 'badge-red' : 'badge-amber'}`}><ShieldAlert size={12} /> {item.riskTier}</span></td><td><div className={mins <= 5 ? 'sla-critical' : ''}><Clock size={14} /> {Number.isFinite(mins) ? mins <= 0 ? 'Response overdue' : `${mins} min remaining` : 'No deadline'}</div></td><td><span className={`badge ${broadcast ? 'badge-amber' : 'badge-green'}`}>{item.status.replaceAll('_', ' ')}</span></td><td><div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}><button className="btn btn-primary btn-sm" disabled={!!pending} onClick={() => broadcast ? setConfirmCase(item) : void open(item)}>{pending === item.id ? 'Opening…' : broadcast ? 'Accept & Review' : item.status === 'ASSIGNED' ? 'Start Review' : 'Continue Review'}</button><button className="btn btn-ghost btn-sm" disabled={!!pending} onClick={() => onSelectCase(item.id)}>View Details</button></div></td></tr>;
+    })}{!activeQueue.length && !error && <tr><td colSpan={5} style={{ padding: '32px', textAlign: 'center' }}>{filter === 'ALL' ? 'No assigned cases. Check High & critical risk for available broadcasts.' : 'No eligible urgent cases awaiting review.'}</td></tr>}</tbody></table></div></div>}
+    {confirmCase && <div className="modal-overlay"><div className="modal" role="dialog" aria-modal="true"><h3>Accept this case?</h3><p>You will take ownership of {confirmCase.visit?.request?.patient?.user?.fullName || 'this patient'}'s case.</p><button className="btn btn-ghost" disabled={!!pending} onClick={() => setConfirmCase(null)}>Cancel</button><button className="btn btn-primary" disabled={!!pending} onClick={() => void open(confirmCase)}>Accept & Review</button></div></div>}
+  </div>;
 }

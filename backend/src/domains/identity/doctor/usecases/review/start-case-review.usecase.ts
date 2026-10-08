@@ -1,4 +1,5 @@
-let getIo: any = () => undefined; try { const { ChatSocketService } = require("../../../communication/chat/chat.socket"); getIo = () => ChatSocketService.getIo(); } catch(e) {}
+import { AcceptEmergencyCaseUseCase } from '../queue/accept-emergency-case.usecase';
+let getIo: any = () => undefined; try { const { ChatSocketService } = require("../../../../communication/chat/chat.socket"); getIo = () => ChatSocketService.getIo(); } catch(e) {}
 import { DoctorRepository } from '../../doctor.repository';
 import { AppError } from '../../../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../../../common/constants/index';
@@ -14,9 +15,8 @@ export class StartCaseReviewUseCase {
 
     // Emergency Broadcast Acceptance Flow
     if (caseAssignment.status === 'PROFESSIONAL_BROADCAST' || caseAssignment.status === 'GENERAL_BROADCAST' || caseAssignment.status === 'ADMIN_ESCALATED') {
-      await this.doctorRepository.findEligibleDoctorsWithWorkload(); // Minimal hack if needed.
       
-      const result = await this.doctorRepository.acceptEmergencyCase(caseId, doctorId);
+      const result = await new AcceptEmergencyCaseUseCase(this.doctorRepository).execute(caseId, doctorId);
       if (!result) {
         throw new AppError('Case is no longer available. Another doctor has accepted this case.', HTTP_STATUS.CONFLICT);
       }
@@ -26,7 +26,9 @@ export class StartCaseReviewUseCase {
       if (io) {
         io.emit('emergency_case_removed', { caseId }); // Notify all to remove from queue
       }
-      return result;
+      const started = await this.doctorRepository.startReview(caseId, doctorId);
+      if (!started.count) throw new AppError('Case changed before review could start', 409);
+      return { ...result, status: 'IN_REVIEW' };
     }
 
     // Normal Flow

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDoctorStore } from '../../store/doctor';
+import CarePlanManager from '../../components/CarePlanManager';
+import ClinicalDecision from '../../components/ClinicalDecision';
 import {
   FileText, Check, Brain, Clipboard, ClipboardList, ShieldAlert,
   Plus, Trash2, Heart, HeartPulse, Activity
@@ -8,17 +10,20 @@ import {
 export default function CaseReview({ caseId, onBack }: { caseId: string; onBack: () => void }) {
   const {
     caseReview, fetchCaseReview,
-    submitDiagnosis, submitCarePlan, submitPrescription, submitDecision, submitAiFeedback,
+    submitDiagnosis, submitCarePlan, submitPrescription, submitAiFeedback,
     isLoading
   } = useDoctorStore();
 
   const [activeFormTab, setActiveFormTab] = useState<'DIAGNOSIS' | 'CAREPLAN' | 'PRESCRIPTION' | 'DECISION' | 'CDSS'>('DIAGNOSIS');
 
   // Form states
+  const [submitting, setSubmitting] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [diagCode, setDiagCode] = useState('');
   const [diagDesc, setDiagDesc] = useState('');
   const [diagNotes, setDiagNotes] = useState('');
 
+  const [planRefresh, setPlanRefresh] = useState(0);
   const [planTitle, setPlanTitle] = useState('');
   const [planGoals, setPlanGoals] = useState(['']);
   const [planInts, setPlanInts] = useState(['']);
@@ -26,16 +31,13 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
 
   const [meds, setMeds] = useState([{ drugName: '', dosage: '', frequency: '', durationDays: 7, instructions: '' }]);
 
-  const [decRec, setDecRec] = useState('');
-  const [decType, setDecType] = useState('MONITOR'); // MONITOR, ESCALATE, ADMIT, DISCHARGE
-  const [decUrgency, setDecUrgency] = useState('ROUTINE'); // ROUTINE, URGENT, EMERGENCY
-
   const [cdssAgree, setCdssAgree] = useState(true);
   const [cdssText, setCdssText] = useState('');
 
   useEffect(() => {
-    fetchCaseReview(caseId).catch(() => {});
-  }, [caseId]);
+    setLoadError('');
+    fetchCaseReview(caseId).catch(err => setLoadError(err.message || 'Unable to load this case'));
+  }, [caseId, fetchCaseReview]);
 
   if (isLoading && !caseReview) {
     return (
@@ -45,11 +47,14 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
     );
   }
 
-  if (!caseReview) return null;
+  if (!caseReview) return <div className="page"><p role="alert">{loadError || 'Case details are unavailable'}</p><button className="btn btn-ghost" onClick={onBack}>Back to Queue</button><button className="btn btn-primary" onClick={() => { setLoadError(''); fetchCaseReview(caseId).catch(err => setLoadError(err.message)); }}>Retry</button></div>;
 
-  const { visit, patient, riskAssessments, aiSummary } = caseReview;
-  const latestVitals = visit?.vitals?.[0] || {};
-  const symptoms = visit?.symptoms || [];
+  const active = ['ASSIGNED', 'IN_REVIEW'].includes(caseReview.case?.status) && !!caseReview.case?.doctorId;
+  const visit = caseReview.case?.visit;
+  const patient = visit?.request?.patient;
+  const aiSummary = caseReview.aiInsights;
+  const latestVitals = caseReview.clinicalData?.vitals?.[0] || {};
+  const symptoms = caseReview.clinicalData?.symptoms || [];
 
   const handleAddGoal = () => setPlanGoals([...planGoals, '']);
   const handleRemoveGoal = (i: number) => setPlanGoals(planGoals.filter((_, idx) => idx !== i));
@@ -61,19 +66,19 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!active || submitting) return;
+    setSubmitting(true);
     try {
       if (activeFormTab === 'DIAGNOSIS') {
         await submitDiagnosis(caseId, { code: diagCode, description: diagDesc, notes: diagNotes });
         alert('Diagnosis submitted successfully');
       } else if (activeFormTab === 'CAREPLAN') {
         await submitCarePlan(caseId, { title: planTitle, goals: planGoals.filter(Boolean), interventions: planInts.filter(Boolean), durationWeeks: planWeeks });
-        alert('Care plan submitted successfully');
+        setPlanRefresh(value => value + 1); alert('Care plan submitted successfully');
       } else if (activeFormTab === 'PRESCRIPTION') {
         await submitPrescription(caseId, { medications: meds.filter(m => m.drugName) });
         alert('Prescription submitted successfully');
-      } else if (activeFormTab === 'DECISION') {
-        await submitDecision(caseId, { recommendation: decRec, actionType: decType, urgency: decUrgency });
-        alert('Clinical decision recorded');
+
       } else if (activeFormTab === 'CDSS') {
         await submitAiFeedback(caseId, { agree: cdssAgree, feedbackText: cdssText });
         alert('AI feedback logged');
@@ -81,7 +86,7 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
       fetchCaseReview(caseId).catch(() => {});
     } catch (err: any) {
       alert(err.message || 'Submission failed');
-    }
+    } finally { setSubmitting(false); }
   };
 
   return (
@@ -94,6 +99,7 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
         <button className="btn btn-ghost" onClick={onBack}>Back to Queue</button>
       </div>
 
+      {patient?.id && <CarePlanManager key={patient.id} patientId={patient.id} refreshKey={planRefresh}/>}
       <div className="case-detail">
         {/* Left Panel: Telemetry & AI Summary */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -154,7 +160,7 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
                 <h4 style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--purple)', fontWeight: '700', marginBottom: '6px' }}>Recommendations</h4>
                 <ul style={{ paddingLeft: '16px', fontSize: '13px', color: 'var(--text-secondary)' }}>
                   {aiSummary.recommendations.map((rec: string, i: number) => (
-                    <li key={i} style={{ marginBottom: '4px' }}>{rec}</li>
+                    <li key={i} style={{ marginBottom: '4px' }}>{typeof rec === 'string' ? rec : (rec as any).text}</li>
                   ))}
                 </ul>
               </div>
@@ -178,6 +184,8 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
           </div>
 
           <form onSubmit={handleFormSubmit} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '12px' }}>
+            {!active && <p>This case is read-only. Accept or start review from the dashboard to record clinical actions.</p>}
+            <fieldset disabled={!active || submitting} style={{ border: 0, padding: 0, minWidth: 0 }}>
             {activeFormTab === 'DIAGNOSIS' && (
               <>
                 <div className="form-group">
@@ -264,31 +272,7 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
               </>
             )}
 
-            {activeFormTab === 'DECISION' && (
-              <>
-                <div className="form-group">
-                  <label className="form-label">Action Recommendation</label>
-                  <textarea className="form-input" style={{ height: '80px', resize: 'none' }} placeholder="Clinical escalation decisions..." value={decRec} onChange={(e) => setDecRec(e.target.value)} required />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Escalation Action Type</label>
-                  <select className="form-input" value={decType} onChange={(e) => setDecType(e.target.value)}>
-                    <option value="MONITOR">Continued Home Monitoring</option>
-                    <option value="ESCALATE">Escalate to Specialized Unit</option>
-                    <option value="ADMIT">Direct ER / Hospital Admission</option>
-                    <option value="DISCHARGE">Discharge Escalation Queue</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Clinical Urgency</label>
-                  <select className="form-input" value={decUrgency} onChange={(e) => setDecUrgency(e.target.value)}>
-                    <option value="ROUTINE">Routine Follow-up</option>
-                    <option value="URGENT">Urgent Intervention Needed</option>
-                    <option value="EMERGENCY">Emergency Response</option>
-                  </select>
-                </div>
-              </>
-            )}
+            {active && activeFormTab === 'DECISION' && <ClinicalDecision caseId={caseId} patient={patient} onSaved={() => { void fetchCaseReview(caseId); }} />}
 
             {activeFormTab === 'CDSS' && (
               <>
@@ -306,9 +290,10 @@ export default function CaseReview({ caseId, onBack }: { caseId: string; onBack:
               </>
             )}
 
-            <button type="submit" className="btn btn-primary" style={{ marginTop: 'auto' }}>
-              Submit Clinical Record
-            </button>
+            {activeFormTab !== 'DECISION' && <button type="submit" className="btn btn-primary" style={{ marginTop: 'auto' }}>
+              {submitting ? 'Saving…' : 'Submit Clinical Record'}
+            </button>}
+            </fieldset>
           </form>
         </div>
       </div>

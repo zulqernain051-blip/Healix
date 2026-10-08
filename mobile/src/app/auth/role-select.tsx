@@ -1,7 +1,8 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import { Avatar, Card, Button, Text } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
+import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 /**
  * Role Selection Screen.
@@ -50,26 +51,26 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 24,
-    backgroundColor: '#F9FAFB',
+    padding: SPACING.xl,
+    backgroundColor: COLORS.surface,
   },
   header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontSize: TYPOGRAPHY.sizes.xxl,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    color: COLORS.textDark,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
+    fontSize: TYPOGRAPHY.sizes.md,
+    color: COLORS.textDarkSecondary,
     textAlign: 'center',
-    marginBottom: 32,
-    marginTop: 6,
+    marginBottom: SPACING.xxl,
+    marginTop: SPACING.xs,
   },
   card: {
-    marginBottom: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    marginBottom: SPACING.md,
+    backgroundColor: COLORS.surfaceCard,
+    borderRadius: RADIUS.lg,
   },
   backButton: {
     marginTop: 16,

@@ -1,5 +1,6 @@
+import { AssertPatientAccessUseCase } from '../../identity/patient/usecases/profile/assert-patient-access.usecase';
 import { CompleteMilestoneUseCase } from './usecases/milestones/complete-milestone.usecase';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import {
   priorityOverrideSchema,
   scheduleOneOffSchema,
@@ -37,46 +38,40 @@ const logMedicationDoseUseCase = new LogMedicationDoseUseCase();
 const getMedicationLogsUseCase = new GetMedicationLogsUseCase();
 
 export class CareController {
-  // We cannot modify endpoints, but there is no explicit create endpoint here!
-  // Wait, the CareService had createNormalizedRequest, but CareController did not expose it?
-  // Let's check original CareController. It didn't have createNormalizedRequest!
-  // It only had getNormalizedRequests.
-  // We will leave createNormalizedRequest out of the Controller if it wasn't there.
-
-  public static async getNormalizedRequests(_req: Request, res: Response) {
+  public static async getNormalizedRequests(_req: Request, res: Response, next: NextFunction) {
     try {
       const list = await listCareRequestsUseCase.execute();
       res.json({ success: true, data: list });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async overridePriority(req: Request, res: Response) {
+  public static async overridePriority(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { priority } = priorityOverrideSchema.parse(req.body);
       const result = await overridePriorityUseCase.execute(id, priority);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async scheduleOneOff(req: Request, res: Response) {
+  public static async scheduleOneOff(req: Request, res: Response, next: NextFunction) {
     try {
       const { requestId, scheduledAt } = scheduleOneOffSchema.parse(req.body);
       const visit = await scheduleOneOffUseCase.execute(requestId, scheduledAt);
       res.json({ success: true, data: visit });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async rescheduleVisit(req: Request, res: Response) {
+  public static async rescheduleVisit(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const { scheduledAt } = req.body;
+      const { scheduledAt } = scheduleOneOffSchema.pick({ scheduledAt: true }).parse(req.body);
       if (!scheduledAt) {
         res.status(400).json({ success: false, message: 'scheduledAt date is required' });
         return;
@@ -85,62 +80,64 @@ export class CareController {
       const result = await rescheduleVisitUseCase.execute(id, scheduledAt);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async cancelVisit(req: Request, res: Response) {
+  public static async cancelVisit(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const deleteSeries = req.query.deleteSeries === 'true';
       const result = await cancelVisitUseCase.execute(id, deleteSeries);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getOverdueMilestones(_req: Request, res: Response) {
+  public static async getOverdueMilestones(_req: Request, res: Response, next: NextFunction) {
     try {
       const list = await getOverdueMilestonesUseCase.execute();
       res.json({ success: true, data: list });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getComplianceMetrics(req: Request, res: Response) {
+  public static async getComplianceMetrics(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params; // Patient ID
-      const metrics = await getComplianceMetricsUseCase.execute(id);
+      const metrics = await getComplianceMetricsUseCase.execute(id, (req as any).user);
       res.json({ success: true, data: metrics });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async logMedicationDose(req: Request, res: Response) {
+  public static async logMedicationDose(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params; // Patient ID
       const { medicationId } = medicationLogSchema.parse(req.body);
+      await AssertPatientAccessUseCase.execute(id, (req as any).user);
       const log = await logMedicationDoseUseCase.execute(medicationId, id);
       res.json({ success: true, data: log });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async getMedicationLogs(req: Request, res: Response) {
+  public static async getMedicationLogs(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params; // Patient ID
+      await AssertPatientAccessUseCase.execute(id, (req as any).user);
       const list = await getMedicationLogsUseCase.execute(id);
       res.json({ success: true, data: list });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      next(err);
     }
   }
 
-  public static async completeMilestone(req: Request, res: Response) {
+  public static async completeMilestone(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: milestoneId } = req.params;
       const actorId = (req as any).user?.id;
@@ -148,7 +145,7 @@ export class CareController {
       const updatedPlan = await completeMilestoneUseCase.execute(milestoneId, actorId);
       res.json({ success: true, data: updatedPlan });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      next(err);
     }
   }
 

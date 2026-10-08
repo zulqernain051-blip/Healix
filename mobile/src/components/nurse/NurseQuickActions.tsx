@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+
 
 interface NurseQuickActionsProps {
   onCheckInPress: () => void;
@@ -25,7 +25,7 @@ export const NurseQuickActions: React.FC<NurseQuickActionsProps> = ({
     { label: 'Patients', icon: '👥', color: 'rgba(59, 130, 246, 0.15)', onPress: onPatientsPress },
     { label: 'Marketplace', icon: '🌐', color: 'rgba(168, 85, 247, 0.15)', onPress: onBidsPress },
     { label: 'Messages', icon: '💬', color: 'rgba(245, 158, 11, 0.15)', onPress: onMessagesPress },
-    { label: 'Emergency', icon: '🚨', color: 'rgba(239, 68, 68, 0.15)', onPress: onEmergencyPress },
+    { label: 'Visit triage', icon: '🚨', color: 'rgba(239, 68, 68, 0.15)', onPress: onEmergencyPress },
     { label: 'Scan QR', icon: '📷', color: 'rgba(20, 184, 166, 0.15)', onPress: onScanQRPress },
   ];
 

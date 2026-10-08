@@ -82,6 +82,8 @@ export function useCompleteMilestone() {
     mutationFn: (milestoneId: string) => healthApi.completeMilestone(milestoneId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: HEALTH_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: ['carePlanHistory'] });
+      queryClient.invalidateQueries({ queryKey: ['carePlans'] });
     },
   });
 }

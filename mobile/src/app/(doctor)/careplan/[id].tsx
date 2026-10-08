@@ -1,38 +1,26 @@
-import React, { useState } from 'react';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { localDateTime } from '../../../utils/dates';
+import { COLORS } from '../../../theme';
+import { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert, TextInput, Switch, TouchableOpacity } from 'react-native';
 import { Button, Card, Divider } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
-import { navigate, goBack } from '../../../utils/navigation';
-import { useSubmitCarePlan } from '../../../hooks/useDoctor';
+import { goBack } from '../../../utils/navigation';
+import { useSubmitCarePlan, useCaseReview } from '../../../hooks/useDoctor';
 
-const COLORS = {
-  bg: '#0A1628',
-  card: '#111D35',
-  border: '#1E2D4A',
-  teal: '#0D9488',
-  emerald: '#10B981',
-  amber: '#F59E0B',
-  blue: '#3B82F6',
-  red: '#EF4444',
-  textPrimary: '#F1F5F9',
-  textSecondary: '#94A3B8',
-  textMuted: '#475569'
-};
 
 export default function CreateCarePlanScreen() {
   const { id } = useLocalSearchParams(); // CaseAssignment ID
   const caseId = id as string;
-  
+
+  const review = useCaseReview(caseId);
+  const canEdit = !!review.data?.case.doctorId && ['ASSIGNED', 'IN_REVIEW'].includes(review.data.case.status);
   const { mutateAsync: submitCarePlan } = useSubmitCarePlan();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [milestones, setMilestones] = useState([{ title: '', targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }]);
-  
-  const [needsNursingCare, setNeedsNursingCare] = useState(false);
-  const [frequency, setFrequency] = useState('WEEKLY');
-  const [occurrences, setOccurrences] = useState('4');
-  const [keepCurrentNurse, setKeepCurrentNurse] = useState(true);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const addMilestone = () => {
@@ -52,13 +40,14 @@ export default function CreateCarePlanScreen() {
   };
 
   const handleSubmit = async () => {
+    if (!canEdit) return;
     if (!title) {
-      Alert.alert('Validation Error', 'Care Plan title is required.');
+      appAlert('Validation Error', 'Care Plan title is required.');
       return;
     }
     const validMilestones = milestones.filter(m => m.title.trim() !== '');
     if (validMilestones.length === 0) {
-      Alert.alert('Validation Error', 'At least one milestone is required.');
+      appAlert('Validation Error', 'At least one milestone is required.');
       return;
     }
 
@@ -69,15 +58,15 @@ export default function CreateCarePlanScreen() {
         data: {
           title,
           description,
-          milestones: validMilestones
+          milestones: validMilestones.map(m => { const date = localDateTime(m.targetDate); if (!date) throw new Error('Choose a valid milestone date (YYYY-MM-DD).'); return { title: m.title.trim(), targetDate: date.toISOString() }; })
         }
       });
-      
-      Alert.alert('Success', 'Care Plan has been created.', [
+
+      appAlert('Success', 'Care Plan has been created.', [
         { text: 'OK', onPress: () => goBack() }
       ]);
     } catch (err: any) {
-      Alert.alert('Error', err.response?.data?.message || err.message || 'Failed to submit care plan');
+      appAlert('Error', err.response?.data?.message || err.message || 'Failed to submit care plan');
     } finally {
       setIsSubmitting(false);
     }
@@ -86,12 +75,15 @@ export default function CreateCarePlanScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button icon="arrow-left" labelStyle={{ color: COLORS.teal }} onPress={() => goBack()}>Back</Button>
+        <Button icon="arrow-left" labelStyle={{ color: COLORS.navy }} onPress={() => goBack()}>Back</Button>
         <Text style={styles.headerTitle}>Create Care Plan</Text>
         <View style={{ width: 60 }} />
       </View>
 
       <ScrollView style={styles.scrollContent} contentContainerStyle={{ paddingBottom: 40 }}>
+        {review.isLoading && <Text style={styles.label}>Loading case...</Text>}
+        {review.error && <View><Text style={styles.label}>{(review.error as Error).message}</Text><Button onPress={() => void review.refetch()}>Retry</Button></View>}
+        {!review.isLoading && !canEdit && <Text style={styles.label}>Care plans require an active case assigned to you.</Text>}
         <Card style={styles.card}>
           <Card.Content>
             <Text style={styles.label}>Plan Title</Text>
@@ -126,7 +118,7 @@ export default function CreateCarePlanScreen() {
                   placeholderTextColor={COLORS.textMuted}
                   value={milestone.title}
                   onChangeText={(val) => updateMilestone(index, val)}
-                />
+                /><Text style={styles.label}>Target date (YYYY-MM-DD)</Text><TextInput style={styles.input} value={milestone.targetDate} onChangeText={targetDate => setMilestones(previous => previous.map((item,i) => i === index ? { ...item,targetDate } : item))} placeholder="YYYY-MM-DD"/>
               </View>
               {milestones.length > 1 && (
                 <TouchableOpacity onPress={() => removeMilestone(index)} style={styles.removeBtn}>
@@ -137,64 +129,18 @@ export default function CreateCarePlanScreen() {
           </Card>
         ))}
 
-        <Button mode="text" textColor={COLORS.teal} onPress={addMilestone} style={{ alignSelf: 'flex-start' }}>
+        <Button mode="text" textColor={COLORS.navy} onPress={addMilestone} style={{ alignSelf: 'flex-start' }}>
           + Add Milestone
         </Button>
 
-        <Divider style={{ backgroundColor: COLORS.border, marginVertical: 20 }} />
+        <Divider style={{ backgroundColor: COLORS.inputBorder, marginVertical: 20 }} />
 
-        <View style={styles.toggleRow}>
-          <Text style={styles.sectionTitle}>Requires Nursing Care</Text>
-          <Switch
-            value={needsNursingCare}
-            onValueChange={setNeedsNursingCare}
-            trackColor={{ false: COLORS.border, true: COLORS.teal }}
-          />
-        </View>
-
-        {needsNursingCare && (
-          <Card style={styles.card}>
-            <Card.Content>
-              <Text style={styles.label}>Frequency</Text>
-              <View style={styles.radioGroup}>
-                {['DAILY', 'WEEKLY', 'BIWEEKLY'].map((freq) => (
-                  <TouchableOpacity
-                    key={freq}
-                    style={[styles.radio, frequency === freq && styles.radioActive]}
-                    onPress={() => setFrequency(freq)}
-                  >
-                    <Text style={[styles.radioText, frequency === freq && { color: '#FFF' }]}>{freq}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-
-              <Text style={styles.label}>Occurrences (Duration)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="e.g. 4"
-                placeholderTextColor={COLORS.textMuted}
-                keyboardType="numeric"
-                value={occurrences}
-                onChangeText={setOccurrences}
-              />
-
-              <View style={styles.toggleRow}>
-                <Text style={styles.label}>Keep Current Nurse (if valid)</Text>
-                <Switch
-                  value={keepCurrentNurse}
-                  onValueChange={setKeepCurrentNurse}
-                  trackColor={{ false: COLORS.border, true: COLORS.teal }}
-                />
-              </View>
-              <Text style={styles.helperText}>If unchecked or unavailable, this will go to the general marketplace.</Text>
-            </Card.Content>
-          </Card>
-        )}
+        <Text style={styles.helperText}>For nursing follow-up, use Schedule Follow-up in Clinical Actions.</Text>
 
       </ScrollView>
 
       <View style={styles.footer}>
-        <Button mode="contained" buttonColor={COLORS.teal} onPress={handleSubmit} loading={isSubmitting} disabled={isSubmitting}>
+        <Button mode="contained" buttonColor={COLORS.navy} onPress={handleSubmit} loading={isSubmitting} disabled={isSubmitting || !canEdit}>
           Create Care Plan
         </Button>
       </View>
@@ -203,21 +149,21 @@ export default function CreateCarePlanScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: COLORS.card, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  headerTitle: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold' },
+  container: { flex: 1, backgroundColor: COLORS.surface },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: COLORS.surfaceCard, borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder },
+  headerTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold' },
   scrollContent: { padding: 16 },
-  sectionTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: 12 },
-  card: { backgroundColor: COLORS.card, marginBottom: 16, borderColor: COLORS.border, borderWidth: 1 },
-  label: { color: COLORS.textSecondary, marginBottom: 6, fontSize: 14 },
-  input: { backgroundColor: COLORS.bg, color: COLORS.textPrimary, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border, marginBottom: 16 },
+  sectionTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '600', marginBottom: 12 },
+  card: { backgroundColor: COLORS.surfaceCard, marginBottom: 16, borderColor: COLORS.inputBorder, borderWidth: 1 },
+  label: { color: COLORS.textBody, marginBottom: 6, fontSize: 14 },
+  input: { backgroundColor: COLORS.surface, color: COLORS.textDark, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.inputBorder, marginBottom: 16 },
   milestoneRow: { flexDirection: 'row', alignItems: 'center' },
   removeBtn: { padding: 12, marginLeft: 8 },
   toggleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   helperText: { color: COLORS.textMuted, fontSize: 12, marginTop: -4 },
   radioGroup: { flexDirection: 'row', marginBottom: 16 },
-  radio: { flex: 1, padding: 10, borderWidth: 1, borderColor: COLORS.border, alignItems: 'center', backgroundColor: COLORS.bg },
-  radioActive: { backgroundColor: COLORS.teal, borderColor: COLORS.teal },
-  radioText: { color: COLORS.textSecondary, fontSize: 12 },
-  footer: { padding: 16, backgroundColor: COLORS.card, borderTopWidth: 1, borderTopColor: COLORS.border }
+  radio: { flex: 1, padding: 10, borderWidth: 1, borderColor: COLORS.inputBorder, alignItems: 'center', backgroundColor: COLORS.surface },
+  radioActive: { backgroundColor: COLORS.navy, borderColor: COLORS.navy },
+  radioText: { color: COLORS.textBody, fontSize: 12 },
+  footer: { padding: 16, backgroundColor: COLORS.surfaceCard, borderTopWidth: 1, borderTopColor: COLORS.inputBorder }
 });

@@ -1,85 +1,135 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING } from '../../theme';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface QuickActionsGridProps {
   onRequestPress: () => void;
   onRecordsPress: () => void;
-  onAIPress: () => void;
-  onPrescriptionsPress: () => void;
+  onMessagesPress: () => void;
+  onHealthPress: () => void;
+}
+
+interface QuickActionItem {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  subtitle: string;
+  bgColor: string;
+  iconColor: string;
+  onPress: () => void;
 }
 
 export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
   onRequestPress,
   onRecordsPress,
-  onAIPress,
-  onPrescriptionsPress,
+  onMessagesPress,
+  onHealthPress,
 }) => {
+  const actions: QuickActionItem[] = [
+    {
+      icon: 'add-circle',
+      title: 'Request Care',
+      subtitle: 'Get the support you need',
+      bgColor: COLORS.quickBlue,
+      iconColor: COLORS.iconBlue,
+      onPress: onRequestPress,
+    },
+    {
+      icon: 'document-text',
+      title: 'View Records',
+      subtitle: 'Access your medical history',
+      bgColor: COLORS.quickGreen,
+      iconColor: COLORS.iconGreen,
+      onPress: onRecordsPress,
+    },
+    {
+      icon: 'chatbubble-ellipses',
+      title: 'Message Team',
+      subtitle: 'Chat with your care team',
+      bgColor: COLORS.quickPurple,
+      iconColor: COLORS.iconPurple,
+      onPress: onMessagesPress,
+    },
+    {
+      icon: 'heart',
+      title: 'Health Info',
+      subtitle: 'Learn & stay informed',
+      bgColor: COLORS.quickPink,
+      iconColor: COLORS.iconPink,
+      onPress: onHealthPress,
+    },
+  ];
+
   return (
-    <View style={styles.quickGrid}>
-      <TouchableOpacity style={styles.quickCard} onPress={onRequestPress} activeOpacity={0.8}>
-        <View style={[styles.quickIconBg, { backgroundColor: 'rgba(0, 230, 118, 0.12)' }]}>
-          <Text style={styles.quickIconText}>🩺</Text>
-        </View>
-        <Text style={styles.quickLabel}>Request Healthcare</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.quickCard} onPress={onRecordsPress} activeOpacity={0.8}>
-        <View style={[styles.quickIconBg, { backgroundColor: 'rgba(59, 130, 246, 0.12)' }]}>
-          <Text style={styles.quickIconText}>📁</Text>
-        </View>
-        <Text style={styles.quickLabel}>Health Records</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.quickCard} onPress={onAIPress} activeOpacity={0.8}>
-        <View style={[styles.quickIconBg, { backgroundColor: 'rgba(168, 85, 247, 0.12)' }]}>
-          <Text style={styles.quickIconText}>🤖</Text>
-        </View>
-        <Text style={styles.quickLabel}>AI Assistant</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.quickCard} onPress={onPrescriptionsPress} activeOpacity={0.8}>
-        <View style={[styles.quickIconBg, { backgroundColor: 'rgba(245, 158, 11, 0.12)' }]}>
-          <Text style={styles.quickIconText}>💊</Text>
-        </View>
-        <Text style={styles.quickLabel}>Prescriptions</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <View style={styles.grid}>
+        {actions.map((action, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[styles.card, { backgroundColor: action.bgColor }]}
+            onPress={action.onPress}
+            activeOpacity={0.75}
+          >
+            <View style={styles.cardTop}>
+              <View style={[styles.iconCircle, { backgroundColor: `${action.iconColor}20` }]}>
+                <Ionicons name={action.icon} size={22} color={action.iconColor} />
+              </View>
+              <Ionicons name="chevron-forward" size={16} color={COLORS.textBody} />
+            </View>
+            <Text style={styles.cardTitle}>{action.title}</Text>
+            <Text style={styles.cardSubtitle}>{action.subtitle}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  quickGrid: {
+  container: {
+    paddingVertical: SPACING.lg,
+  },
+  sectionTitle: {
+    color: COLORS.textDark,
+    fontSize: TYPOGRAPHY.sizes.lg,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    marginBottom: SPACING.md,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.md,
+  },
+  card: {
+    width: '47.5%',
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    minHeight: 130,
+  },
+  cardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: SPACING.sm,
-  },
-  quickCard: {
-    flex: 1,
-    backgroundColor: '#0A2D28',
-    borderRadius: RADIUS.lg,
-    paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.xs,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    marginBottom: SPACING.md,
   },
-  quickIconBg: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
+  iconCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
   },
-  quickIconText: {
-    fontSize: 20,
+  cardTitle: {
+    color: COLORS.textDark,
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+    marginBottom: 4,
   },
-  quickLabel: {
-    color: '#E2E8F0',
-    fontSize: 11,
-    fontWeight: '600',
-    textAlign: 'center',
+  cardSubtitle: {
+    color: COLORS.textBody,
+    fontSize: TYPOGRAPHY.sizes.xs,
+    lineHeight: 16,
   },
 });

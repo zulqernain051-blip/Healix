@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -18,13 +18,13 @@ import { apiClient } from '../../../api/client';
 
 import { ChatBubble } from '../../../components/chat/ChatBubble';
 import { ChatInput } from '../../../components/chat/ChatInput';
-import { SPACING } from '../../../theme';
+import { COLORS, SPACING } from '../../../theme';
 
-export default function NurseChatScreen() {
+export default function DoctorChatScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef<ScrollView>(null);
-  
+
   const { user } = useAuthStore();
   const myId = user?.id;
 
@@ -38,10 +38,10 @@ export default function NurseChatScreen() {
   const { mutate: markAsRead } = useMarkMessagesAsRead(threadId);
   const { typingUsers, sendTypingEvent } = useChatSocket(threadId);
 
-  const rawMessages = historyData?.data?.messages || (historyData as any)?.messages || [];
+  const rawMessages = (historyData as any)?.data?.messages || historyData?.messages || [];
 
   // Sort messages
-  const messages = [...rawMessages].sort((a: any, b: any) => 
+  const messages = [...rawMessages].sort((a: any, b: any) =>
     new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
   );
 
@@ -76,19 +76,20 @@ export default function NurseChatScreen() {
       }
     } catch (err: any) {
       Alert.alert('Message Failed', err.message || 'Error sending message');
+      throw err;
     }
   };
 
-  
-  
+
+
   const handleRequestEmergency = async () => {
     Alert.alert(
       'Request Emergency Dispatch',
       'Are you sure you want to request an emergency ambulance dispatch from the doctor?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Request', 
+        {
+          text: 'Request',
           style: 'destructive',
           onPress: async () => {
             try {
@@ -108,7 +109,7 @@ export default function NurseChatScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.surface} />
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header */}
         <View style={styles.header}>
@@ -120,7 +121,7 @@ export default function NurseChatScreen() {
             size={38}
             label={contactName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
             style={styles.avatarBg}
-            color="#00E676"
+            color={COLORS.navy}
           />
 
           <View style={styles.headerInfo}>
@@ -138,7 +139,7 @@ export default function NurseChatScreen() {
         {/* Banner */}
         <View style={styles.encryptionNotice}>
           <Text style={styles.encryptionText}>
-            🔒 HIPAA Encrypted Channel · Care Notes & Media Attached directly to Patient File
+            Care team conversation - messages and attachments
           </Text>
         </View>
 
@@ -173,23 +174,23 @@ export default function NurseChatScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#0A1628' },
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#061C19', paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: '#1E2D4A' },
+  header: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: '#1E2D4A' },
   backBtn: { padding: 8, marginRight: 8, marginLeft: -8 },
-  backIcon: { color: '#00E676', fontSize: 32, lineHeight: 32, marginTop: -4 },
+  backIcon: { color: COLORS.navy, fontSize: 32, lineHeight: 32, marginTop: -4 },
   avatarBg: { backgroundColor: '#E2E8F0', marginRight: 12 },
   headerInfo: { flex: 1 },
-  headerName: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  headerStatus: { color: '#94A3B8', fontSize: 12, marginTop: 2 },
+  headerName: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  headerStatus: { color: COLORS.textBody, fontSize: 12, marginTop: 2 },
   headerActions: { flexDirection: 'row', gap: 8 },
   headerActionBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#111D35', alignItems: 'center', justifyContent: 'center' },
   headerActionIcon: { fontSize: 16 },
   encryptionNotice: { backgroundColor: '#1E2D4A', padding: 8, alignItems: 'center' },
-  encryptionText: { color: '#94A3B8', fontSize: 11, fontWeight: '600' },
+  encryptionText: { color: COLORS.textBody, fontSize: 11, fontWeight: '600' },
   messagesList: { flex: 1, backgroundColor: '#0A1628' },
   messagesContent: { padding: SPACING.md, paddingBottom: 20 },
   emptyText: { color: '#64748B', textAlign: 'center', marginTop: 40, fontSize: 14 },
   typingIndicatorContainer: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, backgroundColor: '#0A1628' },
-  typingText: { color: '#0D9488', fontSize: 12, fontStyle: 'italic' },
+  typingText: { color: COLORS.navy, fontSize: 12, fontStyle: 'italic' },
 });
 
 

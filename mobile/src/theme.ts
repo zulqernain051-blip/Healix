@@ -38,6 +38,23 @@ export const COLORS = {
   headerText: '#FFFFFF',    // White text on headers
   successBg: 'rgba(16, 185, 129, 0.08)', // Subtle success background
 
+  // ─── New Design System (Patient Home Redesign) ────────────
+  navy: '#0B4268',             // Primary navy
+  navyDark: '#06294B',         // Dark navy
+  accentBlue: '#29A9F5',       // Accent blue
+  careEmerald: '#10B981',      // Care emerald
+  textBody: '#475569',         // Body text on light bg
+  // Quick action card backgrounds
+  quickBlue: '#EBF5FF',
+  quickGreen: '#ECFDF5',
+  quickPurple: '#F3E8FF',
+  quickPink: '#FFF1F2',
+  // Quick action icon colors
+  iconBlue: '#2563EB',
+  iconGreen: '#10B981',
+  iconPurple: '#8B5CF6',
+  iconPink: '#F43F5E',
+
   // Aliases for standardized components
   primary: '#0D9488',
   background: '#030712',

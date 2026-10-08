@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, TextInput, ActivityIndicator, Alert, Platform } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
@@ -130,7 +131,7 @@ export default function AIAssistantScreen() {
   };
 
   const handleTriggerEmergencySos = () => {
-    Alert.alert(
+    appAlert(
       '🚨 Emergency SOS Dispatch Triggered',
       'Connecting immediate triage escalation to on-call doctors and emergency contacts.',
       [{ text: 'Return to Home', onPress: () => navigate('/(patient)/(tabs)/home') }]

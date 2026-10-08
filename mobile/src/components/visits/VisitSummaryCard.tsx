@@ -15,7 +15,7 @@ export const VisitSummaryCard: React.FC<VisitSummaryCardProps> = ({ visit, onPre
   const scheduledAt = visit.request?.scheduledAt
     ? new Date(visit.request.scheduledAt).toLocaleString()
     : 'Pending';
-  const visitType = visit.request?.requirements || (visit.request?.type === 'NURSE_VISIT' ? '????? Nurse Visit' : '?? Care Visit');
+  const visitType = visit.request?.requirements || (visit.request?.type === 'NURSE_VISIT' ? 'Nurse Visit' : 'Care Visit');
   const address = visit.request?.location?.address;
 
   return (
@@ -29,13 +29,13 @@ export const VisitSummaryCard: React.FC<VisitSummaryCardProps> = ({ visit, onPre
       </View>
 
       <View style={styles.footerRow}>
-        <Text style={styles.metaText}>🕐 {scheduledAt}</Text>
+        <Text style={styles.metaText}>Scheduled: {scheduledAt}</Text>
         {address && (
-          <Text style={styles.metaText} numberOfLines={1}>📍 {address}</Text>
+          <Text style={styles.metaText} numberOfLines={1}>{address}</Text>
         )}
       </View>
 
-      <Text style={styles.viewLink}>View Details ›</Text>
+      <Text style={styles.viewLink}>View Details</Text>
     </TouchableOpacity>
   );
 };

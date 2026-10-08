@@ -1,6 +1,15 @@
+import { AppError } from '../../../common/errors/AppError';
 import { prisma } from '../../../common/config/database';
 
 export class DoctorRepository {
+  public static async withCaseAssignmentLock<T>(caseId: string, run: (tx: any) => Promise<T>, outerTx?: any): Promise<T> {
+    const execute = async (tx: any) => {
+      await tx.$queryRaw`SELECT "id" FROM "case_assignments" WHERE "id" = ${caseId} FOR UPDATE`;
+      return run(tx);
+    };
+    return outerTx ? execute(outerTx) : prisma.$transaction(execute);
+  }
+
   public static async findCaseById(caseId: string) {
     return prisma.caseAssignment.findUnique({
       where: { id: caseId },
@@ -41,7 +50,7 @@ export class DoctorRepository {
         doctor: {
           include: {
             user: {
-              select: { fullName: true }
+                  select: { id: true, fullName: true }
             }
           }
         },
@@ -185,6 +194,11 @@ export class DoctorRepository {
         return null; // Already accepted or not broadcast
       }
 
+      const acceptingDoctor = await tx.doctor.findUnique({ where: { id: doctorId }, include: { user: true } });
+      if (!acceptingDoctor || acceptingDoctor.verificationStatus !== 'VERIFIED' || acceptingDoctor.user.status !== 'ACTIVE') throw new AppError('Active verified doctor access required', 403);
+      if (currentStatus === 'PROFESSIONAL_BROADCAST' && !acceptingDoctor.isProfessional) throw new AppError('This broadcast is restricted to professional doctors', 403);
+      if (lockedCases[0].doctorId) return null;
+
       const updated = await tx.caseAssignment.update({
         where: { id: caseId },
         data: {
@@ -198,7 +212,7 @@ export class DoctorRepository {
         data: {
           visitId: updated.visitId,
           method: 'DOCTOR_ACCEPTED',
-          assignedTo: (await tx.doctor.findUnique({ where: { id: doctorId } }))!.userId,
+          assignedTo: acceptingDoctor.userId,
           reason: `Emergency case accepted during ${currentStatus}`
         }
       });
@@ -260,13 +274,13 @@ export class DoctorRepository {
 
   public static async findDoctorsExcluding(doctorId: string) {
     return prisma.doctor.findMany({
-      where: { id: { not: doctorId } },
+      where: { id: { not: doctorId }, verificationStatus: 'VERIFIED', user: { status: 'ACTIVE' } },
       include: { user: { select: { fullName: true } } }
     });
   }
 
-  public static async createSecondOpinion(caseId: string, requestingDoctorId: string, consultedDoctorId: string) {
-    return prisma.secondOpinion.create({
+  public static async createSecondOpinion(caseId: string, requestingDoctorId: string, consultedDoctorId: string, tx?: any) {
+    return (tx || prisma).secondOpinion.create({
       data: {
         caseId,
         requestingDoctorId,

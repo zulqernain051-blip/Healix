@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../../common/config/database';
 import { AppError } from '../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../common/constants/index';
@@ -5,6 +6,11 @@ import { OutboxRepository } from '../../../common/events/outbox.repository';
 import { EVENTS } from '../../../common/events/app-event-bus';
 
 export class ContractRepository {
+  private static async lockParentRequest(tx: Prisma.TransactionClient, contractId: string) {
+    const contract = await tx.contract.findUnique({ where: { id: contractId }, select: { careRequestId: true } });
+    if (contract?.careRequestId) await tx.$queryRaw`SELECT id FROM care_requests WHERE id = ${contract.careRequestId} FOR UPDATE`;
+  }
+
   public static async createContract(data: {
     patientId: string;
     nurseId: string;
@@ -20,24 +26,25 @@ export class ContractRepository {
     expiresAt.setHours(expiresAt.getHours() + 24);
 
     return prisma.$transaction(async (tx) => {
-      const contract = await tx.contract.create({
-        data: {
-          patientId: data.patientId,
-          nurseId: data.nurseId,
-          sourceOfferId: data.sourceOfferId || null,
-          careRequestId: data.careRequestId || null,
-          price: data.price,
-          priceType: data.priceType,
-          scopeText: data.scopeText,
-          status: 'PENDING_APPROVAL',
-          expiresAt
-        }
-      });
+      if (data.careRequestId) await tx.$queryRaw`SELECT id FROM care_requests WHERE id = ${data.careRequestId} FOR UPDATE`;
+      const previous = data.careRequestId ? await tx.contract.findUnique({where:{careRequestId:data.careRequestId}}) : null;
+      if (previous && !['CANCELLED','REJECTED','EXPIRED'].includes(previous.status)) {
+        if (previous.sourceOfferId === data.sourceOfferId) return previous;
+        throw new AppError('This request already has a current contract', HTTP_STATUS.CONFLICT);
+      }
+      const values = {
+        patientId:data.patientId,nurseId:data.nurseId,sourceOfferId:data.sourceOfferId || null,careRequestId:data.careRequestId || null,
+        price:data.price,priceType:data.priceType,scopeText:data.scopeText,status:'PENDING_APPROVAL',expiresAt,
+        patientApproved:false,nurseApproved:false,patientReason:null,nurseReason:null
+      };
+      if (previous) await tx.contract.update({where:{id:previous.id},data:{careRequestId:null,originalCareRequestId:previous.careRequestId}});
+      const contract = await tx.contract.create({data:values});
 
       await tx.contractAuditLog.create({
         data: {
           contractId: contract.id,
           action: 'CREATED',
+          beforeValue: previous ? JSON.stringify(previous) : null,
           actorId: data.actorId,
           actorRole: data.actorRole,
           afterValue: JSON.stringify(contract),
@@ -63,8 +70,8 @@ export class ContractRepository {
     return prisma.contract.findUnique({
       where: { id },
       include: {
-        patient: { include: { user: { select: { fullName: true, email: true } } } },
-        nurse: { include: { user: { select: { fullName: true, email: true } } } },
+        patient: { select: { id: true, user: { select: { fullName: true } } } },
+        nurse: { select: { id: true, user: { select: { fullName: true } } } },
         approvals: true,
         auditLogs: { orderBy: { createdAt: 'desc' } },
         sourceOffer: true
@@ -92,7 +99,7 @@ export class ContractRepository {
     return prisma.contract.findMany({
       where: { patientId },
       include: {
-        nurse: { include: { user: { select: { fullName: true } } } }
+        nurse: { select: { id: true, user: { select: { fullName: true } } } }
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -102,7 +109,7 @@ export class ContractRepository {
     return prisma.contract.findMany({
       where: { nurseId },
       include: {
-        patient: { include: { user: { select: { fullName: true } } } }
+        patient: { select: { id: true, user: { select: { fullName: true } } } }
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -115,7 +122,8 @@ export class ContractRepository {
     actorRole: string
   ) {
     return prisma.$transaction(async (tx) => {
-      // 1. Lock the Contract row to guarantee serialized concurrency
+      await this.lockParentRequest(tx, contractId);
+      // 1. Lock the Contract row after its parent request, matching visit start.
       const lockResult = await tx.$queryRaw<any[]>`
         SELECT * FROM "contracts" WHERE id = ${contractId} FOR UPDATE
       `;
@@ -135,6 +143,8 @@ export class ContractRepository {
       if (current.status !== 'PENDING_APPROVAL') {
         throw new AppError(`Contract cannot be approved in its current state: ${current.status}`, HTTP_STATUS.BAD_REQUEST);
       }
+
+      if (new Date(current.expiresAt).getTime() <= Date.now()) throw new AppError('Contract approval deadline has passed', HTTP_STATUS.CONFLICT);
 
       // 3. Prevent duplicate identical approvals from creating redundant audit logs unnecessarily
       const isAlreadyApprovedByRole = (role === 'PATIENT' && current.patientApproved) || 
@@ -215,10 +225,14 @@ export class ContractRepository {
     actorRole: string
   ) {
     return prisma.$transaction(async (tx) => {
+      await this.lockParentRequest(tx, contractId);
+      await tx.$queryRaw`SELECT id FROM contracts WHERE id = ${contractId} FOR UPDATE`;
       const current = await tx.contract.findUnique({
         where: { id: contractId }
       });
       if (!current) throw new AppError('Contract not found', HTTP_STATUS.NOT_FOUND);
+      if (current.status === 'REJECTED') return current;
+      if (current.status !== 'PENDING_APPROVAL') throw new AppError('Only a pending contract can be rejected', HTTP_STATUS.CONFLICT);
 
       const updateData: any = {
         status: 'REJECTED'
@@ -262,6 +276,11 @@ export class ContractRepository {
         payload: { contractId }
       });
 
+      if (current.careRequestId) {
+        const { MarketplaceRepository } = require('../marketplace/marketplace.repository');
+        await MarketplaceRepository.reopenListing(current.careRequestId, tx);
+      }
+
       return updated;
     });
   }
@@ -273,11 +292,20 @@ export class ContractRepository {
     actorRole: string
   ) {
     return prisma.$transaction(async (tx) => {
+      await this.lockParentRequest(tx, contractId);
+      await tx.$queryRaw`SELECT id FROM contracts WHERE id = ${contractId} FOR UPDATE`;
       const current = await tx.contract.findUnique({
         where: { id: contractId }
       });
       if (!current) throw new AppError('Contract not found', HTTP_STATUS.NOT_FOUND);
+      if (current.status === 'CANCELLED') return current;
+      if (!['PENDING_APPROVAL','ACTIVE'].includes(current.status)) throw new AppError('This contract can no longer be cancelled', HTTP_STATUS.CONFLICT);
 
+      if (current.careRequestId) {
+        const activeCare = await tx.visit.count({where:{requestId:current.careRequestId,status:{in:['IN_PROGRESS','COMPLETED']}}});
+        if (activeCare) throw new AppError('Care has started or finished. Use visit review or a dispute instead of cancellation.', HTTP_STATUS.CONFLICT);
+        await tx.visit.updateMany({where:{requestId:current.careRequestId,status:{in:['SCHEDULED','ACCEPTED']}},data:{status:'CANCELLED'}});
+      }
       const updated = await tx.contract.update({
         where: { id: contractId },
         data: { status: 'CANCELLED' }
@@ -302,16 +330,24 @@ export class ContractRepository {
         payload: { contractId }
       });
 
+      if (current.careRequestId) {
+        const { MarketplaceRepository } = require('../marketplace/marketplace.repository');
+        await MarketplaceRepository.reopenListing(current.careRequestId, tx);
+      }
+
       return updated;
     });
   }
 
   public static async expireContract(contractId: string) {
     return prisma.$transaction(async (tx) => {
+      await this.lockParentRequest(tx, contractId);
+      await tx.$queryRaw`SELECT id FROM contracts WHERE id = ${contractId} FOR UPDATE`;
       const current = await tx.contract.findUnique({
         where: { id: contractId }
       });
       if (!current) throw new AppError('Contract not found', HTTP_STATUS.NOT_FOUND);
+      if (current.status !== 'PENDING_APPROVAL' || current.expiresAt > new Date()) return current;
 
       const updated = await tx.contract.update({
         where: { id: contractId },
@@ -343,10 +379,13 @@ export class ContractRepository {
 
   public static async markContractCompleted(contractId: string) {
     return prisma.$transaction(async (tx) => {
+      await this.lockParentRequest(tx, contractId);
+      await tx.$queryRaw`SELECT id FROM contracts WHERE id = ${contractId} FOR UPDATE`;
       const current = await tx.contract.findUnique({
         where: { id: contractId }
       });
       if (!current) return;
+      if (current.status !== 'ACTIVE') return current;
 
       const updated = await tx.contract.update({
         where: { id: contractId },

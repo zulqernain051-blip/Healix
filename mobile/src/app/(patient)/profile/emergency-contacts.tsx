@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Linking, Alert } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -24,15 +25,15 @@ export default function EmergencyContactsScreen() {
     if (!patientId) return;
     try {
       await addContact({ patientId, data: { name, phone, relationship } });
-      Alert.alert('Success', 'Emergency contact added.');
+      appAlert('Success', 'Emergency contact added.');
       setShowAddModal(false);
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to add emergency contact.');
+      throw err;
     }
   };
 
   const handleDelete = (contactId: string, name: string) => {
-    Alert.alert('Delete Contact', `Remove ${name} from emergency contacts?`, [
+    appAlert('Delete Contact', `Remove ${name} from emergency contacts?`, [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
@@ -41,9 +42,9 @@ export default function EmergencyContactsScreen() {
           if (!patientId) return;
           try {
             await deleteContact({ patientId, contactId });
-            Alert.alert('Deleted', 'Emergency contact removed.');
+            appAlert('Deleted', 'Emergency contact removed.');
           } catch (err: any) {
-            Alert.alert('Error', err.message || 'Failed to delete contact.');
+            appAlert('Error', err.message || 'Failed to delete contact.');
           }
         },
       },

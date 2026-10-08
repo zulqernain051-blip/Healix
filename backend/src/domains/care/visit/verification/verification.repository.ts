@@ -17,7 +17,7 @@ export class VerificationRepository {
   public static async findVisitWithPatient(visitId: string) {
     return prisma.visit.findUnique({
       where: { id: visitId },
-      include: { request: { include: { patient: true } } }
+      include: { request: { include: { patient: true } }, caseAssignment: { select: { doctorId: true, secondOpinions: { select: { consultedDoctorId: true } } } } }
     });
   }
 
@@ -47,10 +47,8 @@ export class VerificationRepository {
 
 
   public static async checkOutVisit(visitId: string) {
-    return prisma.attendanceRecord.update({
-      where: { visitId },
-      data: { checkOutAt: new Date() }
-    });
+    await prisma.attendanceRecord.updateMany({ where: { visitId, checkOutAt: null }, data: { checkOutAt: new Date() } });
+    return prisma.attendanceRecord.findUniqueOrThrow({ where: { visitId } });
   }
 
   public static async confirmPatientArrival(visitId: string) {

@@ -5,12 +5,12 @@ import { AppError } from '../../../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../../../common/constants';
 
 export class GetVerificationStatusUseCase {
-  public static async execute(userId: string, nurseId: string) {
+  public static async execute(_userId: string, nurseId: string) {
     const nurse = await NurseRepository.findNurseById(nurseId);
     if (!nurse) {
       throw new AppError('Nurse profile not found', HTTP_STATUS.NOT_FOUND);
     }
-    const documents = await NurseVerificationRepository.findDocuments(userId);
+    const documents = await NurseVerificationRepository.findDocuments(nurse.userId);
     
     const checksMap = VerificationPolicy.buildVerificationStatusMap(documents);
     const allApproved = VerificationPolicy.isEligibleForActivation(documents);

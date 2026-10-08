@@ -17,9 +17,9 @@ export const registerController = asyncHandler(async (req: Request, res: Respons
   // Payload has already been validated and structured by validateRequest middleware
   const result = await AuthService.register(req.body);
   return sendSuccessResponse(
-    res, 
-    'User registered successfully. Please verify the OTP sent to your email/phone.', 
-    result, 
+    res,
+    'User registered successfully. Please verify the OTP sent to your email.',
+    result,
     201
   );
 });
@@ -27,11 +27,11 @@ export const registerController = asyncHandler(async (req: Request, res: Respons
 export const verifyOtpController = asyncHandler(async (req: Request, res: Response) => {
   const { emailOrPhone, code } = req.body;
   const result = await AuthService.verifyOtp(emailOrPhone, code);
-  
-  const message = result.status === 'ACTIVE' 
+
+  const message = result.status === 'ACTIVE'
     ? 'Account verified and activated successfully.'
-    : 'Account email/phone verified successfully. Pending administrator verification.';
-    
+    : 'Account email verified successfully. Pending administrator verification.';
+
   return sendSuccessResponse(res, message, result, 200);
 });
 
@@ -47,16 +47,21 @@ export const loginController = asyncHandler(async (req: Request, res: Response) 
     deviceInfo: req.headers['user-agent'] || 'Unknown Device',
     ipAddress: req.ip || req.socket.remoteAddress
   };
-  
+
   const result = await AuthService.login(payload);
   return sendSuccessResponse(res, 'Login successful.', result, 200);
+});
+
+export const googleLoginController = asyncHandler(async (req: Request, res: Response) => {
+  const result = await AuthService.loginWithGoogle(req.body.credential, req.headers['user-agent'] || 'Unknown Device', req.ip || req.socket.remoteAddress);
+  return sendSuccessResponse(res, 'Google login successful.', result, 200);
 });
 
 export const refreshController = asyncHandler(async (req: Request, res: Response) => {
   const { refreshToken } = req.body;
   const deviceInfo = req.headers['user-agent'] || 'Unknown Device';
   const ipAddress = req.ip || req.socket.remoteAddress;
-  
+
   const result = await AuthService.refresh(refreshToken, deviceInfo, ipAddress);
   return sendSuccessResponse(res, 'Token refreshed successfully.', result, 200);
 });
@@ -78,9 +83,12 @@ export const getMeController = asyncHandler(async (req: Request, res: Response) 
     role: user.role,
     status: user.status,
     createdAt: user.createdAt,
+    mfaEnabled: user.mfaEnabled,
     patientId: user.patient?.id,
     nurseId: user.nurse?.id,
-    doctorId: user.doctor?.id
+    doctorId: user.doctor?.id,
+    doctor: user.doctor ? { pmdcNumber: user.doctor.pmdcNumber, verificationStatus: user.doctor.verificationStatus, bio: user.doctor.bio, emergencyAvailable: user.doctor.emergencyAvailable, isProfessional: user.doctor.isProfessional } : undefined,
+    paramedicId: user.paramedic?.id
   }, 200);
 });
 

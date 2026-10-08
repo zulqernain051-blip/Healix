@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import { COLORS } from '../../theme';
+import { useState } from 'react';
 import { View, StyleSheet, TextInput, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Button, Text, Card, Checkbox } from 'react-native-paper';
 import { useScheduleFollowUp } from '../../hooks/useDoctor';
 
-const COLORS = {
-  bg: '#0A1628', card: '#111D35', border: '#1E2D4A', teal: '#0D9488',
-  textPrimary: '#F1F5F9', textSecondary: '#94A3B8', textMuted: '#475569'
-};
 
 export function FollowUpForm({ caseId, hasCurrentNurse, onComplete, onCancel }: { caseId: string, hasCurrentNurse: boolean, onComplete: () => void, onCancel: () => void }) {
   const { mutateAsync: scheduleFollowUp, isPending } = useScheduleFollowUp();
@@ -15,8 +12,8 @@ export function FollowUpForm({ caseId, hasCurrentNurse, onComplete, onCancel }: 
   const [preferCurrentNurse, setPreferCurrentNurse] = useState(false);
 
   const handleSubmit = async () => {
-    const days = parseInt(daysFromNow, 10);
-    if (isNaN(days) || days <= 0) {
+    const days = Number(daysFromNow);
+    if (!Number.isInteger(days) || days <= 0 || days > 365) {
       if (Platform.OS === 'web') alert('Please enter a valid number of days in the future.'); else Alert.alert('Validation Error', 'Please enter a valid number of days in the future.');
       return;
     }
@@ -74,15 +71,15 @@ export function FollowUpForm({ caseId, hasCurrentNurse, onComplete, onCancel }: 
             <Checkbox.Android 
               status={preferCurrentNurse ? 'checked' : 'unchecked'} 
               onPress={() => setPreferCurrentNurse(!preferCurrentNurse)}
-              color={COLORS.teal}
+              color={COLORS.navy}
             />
             <Text style={styles.checkboxLabel}>Prefer keeping the current nurse</Text>
           </TouchableOpacity>
         )}
 
         <View style={styles.actions}>
-          <Button mode="text" onPress={onCancel} textColor={COLORS.textSecondary} disabled={isPending}>Cancel</Button>
-          <Button mode="contained" onPress={handleSubmit} buttonColor={COLORS.teal} loading={isPending} disabled={isPending}>Schedule Follow-up</Button>
+          <Button mode="text" onPress={onCancel} textColor={COLORS.textBody} disabled={isPending}>Cancel</Button>
+          <Button mode="contained" onPress={handleSubmit} buttonColor={COLORS.navy} loading={isPending} disabled={isPending}>Schedule Follow-up</Button>
         </View>
       </Card.Content>
     </Card>
@@ -90,11 +87,11 @@ export function FollowUpForm({ caseId, hasCurrentNurse, onComplete, onCancel }: 
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: COLORS.card, borderColor: COLORS.border, borderWidth: 1, marginBottom: 16 },
-  title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
-  label: { color: COLORS.textSecondary, marginBottom: 6, fontSize: 14 },
-  input: { backgroundColor: COLORS.bg, color: COLORS.textPrimary, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border, marginBottom: 16 },
+  card: { backgroundColor: COLORS.surfaceCard, borderColor: COLORS.inputBorder, borderWidth: 1, marginBottom: 16 },
+  title: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  label: { color: COLORS.textBody, marginBottom: 6, fontSize: 14 },
+  input: { backgroundColor: COLORS.surface, color: COLORS.textDark, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.inputBorder, marginBottom: 16 },
   checkboxRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  checkboxLabel: { color: COLORS.textPrimary, fontSize: 14, marginLeft: 8 },
+  checkboxLabel: { color: COLORS.textDark, fontSize: 14, marginLeft: 8 },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }
 });

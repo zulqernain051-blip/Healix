@@ -1,5 +1,6 @@
-import React, { forwardRef } from 'react';
-import { View, ScrollView, Image, StyleSheet, Text } from 'react-native';
+import { forwardRef } from 'react';
+import { useVoicePlayback } from '../../../hooks/useVoicePlayback';
+import { View, ScrollView, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { RADIUS, SPACING } from '../../../theme';
 import { MessageItem } from './types';
 
@@ -8,52 +9,9 @@ interface MessageListProps {
 }
 
 import { API_URL } from '../../../api/client';
-const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 const PatientAudioBubble = ({ uri, isMe, durationMs }: { uri: string; isMe: boolean; durationMs?: number }) => {
-  const [sound, setSound] = React.useState<Audio.Sound | null>(null);
-  const [isPlaying, setIsPlaying] = React.useState(false);
-  const [position, setPosition] = React.useState(0);
-  const [duration, setDuration] = React.useState(durationMs || 0);
-
-  React.useEffect(() => {
-    return sound ? () => { sound.unloadAsync(); } : undefined;
-  }, [sound]);
-
-  const togglePlayback = async () => {
-    try {
-      if (sound) {
-        if (isPlaying) {
-          await sound.pauseAsync();
-        } else {
-          if (position >= duration && duration > 0) {
-            await sound.playFromPositionAsync(0);
-          } else {
-            await sound.playAsync();
-          }
-        }
-      } else {
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri },
-          { shouldPlay: true },
-          (status) => {
-            if (status.isLoaded) {
-              setPosition(status.positionMillis);
-              if (status.durationMillis) setDuration(status.durationMillis);
-              setIsPlaying(status.isPlaying);
-              if (status.didJustFinish) {
-                setIsPlaying(false);
-                setPosition(status.durationMillis || 0);
-              }
-            }
-          }
-        );
-        setSound(newSound);
-      }
-    } catch (err) {
-      console.log('Error playing audio', err);
-    }
-  };
+  const { isPlaying, position, duration, togglePlayback } = useVoicePlayback(uri, durationMs);
 
   const formatTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);

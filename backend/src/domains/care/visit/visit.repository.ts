@@ -6,7 +6,7 @@ import { OutboxRepository } from '../../../common/events/outbox.repository';
 export class VisitRepository {
   public static async findVisitByRequestId(requestId: string) {
     return prisma.visit.findFirst({
-      where: { requestId }
+      where: { requestId, status: { notIn: ['CANCELLED','DECLINED'] } }
     });
   }
 
@@ -60,7 +60,8 @@ export class VisitRepository {
         vitals: {
           orderBy: { recordedAt: 'desc' }
         },
-        review: true
+        review: true,
+        caseAssignment: { select: { doctorId: true, secondOpinions: { select: { consultedDoctorId: true } } } }
       }
     });
   }
@@ -89,25 +90,6 @@ export class VisitRepository {
     });
   }
 
-  public static async acceptVisit(visitId: string) {
-    return prisma.visit.update({
-      where: { id: visitId },
-      data: {
-        status: 'ACCEPTED',
-        acceptedAt: new Date()
-      }
-    });
-  }
-
-  public static async declineVisit(visitId: string) {
-    return prisma.visit.update({
-      where: { id: visitId },
-      data: {
-        status: 'DECLINED'
-      }
-    });
-  }
-
   public static async startVisit(
     visitId: string, 
     verificationMethod?: string, 
@@ -116,8 +98,15 @@ export class VisitRepository {
     longitude?: number
   ) {
     return prisma.$transaction(async (tx) => {
+      const initial = await tx.visit.findUnique({ where: { id: visitId } });
+      if (!initial) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
+      // Use the same parent lock as request cancellation and contract transitions.
+      await tx.$queryRaw`SELECT id FROM care_requests WHERE id = ${initial.requestId} FOR UPDATE`;
+      const request = await tx.careRequest.findUniqueOrThrow({ where: { id: initial.requestId }, include: { contract: true } });
+      if (['CANCELLED', 'COMPLETED'].includes(request.status)) throw new AppError('This care request is closed.', 409);
+      if (initial.sourceContractId && (request.contract?.id !== initial.sourceContractId || request.contract.status !== 'ACTIVE')) throw new AppError('The visit agreement is no longer active.', 409);
       const updateResult = await tx.visit.updateMany({
-        where: { id: visitId, status: 'SCHEDULED' },
+        where: { id: visitId, status: { in: ['SCHEDULED', 'ACCEPTED'] } },
         data: {
           status: 'IN_PROGRESS',
           startedAt: new Date()
@@ -194,7 +183,8 @@ export class VisitRepository {
         where: { id: visitId, status: 'IN_PROGRESS' },
         data: {
           status: 'COMPLETED',
-          completedAt: new Date()
+          completedAt: new Date(),
+          nurseConfirmed: true
         }
       });
 
@@ -260,7 +250,7 @@ export class VisitRepository {
     return prisma.visit.findMany({
       where: {
         request: { patientId },
-        status: { in: ['SCHEDULED', 'IN_PROGRESS'] }
+        status: { in: ['SCHEDULED', 'ACCEPTED', 'IN_PROGRESS'] }
       },
       include: {
         request: true,
@@ -271,7 +261,7 @@ export class VisitRepository {
           select: { user: { select: { fullName: true } } }
         }
       },
-      orderBy: { startedAt: 'asc' },
+      orderBy: [{ agreedStartTime: { sort: 'asc', nulls: 'last' } }, { request: { scheduledAt: 'asc' } }],
       take: 3
     });
   }
@@ -305,13 +295,18 @@ export class VisitRepository {
   }
   public static async createVisitFromContract(data: {
     requestId: string;
+    sourceContractId?: string;
     nurseId: string;
     agreedStartTime: Date;
   }) {
     return prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM care_requests WHERE id = ${data.requestId} FOR UPDATE`;
+      const existing=await tx.visit.findFirst({where:{requestId:data.requestId,status:{notIn:['CANCELLED','DECLINED']}}});
+      if (existing) return existing;
       const visit = await tx.visit.create({
         data: {
           requestId: data.requestId,
+          sourceContractId: data.sourceContractId,
           nurseId: data.nurseId,
           status: 'SCHEDULED', // Visit starts scheduled since it is accepted by contract
           agreedStartTime: data.agreedStartTime

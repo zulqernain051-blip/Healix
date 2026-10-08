@@ -10,8 +10,8 @@ export const mapPrismaError = (error: any): any => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     switch (error.code) {
       case 'P2002': {
-        const fields = error.meta?.target as string[] | undefined;
-        const fieldName = fields ? fields.join(', ') : 'field';
+        const fields = error.meta?.target;
+        const fieldName = Array.isArray(fields) ? fields.join(', ') : typeof fields === 'string' ? fields : 'field';
         return new AppError(
           `A record with this ${fieldName} already exists.`,
           HTTP_STATUS.CONFLICT

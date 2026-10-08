@@ -16,8 +16,9 @@ export class NurseVerificationRepository {
 
   /** Upsert a verification document (one document per type per user) */
   public static async upsertDocument(userId: string, documentType: string, fileUrl: string) {
-    await prisma.userDocument.deleteMany({ where: { userId, documentType: documentType as any } });
-    return prisma.userDocument.create({
+    return prisma.$transaction(async tx => {
+    await tx.userDocument.deleteMany({ where: { userId, documentType: documentType as any } });
+    return tx.userDocument.create({
       data: {
         userId,
         documentType: documentType as any,
@@ -26,6 +27,7 @@ export class NurseVerificationRepository {
         verified: false,
         rejectionReason: null
       }
+    });
     });
   }
 
@@ -43,9 +45,9 @@ export class NurseVerificationRepository {
 
   /** Update the user status (e.g. to ACTIVE after verification) */
   public static async updateUserStatus(userId: string, status: string) {
-    return prisma.user.update({
-      where: { id: userId },
-      data: { status: status as any }
+    return prisma.$transaction(async tx => {
+      await tx.nurse.updateMany({ where: { userId, verificationStatus: 'PENDING' }, data: { verificationStatus: 'VERIFIED', verificationApprovedAt: new Date(), rejectionReason: null } });
+      return tx.user.updateMany({ where: { id: userId, status: 'PENDING_VERIFICATION', nurse: { verificationStatus: 'VERIFIED' } }, data: { status: status as any } });
     });
   }
 }

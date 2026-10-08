@@ -1,5 +1,6 @@
-﻿import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Alert, ScrollView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { appAlert } from '../../common/AppDialogs';
+import { View, StyleSheet, TextInput, Alert, Platform } from 'react-native';
 import { Text, Button, Card, Divider } from 'react-native-paper';
 import { useSubmitVitals } from '../../../hooks/useVisits';
 import { vitalsSchema, VitalsRecord } from '../../../types/visit';
@@ -15,7 +16,7 @@ const FIELDS = [
   { key: 'systolic', label: 'Systolic BP', unit: 'mmHg', placeholder: '120' },
   { key: 'diastolic', label: 'Diastolic BP', unit: 'mmHg', placeholder: '80' },
   { key: 'heartRate', label: 'Heart Rate', unit: 'bpm', placeholder: '72' },
-  { key: 'temperature', label: 'Temperature', unit: 'Ã‚Â°C', placeholder: '36.6' },
+  { key: 'temperature', label: 'Temperature', unit: '°C', placeholder: '36.6' },
   { key: 'oxygenSaturation', label: 'SpO2', unit: '%', placeholder: '98' },
   { key: 'bloodSugar', label: 'Blood Sugar (optional)', unit: 'mg/dL', placeholder: '' },
 ] as const;
@@ -58,24 +59,18 @@ export const VitalsForm: React.FC<VitalsFormProps> = ({ visitId, onSuccess, exis
     setErrors({});
 
     try {
-      await submitVitals.mutateAsync({ visitId, data: result.data });
+      const saved = await submitVitals.mutateAsync({ visitId, data: result.data });
       onSuccess();
-      setTimeout(() => {
-        if (Platform.OS === 'web') {
-          alert('âœ… Vitals Saved');
-        } else {
-          Alert.alert('âœ… Vitals Saved', 'Patient vitals have been recorded.');
-        }
-      }, 100);
+      appAlert(saved.queued ? 'Vitals saved as a draft' : 'Vitals saved', saved.queued ? 'Not yet delivered. Open Offline drafts to retry. Sync before finishing the visit.' : 'The observation has been saved to the visit.');
     } catch (err: any) {
-      if (Platform.OS === 'web') alert('Error: ' + (err.message || 'Failed to submit vitals.')); else Alert.alert('Error', err.message || 'Failed to submit vitals.');
+      appAlert('Could not save observation', err.message || 'Please try again.');
     }
   };
 
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Text style={styles.title}>Ã°Å¸Â©Âº Record Vitals</Text>
+        <Text style={styles.title}>Record Vitals</Text>
         <Divider style={styles.divider} />
         {FIELDS.map((f) => (
           <View key={f.key} style={styles.fieldRow}>

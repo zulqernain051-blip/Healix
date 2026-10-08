@@ -4,6 +4,11 @@ import { OverrideCaseAssignmentUseCase } from './usecases/override-case-assignme
 import { AdminRepository } from './admin.repository';
 
 import { InviteUserUseCase } from './usecases/invite-user.usecase';
+function withoutAuthSecrets(value: any): any {
+  if (!value || typeof value !== 'object' || value instanceof Date) return value;
+  if (Array.isArray(value)) return value.map(withoutAuthSecrets);
+  return Object.fromEntries(Object.entries(value).filter(([key])=>!['passwordHash','refreshToken','refreshTokenHash','tokenHash','token','mfaSecret','resetToken'].includes(key)).map(([key,item])=>[key,withoutAuthSecrets(item)]));
+}
 export class AdminService {
   static async inviteUser(data: { email?: string; phone?: string; role: any }, adminId: string) {
     return await InviteUserUseCase.execute(data, adminId);
@@ -45,23 +50,23 @@ export class AdminService {
   static async createDoctor(payload: any, admin: any) {
     const { CreateDoctorUseCase } = require('./usecases/create-doctor.usecase');
     const useCase = new CreateDoctorUseCase();
-    return useCase.execute(payload, admin);
+    return withoutAuthSecrets(await useCase.execute(payload, admin));
   }
 
   static async createParamedic(payload: any, admin: any) {
     const { CreateParamedicUseCase } = require('./usecases/create-paramedic.usecase');
     const useCase = new CreateParamedicUseCase();
-    return useCase.execute(payload, admin);
+    return withoutAuthSecrets(await useCase.execute(payload, admin));
   }
 
   static async getUsers(query: any) {
-    return AdminRepository.findUsers(query);
+    return withoutAuthSecrets(await AdminRepository.findUsers(query));
   }
 
   static async getUserById(id: string) {
     const user = await AdminRepository.findUserById(id);
     if (!user) throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
-    return user;
+    return withoutAuthSecrets(user);
   }
 
   static async updateUserStatus(id: string, status: string, reason: string, adminUser: any) {
@@ -69,6 +74,11 @@ export class AdminService {
     if (!target) throw new AppError('User not found', HTTP_STATUS.NOT_FOUND);
     if (target.deletedAt) throw new AppError('Cannot update a deleted user', HTTP_STATUS.BAD_REQUEST);
 
+    if (status === 'ACTIVE') {
+      if (target.emailVerificationRequired && !target.emailVerifiedAt) throw new AppError('User must verify their email first',409);
+      const provider = target.nurse || target.doctor || target.paramedic;
+      if (provider && provider.verificationStatus !== 'VERIFIED') throw new AppError('Complete professional approval before activating this account',409);
+    }
     // Admins cannot deactivate other admins
     if (target.role === 'ADMIN') {
       throw Object.assign(new Error('Cannot modify another administrator account'), { statusCode: 403 });
@@ -90,7 +100,7 @@ export class AdminService {
       reason,
     });
 
-    return updated;
+    return withoutAuthSecrets(updated);
   }
 
   static async softDeleteUser(id: string, reason: string, adminUser: any) {
@@ -366,6 +376,57 @@ export class AdminService {
       entityId: emergencyId,
       metadataJson: JSON.stringify({ doctorId })
     });
+    return event;
+  }
+
+  static async assignEmergencyParamedic(dispatchId: string, paramedicId: string, adminId: string) {
+    const dispatch = await AdminRepository.assignEmergencyParamedic(dispatchId, paramedicId);
+    await AdminRepository.createAuditLog({
+      adminId,
+      action: 'EMERGENCY_PARAMEDIC_ASSIGNED',
+      entityType: 'AMBULANCE_DISPATCH',
+      entityId: dispatchId,
+      metadataJson: JSON.stringify({ paramedicId })
+    });
+    return dispatch;
+  }
+
+  static async assignEmergencyAmbulance(dispatchId: string, ambulanceId: string, adminId: string) {
+    const dispatch = await AdminRepository.assignEmergencyAmbulance(dispatchId, ambulanceId);
+    await AdminRepository.createAuditLog({
+      adminId,
+      action: 'EMERGENCY_AMBULANCE_ASSIGNED',
+      entityType: 'AMBULANCE_DISPATCH',
+      entityId: dispatchId,
+      metadataJson: JSON.stringify({ ambulanceId })
+    });
+    return dispatch;
+  }
+
+  static async resolveEmergency(emergencyId: string, resolutionNotes?: string, adminId?: string) {
+    const event = await AdminRepository.resolveEmergency(emergencyId, resolutionNotes);
+    if (adminId) {
+      await AdminRepository.createAuditLog({
+        adminId,
+        action: 'EMERGENCY_RESOLVED',
+        entityType: 'EMERGENCY_EVENT',
+        entityId: emergencyId,
+        metadataJson: JSON.stringify({ resolutionNotes })
+      });
+    }
+    return event;
+  }
+
+  static async escalateEmergency(emergencyId: string, adminId?: string) {
+    const event = await AdminRepository.escalateEmergency(emergencyId);
+    if (adminId) {
+      await AdminRepository.createAuditLog({
+        adminId,
+        action: 'EMERGENCY_ESCALATED',
+        entityType: 'EMERGENCY_EVENT',
+        entityId: emergencyId,
+      });
+    }
     return event;
   }
 

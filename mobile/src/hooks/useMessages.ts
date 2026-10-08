@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { messagesApi, ChatMessage } from '../api/messages.api';
-import { getSocket, initSocket, disconnectSocket } from '../services/socket';
+import { getSocket, initSocket } from '../services/socket';
 import { useAuthStore } from '../store/auth';
 
 export function useConversations() {
@@ -31,83 +31,36 @@ export function useChatSocket(threadId: string) {
     socket.emit('join_thread', { threadId });
 
     const handleNewMessage = (msg: ChatMessage) => {
-      // Avoid duplicate messages
+      if (msg.threadId !== threadId) return;
       queryClient.setQueryData(['messages', 'history', threadId, 1], (old: any) => {
-        if (!old || !old.data || !old.data.messages) return old;
-        const exists = old.data.messages.some((m: any) => m.id === msg.id);
-        if (exists) return old;
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            messages: [msg, ...old.data.messages],
-          },
-        };
+        if (!old?.messages || old.messages.some((m: ChatMessage) => m.id === msg.id)) return old;
+        return { ...old, messages: [msg, ...old.messages], total: old.total + 1 };
       });
-
-      // Update conversations list latest message
-      queryClient.setQueryData(['messages', 'conversations'], (old: any) => {
-        if (!old || !old.data) return old;
-        return {
-          ...old,
-          data: old.data.map((conv: any) => 
-            conv.threadId === threadId 
-              ? { ...conv, latestMessage: msg, updatedAt: msg.sentAt } 
-              : conv
-          ).sort((a: any, b: any) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-        };
-      });
-
-      // Emit delivered receipt if we are the recipient
+      void queryClient.invalidateQueries({ queryKey: ['messages', 'conversations'] });
       const { user } = useAuthStore.getState();
-      if (user && msg.senderId !== user.id) {
-        socket.emit('message_delivered', { threadId, messageId: msg.id });
-      }
+      if (user && msg.senderId !== user.id) socket.emit('message_delivered', { threadId, messageId: msg.id });
     };
-
-    const handleDelivered = (data: any) => {
-      queryClient.setQueryData(['messages', 'history', threadId, 1], (old: any) => {
-        if (!old || !old.data || !old.data.messages) return old;
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            messages: old.data.messages.map((m: any) => 
-              m.id === data.messageId ? { ...m, status: 'DELIVERED' } : m
-            ),
-          },
-        };
-      });
+    const handleDelivered = (data: { threadId: string; messageId: string }) => {
+      if (data.threadId !== threadId) return;
+      queryClient.setQueryData(['messages', 'history', threadId, 1], (old: any) => old?.messages ? {
+        ...old, messages: old.messages.map((m: ChatMessage) => m.id === data.messageId && m.status !== 'READ' ? { ...m, status: 'DELIVERED' } : m),
+      } : old);
     };
-
-    const handleRead = (data: any) => {
-      queryClient.setQueryData(['messages', 'history', threadId, 1], (old: any) => {
-        if (!old || !old.data || !old.data.messages) return old;
-        return {
-          ...old,
-          data: {
-            ...old.data,
-            messages: old.data.messages.map((m: any) => 
-              (m.senderId !== data.userId && m.status !== 'READ') ? { ...m, status: 'READ' } : m
-            ),
-          },
-        };
-      });
-      // Also invalidate conversations to update unread count
-      queryClient.invalidateQueries({ queryKey: ['messages', 'conversations'] });
+    const handleRead = (data: { threadId: string }) => {
+      if (data.threadId !== threadId) return;
+      void queryClient.invalidateQueries({ queryKey: ['messages', 'history', threadId] });
+      void queryClient.invalidateQueries({ queryKey: ['messages', 'conversations'] });
     };
-
-    const handleTypingStart = (data: any) => {
-      setTypingUsers(prev => prev.includes(data.userId) ? prev : [...prev, data.userId]);
+    const handleTypingStart = (data: { threadId: string; userId: string }) => {
+      if (data.threadId === threadId) setTypingUsers(prev => prev.includes(data.userId) ? prev : [...prev, data.userId]);
     };
-
-    const handleTypingStop = (data: any) => {
-      setTypingUsers(prev => prev.filter(id => id !== data.userId));
+    const handleTypingStop = (data: { threadId: string; userId: string }) => {
+      if (data.threadId === threadId) setTypingUsers(prev => prev.filter(id => id !== data.userId));
     };
-
     const handleReconnect = () => {
+      setTypingUsers([]);
       socket.emit('join_thread', { threadId });
-      queryClient.invalidateQueries({ queryKey: ['messages', 'history', threadId] });
+      void queryClient.invalidateQueries({ queryKey: ['messages', 'history', threadId] });
     };
 
     socket.on('new_message', handleNewMessage);
@@ -125,7 +78,7 @@ export function useChatSocket(threadId: string) {
       socket.off('user_typing', handleTypingStart);
       socket.off('user_stopped_typing', handleTypingStop);
       socket.off('connect', handleReconnect);
-      disconnectSocket();
+
     };
   }, [threadId, accessToken, queryClient]);
 

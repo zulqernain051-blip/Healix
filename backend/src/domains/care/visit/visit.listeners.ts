@@ -10,6 +10,7 @@ export function registerVisitListeners() {
       console.log(`[Visit Domain] Successfully created visit for contract ${payload.contractId}.`);
     } catch (err: any) {
       console.error(`[Visit Domain] Failed to create visit for contract ${payload.contractId}:`, err.message);
+      throw err;
     }
     
     // Auto-create Chat Thread for Nurse Assignment
@@ -33,6 +34,7 @@ export function registerVisitListeners() {
       }
     } catch (err: any) {
       console.error(`[Visit Domain] Failed to cancel visits for CareRequest ${careRequestId}:`, err.message);
+      throw err;
     }
   };
 
@@ -49,6 +51,7 @@ export function registerVisitListeners() {
       }
     } catch (err: any) {
       console.error(`[Visit Domain] Failed to process CONTRACT_CANCELLED:`, err.message);
+      throw err;
     }
   });
 }

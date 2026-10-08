@@ -1,11 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, ActivityIndicator, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
-import { Text, Card, Avatar, ProgressBar } from 'react-native-paper';
+import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { Text, Card, Avatar, ProgressBar, Button } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useCarePlans, useCompleteMilestone } from '../../../hooks/useHealth';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 import { LoadingState } from '../../../components/common/LoadingState';
+import { appAlert } from '../../../components/common/AppDialogs';
 import { ErrorState } from '../../../components/common/ErrorState';
 
 export default function CarePlansScreen() {
@@ -19,7 +20,7 @@ export default function CarePlansScreen() {
     try {
       await completeMilestone(milestoneId);
     } catch (err) {
-      console.error(err);
+      appAlert('Could not update milestone', err instanceof Error ? err.message : 'Please try again.');
     }
   };
 
@@ -54,7 +55,7 @@ export default function CarePlansScreen() {
             ) : (
               carePlans.map((plan: any) => (
                 <View key={plan.id} style={styles.planItem}>
-                  <Text style={styles.planTitle}>{plan.title}</Text>
+                  <Text style={styles.planTitle}>{plan.title}</Text><Button textColor={COLORS.accentBlue} onPress={() => navigate(`/care-plans/${plan.id}`)}>View version history</Button>
                   {plan.description && <Text style={styles.planDesc}>{plan.description}</Text>}
                   
                   <View style={styles.progressContainer}>

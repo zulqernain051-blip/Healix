@@ -11,6 +11,7 @@ export const useCareRequests = () => {
       const response = await careApi.getCareRequests();
       return response || [];
     },
+    refetchInterval: 5000,
   });
 };
 

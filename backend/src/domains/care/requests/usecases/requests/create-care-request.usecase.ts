@@ -51,6 +51,15 @@ export class CreateCareRequestUseCase {
     // 7. Create Care Request (transactionally creates CARE_REQUEST_CREATED outbox event)
     const request = await CareRequestRepository.createCareRequest(data, priority, fallbackLocation);
 
+    // 8. Publish immediately to marketplace for instant nurse visibility
+    try {
+      const { PublishCareRequestToMarketplaceUseCase } = require('../../../../marketplace/marketplace/usecases/publish-care-request-to-marketplace.usecase');
+      await new PublishCareRequestToMarketplaceUseCase().execute(request.id);
+    } catch (err: any) {
+      // Non-blocking: outbox worker will retry if this fails
+      console.warn('[CreateCareRequestUseCase] Immediate marketplace publish warning (will be handled by outbox):', err.message);
+    }
+
     return request;
   }
 }

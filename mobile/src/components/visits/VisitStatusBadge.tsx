@@ -1,3 +1,4 @@
+import { COLORS } from '../../theme';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -8,6 +9,7 @@ interface VisitStatusBadgeProps {
 }
 
 const STATUS_CONFIG: Record<VisitStatus, { label: string; color: string; bg: string }> = {
+  CANCELLED: { label: 'Cancelled', color: COLORS.red, bg: COLORS.redLight },
   SCHEDULED: { label: 'Scheduled', color: '#F59E0B', bg: 'rgba(245,158,11,0.12)' },
   ACCEPTED: { label: 'Accepted', color: '#3B82F6', bg: 'rgba(59,130,246,0.12)' },
   IN_PROGRESS: { label: 'In Progress', color: '#00E676', bg: 'rgba(0,230,118,0.12)' },

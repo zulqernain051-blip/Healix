@@ -10,6 +10,10 @@ interface Props {
   isPatientView?: boolean;
   onSelect?: (offerId: string) => void;
   onWithdraw?: (offerId: string) => void;
+  onReject?: (offerId: string) => void;
+  onFavorite?: (nurseId: string) => void;
+  isFavorite?: boolean;
+  busy?: boolean;
   isSelecting?: boolean;
   isWithdrawing?: boolean;
   style?: any;
@@ -20,11 +24,12 @@ export const OfferCard: React.FC<Props> = ({
   isPatientView = false,
   onSelect,
   onWithdraw,
+  onReject, onFavorite, isFavorite = false, busy = false,
   isSelecting = false,
   isWithdrawing = false,
   style,
 }) => {
-  const isPending = offer.status === 'PENDING';
+  const isPending = offer.status === 'PENDING' && Date.parse(offer.expiresAt) > Date.now();
 
   return (
     <Card style={[styles.card, style]}>
@@ -35,11 +40,22 @@ export const OfferCard: React.FC<Props> = ({
               {isPatientView ? offer.nurse?.user?.fullName || 'Nurse' : 'Your Offer'}
             </Text>
             {isPatientView && offer.bestMatchScore !== undefined && (
-              <Text style={styles.scoreText}>Match: {offer.bestMatchScore}%</Text>
+              <Text style={styles.scoreText}>Comparison: {offer.bestMatchScore}/100</Text>
             )}
           </View>
           <OfferStatusBadge status={offer.status} />
         </View>
+
+        {isPatientView && <View>
+          <Text style={styles.value}>Patient ratings: {offer.reviewSummary?.averageStars==null?'No ratings recorded':`${offer.reviewSummary.averageStars.toFixed(1)}/5 · ${offer.reviewSummary.count} reviews`}</Text>
+          <Text style={styles.value}>Experience: {offer.nurse.experience == null ? 'Not recorded' : `${offer.nurse.experience} years`}</Text>
+          <Text style={styles.value}>Recorded performance: {offer.nurse.score ? `${Math.round(offer.nurse.score.compositeScore)} / 100` : 'Not assessed'}</Text>
+          <Text style={styles.value}>Certified specialties: {offer.nurse.specializations?.filter(s => s.certified).map(s => s.specialization.replace(/_/g, ' ')).join(', ') || 'None recorded'}</Text>
+          <Text style={styles.value}>Estimated service: PKR {offer.estimatedServiceCost ?? 'Unavailable'} for {offer.priceDurationMinutes ?? '—'} minutes{offer.priceDurationAssumed?' (comparison assumption)':''}</Text>
+          <Text style={styles.value}>Platform fee ({offer.feePercentage ?? '—'}%): PKR {offer.estimatedPlatformFee ?? 'Unavailable'} · Total estimate: PKR {offer.estimatedTotal ?? 'Unavailable'}</Text>
+          {offer.matchBasis && <Text style={styles.label}>{offer.matchBasis}</Text>}
+          {onFavorite && <Button disabled={busy} onPress={() => onFavorite(offer.nurseId)}>{isFavorite ? 'Remove favorite' : 'Save nurse'}</Button>}
+        </View>}
 
         <View style={styles.detailsBox}>
           <View style={styles.detailRow}>
@@ -67,14 +83,15 @@ export const OfferCard: React.FC<Props> = ({
 
       {(isPatientView && isPending && onSelect) || (!isPatientView && isPending && onWithdraw) ? (
         <Card.Actions style={styles.actions}>
+          {isPatientView && isPending && onReject && <Button disabled={busy || isSelecting} onPress={() => onReject(offer.id)}>Reject</Button>}
           {isPatientView && isPending && onSelect && (
             <Button
               mode="contained"
               onPress={() => onSelect(offer.id)}
               loading={isSelecting}
-              disabled={isSelecting}
+              disabled={isSelecting || busy}
               style={styles.selectBtn}
-              buttonColor={COLORS.primary}
+              buttonColor={COLORS.navy}
             >
               Select Offer
             </Button>
@@ -99,10 +116,10 @@ export const OfferCard: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.inputBorder,
     marginBottom: SPACING.md,
   },
   header: {
@@ -116,7 +133,7 @@ const styles = StyleSheet.create({
   },
   nurseName: {
     ...TYPOGRAPHY.h3,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
   },
   scoreText: {
     ...TYPOGRAPHY.bodySmall,
@@ -137,20 +154,20 @@ const styles = StyleSheet.create({
   },
   label: {
     ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textSecondary,
+    color: COLORS.textBody,
   },
   value: {
     ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
     fontWeight: '500',
   },
   price: {
     ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
     fontWeight: 'bold',
   },
   priceType: {
-    color: COLORS.textSecondary,
+    color: COLORS.textBody,
     fontWeight: 'normal',
     fontSize: 12,
   },
@@ -159,12 +176,12 @@ const styles = StyleSheet.create({
   },
   messageLabel: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.textBody,
     marginBottom: 2,
   },
   messageText: {
     ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
     fontStyle: 'italic',
   },
   actions: {
@@ -174,7 +191,6 @@ const styles = StyleSheet.create({
   },
   selectBtn: {
     borderRadius: RADIUS.sm,
-    width: '100%',
   },
   withdrawBtn: {
     borderRadius: RADIUS.sm,

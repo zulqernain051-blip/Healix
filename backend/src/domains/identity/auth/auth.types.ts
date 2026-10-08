@@ -9,11 +9,23 @@ export interface RegisterPayload {
   cnic?: string;
   pncNumber?: string;  // For Nurse only
   pmdcNumber?: string; // For Doctor only
+  certificationNumber?: string; // For Paramedic only
 }
 
 export interface VerifyOtpPayload {
   emailOrPhone: string;
   code: string;
+}
+
+export interface RegisterInvitedPayload {
+  invitationToken: string;
+  email: string;
+  phone: string;
+  fullName: string;
+  password: string;
+  cnic: string;
+  professionalId?: string;
+  specialization?: string;
 }
 
 export interface ResendOtpPayload {
@@ -43,4 +55,5 @@ export interface UserResponse {
   patientId?: string;
   nurseId?: string;
   doctorId?: string;
+  paramedicId?: string;
 }

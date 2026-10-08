@@ -21,7 +21,13 @@ export interface MarketplaceListing {
 /** Embedded care request info returned by GET /marketplace/requests */
 export interface ListingCareRequest {
   type: string;
-  scheduledAt: string;
+  requirements?: string | null;
+  scheduledAt?: string | null;
+  preferredDate?: string;
+  preferredStartTime?: string;
+  preferredTimeWindow?: string;
+  durationMinutes?: number;
+  scheduleType?: string;
   notes: string | null;
   patient: {
     fullName: string;   // PII-masked by backend (e.g. "John D.")
@@ -41,7 +47,7 @@ export interface ListingOfferSummary {
 
 // ─── Offer ─────────────────────────────────────
 
-export type OfferStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED';
+export type OfferStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'EXPIRED' | 'WITHDRAWN' | 'NOT_SELECTED';
 export type PriceType = 'HOURLY' | 'DAILY' | 'FIXED';
 
 export interface NurseOffer {
@@ -56,10 +62,19 @@ export interface NurseOffer {
   expiresAt: string;
   createdAt: string;
   bestMatchScore: number;
+  estimatedServiceCost?: number;
+  reviewSummary?: { count: number; averageStars: number | null };
+  priceDurationAssumed?: boolean;
+  estimatedPlatformFee?: number;
+  estimatedTotal?: number;
+  feePercentage?: number;
+  priceDurationMinutes?: number;
+  matchBasis?: string;
   nurse: OfferNurseInfo;
 }
 
 export interface OfferNurseInfo {
+  experience?: number | null;
   user: {
     fullName: string;
   };

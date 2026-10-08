@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function HealthRecordsScreen() {
   const recordItems = [

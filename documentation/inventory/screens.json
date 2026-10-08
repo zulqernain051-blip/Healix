@@ -1,0 +1,2380 @@
+[
+  {
+    "id": "MOB-COM-",
+    "name": "Mobile /",
+    "platform": "mobile",
+    "module": "Common",
+    "route": "/",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-COM-UNSUPPORTED-ROLE",
+    "name": "Mobile unsupported-role",
+    "platform": "mobile",
+    "module": "Common",
+    "route": "unsupported-role",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/unsupported-role.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-COM-_LAYOUT",
+    "name": "Mobile _layout",
+    "platform": "mobile",
+    "module": "Common",
+    "route": "_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-_LAYOUT",
+    "name": "Mobile (doctor)/_layout",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(doctor)/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-TABS-HOME",
+    "name": "Mobile (doctor)/(tabs)/home",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/(tabs)/home",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/(tabs)/home.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-TABS-MESSAGES",
+    "name": "Mobile (doctor)/(tabs)/messages",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/(tabs)/messages",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/(tabs)/messages.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Search active chats...",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. 0300",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-TABS-PROFILE",
+    "name": "Mobile (doctor)/(tabs)/profile",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/(tabs)/profile",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/(tabs)/profile.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-TABS-_LAYOUT",
+    "name": "Mobile (doctor)/(tabs)/_layout",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/(tabs)/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(doctor)/(tabs)/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-ACTION-ID",
+    "name": "Mobile (doctor)/action/[id]",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/action/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/action/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-ACTION-_LAYOUT",
+    "name": "Mobile (doctor)/action/_layout",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/action/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(doctor)/action/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-CAREPLAN-ID",
+    "name": "Mobile (doctor)/careplan/[id]",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/careplan/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/careplan/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Input: e.g. Hypertension Management",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: Detailed treatment strategy...",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. Blood pressure stabilized below 130/80",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. 4",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-CAREPLAN-_LAYOUT",
+    "name": "Mobile (doctor)/careplan/_layout",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/careplan/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(doctor)/careplan/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-DIAGNOSIS-ID",
+    "name": "Mobile (doctor)/diagnosis/[id]",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/diagnosis/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/diagnosis/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Input: e.g. I10 (Essential Hypertension)",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-DIAGNOSIS-_LAYOUT",
+    "name": "Mobile (doctor)/diagnosis/_layout",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/diagnosis/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(doctor)/diagnosis/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-MESSAGES-CHAT",
+    "name": "Mobile (doctor)/messages/chat",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/messages/chat",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/messages/chat.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-REVIEWS-ID",
+    "name": "Mobile (doctor)/reviews/[id]",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/reviews/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(doctor)/reviews/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Help improve accuracy by commenting on discrepancy...",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-DOC-DOCTOR-REVIEWS-_LAYOUT",
+    "name": "Mobile (doctor)/reviews/_layout",
+    "platform": "mobile",
+    "module": "Doctor",
+    "route": "(doctor)/reviews/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(doctor)/reviews/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-_LAYOUT",
+    "name": "Mobile (nurse)/_layout",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(nurse)/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-TABS-HOME",
+    "name": "Mobile (nurse)/(tabs)/home",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/(tabs)/home",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/(tabs)/home.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-TABS-MARKETPLACE",
+    "name": "Mobile (nurse)/(tabs)/marketplace",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/(tabs)/marketplace",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/(tabs)/marketplace.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-TABS-MESSAGES",
+    "name": "Mobile (nurse)/(tabs)/messages",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/(tabs)/messages",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/(tabs)/messages.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Search active chats...",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. 0300",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-TABS-MORE",
+    "name": "Mobile (nurse)/(tabs)/more",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/(tabs)/more",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/(tabs)/more.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-TABS-PROFILE",
+    "name": "Mobile (nurse)/(tabs)/profile",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/(tabs)/profile",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/(tabs)/profile.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-TABS-VISITS",
+    "name": "Mobile (nurse)/(tabs)/visits",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/(tabs)/visits",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/(tabs)/visits.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-TABS-_LAYOUT",
+    "name": "Mobile (nurse)/(tabs)/_layout",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/(tabs)/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(nurse)/(tabs)/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-AI",
+    "name": "Mobile (nurse)/ai",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/ai",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/ai/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Ask AI a health question or symptom...",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-MARKETPLACE-ID",
+    "name": "Mobile (nurse)/marketplace/[id]",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/marketplace/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/marketplace/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-MARKETPLACE-CONTRACTS",
+    "name": "Mobile (nurse)/marketplace/contracts",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/marketplace/contracts",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/marketplace/contracts/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-MARKETPLACE-CONTRACTS-ID",
+    "name": "Mobile (nurse)/marketplace/contracts/[id]",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/marketplace/contracts/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/marketplace/contracts/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-MESSAGES-CHAT",
+    "name": "Mobile (nurse)/messages/chat",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/messages/chat",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/messages/chat.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PATIENTS",
+    "name": "Mobile (nurse)/patients",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/patients",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/patients/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PATIENTS-ID",
+    "name": "Mobile (nurse)/patients/[id]",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/patients/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/patients/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PATIENTS-ID-TIMELINE",
+    "name": "Mobile (nurse)/patients/[id]/timeline",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/patients/[id]/timeline",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/patients/[id]/timeline.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PROFILE-AVAILABILITY",
+    "name": "Mobile (nurse)/profile/availability",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/profile/availability",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/profile/availability.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: 09:00",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: 17:00",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PROFILE-EARNINGS",
+    "name": "Mobile (nurse)/profile/earnings",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/profile/earnings",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/profile/earnings.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PROFILE-PERFORMANCE",
+    "name": "Mobile (nurse)/profile/performance",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/profile/performance",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/profile/performance.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PROFILE-REVIEWS",
+    "name": "Mobile (nurse)/profile/reviews",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/profile/reviews",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/profile/reviews.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-PROFILE-VERIFICATION",
+    "name": "Mobile (nurse)/profile/verification",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/profile/verification",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/profile/verification.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-SCHEDULE",
+    "name": "Mobile (nurse)/schedule",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/schedule",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/schedule/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-SYNC",
+    "name": "Mobile (nurse)/sync",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/sync",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/sync/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-VISITS-CARE-PLAN",
+    "name": "Mobile (nurse)/visits/care-plan",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/visits/care-plan",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/visits/care-plan.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-VISITS-PATIENT-SUMMARY",
+    "name": "Mobile (nurse)/visits/patient-summary",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/visits/patient-summary",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/visits/patient-summary.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-VISITS-PRESCRIPTION-VIEW",
+    "name": "Mobile (nurse)/visits/prescription-view",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/visits/prescription-view",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/visits/prescription-view.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-VISITS-RISK-ASSESS",
+    "name": "Mobile (nurse)/visits/risk-assess",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/visits/risk-assess",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/visits/risk-assess.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-NUR-NURSE-VISITS-ID",
+    "name": "Mobile (nurse)/visits/[id]",
+    "platform": "mobile",
+    "module": "Nurse",
+    "route": "(nurse)/visits/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(nurse)/visits/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Enter clinical notes...",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Interactive element trigger",
+        "result": "Navigates to /(nurse)/(tabs)/visits (replace)"
+      },
+      {
+        "action": "Interactive element trigger",
+        "result": "Navigates to /(nurse)/(tabs)/visits (replace)"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-_LAYOUT",
+    "name": "Mobile (patient)/_layout",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(patient)/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-TABS-HOME",
+    "name": "Mobile (patient)/(tabs)/home",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/(tabs)/home",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/(tabs)/home.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-TABS-MESSAGES",
+    "name": "Mobile (patient)/(tabs)/messages",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/(tabs)/messages",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/(tabs)/messages.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Search active chats...",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. 0300",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-TABS-MORE",
+    "name": "Mobile (patient)/(tabs)/more",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/(tabs)/more",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/(tabs)/more.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-TABS-PROFILE",
+    "name": "Mobile (patient)/(tabs)/profile",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/(tabs)/profile",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/(tabs)/profile.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-TABS-RECORDS",
+    "name": "Mobile (patient)/(tabs)/records",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/(tabs)/records",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/(tabs)/records.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-TABS-REQUESTS",
+    "name": "Mobile (patient)/(tabs)/requests",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/(tabs)/requests",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/(tabs)/requests.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-TABS-_LAYOUT",
+    "name": "Mobile (patient)/(tabs)/_layout",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/(tabs)/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(patient)/(tabs)/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-AI",
+    "name": "Mobile (patient)/ai",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/ai",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/ai/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Ask AI a health question or symptom...",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH-CAREGIVERS",
+    "name": "Mobile (patient)/health/caregivers",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health/caregivers",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/health/caregivers.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH-CAREPLANS",
+    "name": "Mobile (patient)/health/careplans",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health/careplans",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/health/careplans.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH-CLINICAL-OUTCOMES",
+    "name": "Mobile (patient)/health/clinical-outcomes",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health/clinical-outcomes",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/health/clinical-outcomes.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH",
+    "name": "Mobile (patient)/health",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/health/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH-MEDICAL",
+    "name": "Mobile (patient)/health/medical",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health/medical",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/health/medical.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH-PRESCRIPTIONS",
+    "name": "Mobile (patient)/health/prescriptions",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health/prescriptions",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/health/prescriptions.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH-RECURRING",
+    "name": "Mobile (patient)/health/recurring",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health/recurring",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/health/recurring.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-HEALTH-_LAYOUT",
+    "name": "Mobile (patient)/health/_layout",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/health/_layout",
+    "screenType": "Layout",
+    "sourceFile": "mobile/src/app/(patient)/health/_layout.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-MARKETPLACE",
+    "name": "Mobile (patient)/marketplace",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/marketplace",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/marketplace/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-MARKETPLACE-ID",
+    "name": "Mobile (patient)/marketplace/[id]",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/marketplace/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/marketplace/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Interactive element trigger",
+        "result": "Navigates to /(patient)/(tabs)/requests (replace)"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-MARKETPLACE-CONTRACTS",
+    "name": "Mobile (patient)/marketplace/contracts",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/marketplace/contracts",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/marketplace/contracts/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-MARKETPLACE-CONTRACTS-ID",
+    "name": "Mobile (patient)/marketplace/contracts/[id]",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/marketplace/contracts/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/marketplace/contracts/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Interactive element trigger",
+        "result": "Navigates to /(patient)/(tabs)/requests (replace)"
+      },
+      {
+        "action": "Interactive element trigger",
+        "result": "Navigates to /(patient)/(tabs)/requests (replace)"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-MESSAGES-CHAT",
+    "name": "Mobile (patient)/messages/chat",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/messages/chat",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/messages/chat.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-NOTIFICATIONS",
+    "name": "Mobile (patient)/notifications",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/notifications",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/notifications/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-PROFILE-EDIT",
+    "name": "Mobile (patient)/profile/edit",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/profile/edit",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/profile/edit.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: e.g. 1995-12-30",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. Male, Female",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. House 12, Street 5, DHA Phase 6",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. 31.5204",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. 74.3587",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-PROFILE-EMERGENCY-CONTACTS",
+    "name": "Mobile (patient)/profile/emergency-contacts",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/profile/emergency-contacts",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/profile/emergency-contacts.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-PROFILE-SETTINGS",
+    "name": "Mobile (patient)/profile/settings",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/profile/settings",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/profile/settings.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-RECORDS-RISK-HISTORY",
+    "name": "Mobile (patient)/records/risk-history",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/records/risk-history",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/records/risk-history.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-RECORDS-VITALS",
+    "name": "Mobile (patient)/records/vitals",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/records/vitals",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/records/vitals.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-REQUESTS-NEW",
+    "name": "Mobile (patient)/requests/new",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/requests/new",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/requests/new.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Describe your medical needs...",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. Female Nurse, Wound Care Specialist",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: 45",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-REQUESTS-ID",
+    "name": "Mobile (patient)/requests/[id]",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/requests/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/requests/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-VISITS",
+    "name": "Mobile (patient)/visits",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/visits",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/visits/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-PAT-PATIENT-VISITS-ID",
+    "name": "Mobile (patient)/visits/[id]",
+    "platform": "mobile",
+    "module": "Patient",
+    "route": "(patient)/visits/[id]",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/(patient)/visits/[id].tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-AUDIT",
+    "name": "Mobile admin/audit",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/audit",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/audit.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-CARE",
+    "name": "Mobile admin/care",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/care",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/care.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-CLINICAL",
+    "name": "Mobile admin/clinical",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/clinical",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/clinical.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-CONFIG",
+    "name": "Mobile admin/config",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/config",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/config.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-DOCTORS",
+    "name": "Mobile admin/doctors",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/doctors",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/doctors.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-EMERGENCY",
+    "name": "Mobile admin/emergency",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/emergency",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/emergency.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN",
+    "name": "Mobile admin",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/index.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-NETWORK",
+    "name": "Mobile admin/network",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/network",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/network.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-NURSES",
+    "name": "Mobile admin/nurses",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/nurses",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/nurses.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-PARAMEDICS",
+    "name": "Mobile admin/paramedics",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/paramedics",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/paramedics.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Search name, email, or phone...",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-PATIENTS",
+    "name": "Mobile admin/patients",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/patients",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/patients.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Search name, email, or phone...",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-REVIEWS",
+    "name": "Mobile admin/reviews",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/reviews",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/reviews.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-USERS",
+    "name": "Mobile admin/users",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/users",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/users.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Search name, email, or phone...",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-ADM-ADMIN-VERIFICATION",
+    "name": "Mobile admin/verification",
+    "platform": "mobile",
+    "module": "Admin",
+    "route": "admin/verification",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/admin/verification.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-CHANGE-PASSWORD",
+    "name": "Mobile auth/change-password",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/change-password",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/change-password.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: Min 8 chars, 1 number, 1 symbol",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Interactive element trigger",
+        "result": "Navigates to /auth/login (replace)"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-FORGOT",
+    "name": "Mobile auth/forgot",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/forgot",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/forgot.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: e.g. user@gmail.com or 03001234567",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-LOGIN",
+    "name": "Mobile auth/login",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/login",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/login.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-MFA-VERIFY",
+    "name": "Mobile auth/mfa-verify",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/mfa-verify",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/mfa-verify.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-REGISTER",
+    "name": "Mobile auth/register",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/register",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/register.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: e.g. 03001234567",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: e.g. 37405-1234567-1",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-RESET",
+    "name": "Mobile auth/reset",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/reset",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/reset.tsx",
+    "ui_elements": [
+      {
+        "name": "Input: e.g. 123456",
+        "description": "Text entry field"
+      },
+      {
+        "name": "Input: Min 8 chars, 1 number, 1 symbol",
+        "description": "Text entry field"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Interactive element trigger",
+        "result": "Navigates to /auth/login (replace)"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-ROLE-SELECT",
+    "name": "Mobile auth/role-select",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/role-select",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/role-select.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "MOB-AUT-AUTH-VERIFY-OTP",
+    "name": "Mobile auth/verify-otp",
+    "platform": "mobile",
+    "module": "Auth",
+    "route": "auth/verify-otp",
+    "screenType": "Screen",
+    "sourceFile": "mobile/src/app/auth/verify-otp.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-WEB-LOGIN",
+    "name": "Web Login",
+    "platform": "web",
+    "module": "Web",
+    "route": "Login",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/Login.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-ADM-ADMIN-AUDITLOGS",
+    "name": "Web admin/AuditLogs",
+    "platform": "web",
+    "module": "Admin",
+    "route": "admin/AuditLogs",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/admin/AuditLogs.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-ADM-ADMIN-CONFIG",
+    "name": "Web admin/Config",
+    "platform": "web",
+    "module": "Admin",
+    "route": "admin/Config",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/admin/Config.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-ADM-ADMIN-DASHBOARD",
+    "name": "Web admin/Dashboard",
+    "platform": "web",
+    "module": "Admin",
+    "route": "admin/Dashboard",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/admin/Dashboard.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-ADM-ADMIN-DOCTORVERIFICATION",
+    "name": "Web admin/DoctorVerification",
+    "platform": "web",
+    "module": "Admin",
+    "route": "admin/DoctorVerification",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/admin/DoctorVerification.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-ADM-ADMIN-MARKETPLACE",
+    "name": "Web admin/Marketplace",
+    "platform": "web",
+    "module": "Admin",
+    "route": "admin/Marketplace",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/admin/Marketplace.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-ADM-ADMIN-NURSEVERIFICATION",
+    "name": "Web admin/NurseVerification",
+    "platform": "web",
+    "module": "Admin",
+    "route": "admin/NurseVerification",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/admin/NurseVerification.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-ADM-ADMIN-USERS",
+    "name": "Web admin/Users",
+    "platform": "web",
+    "module": "Admin",
+    "route": "admin/Users",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/admin/Users.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-DOC-DOCTOR-CASEREVIEW",
+    "name": "Web doctor/CaseReview",
+    "platform": "web",
+    "module": "Doctor",
+    "route": "doctor/CaseReview",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/doctor/CaseReview.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-DOC-DOCTOR-DASHBOARD",
+    "name": "Web doctor/Dashboard",
+    "platform": "web",
+    "module": "Doctor",
+    "route": "doctor/Dashboard",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/doctor/Dashboard.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  },
+  {
+    "id": "WEB-DOC-DOCTOR-HOMEVISITS",
+    "name": "Web doctor/HomeVisits",
+    "platform": "web",
+    "module": "Doctor",
+    "route": "doctor/HomeVisits",
+    "screenType": "Page",
+    "sourceFile": "web/src/pages/doctor/HomeVisits.tsx",
+    "ui_elements": [
+      {
+        "name": "Main View Container",
+        "description": "Displays screen content"
+      }
+    ],
+    "ui_actions": [
+      {
+        "action": "Scroll",
+        "result": "Views additional content"
+      }
+    ]
+  }
+]

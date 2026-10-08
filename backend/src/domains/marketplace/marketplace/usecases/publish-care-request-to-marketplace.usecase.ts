@@ -2,6 +2,7 @@ import { AppError } from '../../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../../common/constants/index';
 import { MarketplaceRepository } from '../marketplace.repository';
 import { CareRequestRepository } from '../../../care/requests/repository/care-request.repository';
+import { PRIVATE_LOCATION } from '../pricing';
 
 export class PublishCareRequestToMarketplaceUseCase {
   constructor(
@@ -25,15 +26,14 @@ export class PublishCareRequestToMarketplaceUseCase {
     }
 
     // Determine zone based on patient's address logic
-    const address = careRequest.patient?.address || 'Unknown';
-    const zoneStr = address.split(',')[0] || address;
+    const zoneStr = careRequest.patient?.city || PRIVATE_LOCATION;
 
     // Create the MarketplaceListing securely with idempotency on unique constraint failure
     try {
       return await this.marketplaceRepo.createListing({
         careRequestId,
         zone: zoneStr,
-        specializationRequired: null, // Basic version
+        specializationRequired: careRequest.requirements || null,
         status: 'OPEN'
       });
     } catch (err: any) {

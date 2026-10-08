@@ -62,12 +62,125 @@ export interface CareRequestResponse {
   marketplaceListing?: {
     id: string;
     status: string;
+    _count?: {
+      offers: number;
+    };
   };
+  contract?: {
+    id: string;
+    status: string;
+    price: number;
+    priceType: string;
+    patientApproved: boolean;
+    nurseApproved: boolean;
+    nurse?: {
+      user?: {
+        fullName: string;
+      };
+    };
+  } | null;
   visits?: Array<{
     id: string;
     status: string;
-    scheduledAt: string;
+    scheduledAt?: string;
+    startedAt?: string;
+    completedAt?: string;
+    nurse?: {
+      experience?: number;
+      user?: {
+        fullName: string;
+        phone?: string;
+      };
+    };
+    doctor?: {
+      pmdcNumber?: string;
+      user?: {
+        fullName: string;
+        phone?: string;
+      };
+    };
+    vitals?: Array<{
+      id: string;
+      systolic: number;
+      diastolic: number;
+      heartRate: number;
+      temperature: number;
+      oxygenSaturation: number;
+      bloodSugar?: number | null;
+      recordedAt: string;
+    }>;
+    assessments?: Array<{
+      id: string;
+      riskTier: string;
+      fusedScore: number;
+      mlScore?: number;
+      nurseConfidence?: number;
+      notes?: string;
+      assessedAt: string;
+    }>;
+    caseAssignment?: {
+      id: string;
+      status: string;
+      riskTier: string;
+      slaDeadline?: string;
+      doctor?: {
+        user?: {
+          fullName: string;
+        };
+      };
+    } | null;
   }>;
+  visit?: {
+    id: string;
+    status: string;
+    scheduledAt?: string;
+    startedAt?: string;
+    completedAt?: string;
+    nurse?: {
+      experience?: number;
+      user?: {
+        fullName: string;
+        phone?: string;
+      };
+    };
+    doctor?: {
+      pmdcNumber?: string;
+      user?: {
+        fullName: string;
+        phone?: string;
+      };
+    };
+    vitals?: Array<{
+      id: string;
+      systolic: number;
+      diastolic: number;
+      heartRate: number;
+      temperature: number;
+      oxygenSaturation: number;
+      bloodSugar?: number | null;
+      recordedAt: string;
+    }>;
+    assessments?: Array<{
+      id: string;
+      riskTier: string;
+      fusedScore: number;
+      mlScore?: number;
+      nurseConfidence?: number;
+      notes?: string;
+      assessedAt: string;
+    }>;
+    caseAssignment?: {
+      id: string;
+      status: string;
+      riskTier: string;
+      slaDeadline?: string;
+      doctor?: {
+        user?: {
+          fullName: string;
+        };
+      };
+    } | null;
+  } | null;
 }
 
 export interface RescheduleRequestDto {

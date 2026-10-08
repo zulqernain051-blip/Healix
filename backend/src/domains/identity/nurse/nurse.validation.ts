@@ -47,8 +47,9 @@ export const reviewDocumentSchema = z.object({
 /** Create a weekly availability slot */
 export const availabilitySlotSchema = z.object({
   dayOfWeek: z.number().int().min(0, 'Day must be 0 (Sunday) to 6 (Saturday)').max(6, 'Day must be 0 (Sunday) to 6 (Saturday)'),
-  startTime: z.string().trim().regex(/^\d{2}:\d{2}$/, 'startTime must be in HH:MM format (e.g. 09:00)'),
-  endTime: z.string().trim().regex(/^\d{2}:\d{2}$/, 'endTime must be in HH:MM format (e.g. 17:00)')
+  startTime: z.string().trim().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'startTime must be a valid HH:MM time'),
+  endTime: z.string().trim().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'endTime must be a valid HH:MM time'),
+  shiftType: z.enum(['DAY', 'EVENING', 'NIGHT']).default('DAY')
 }).refine(
   (data) => data.startTime < data.endTime,
   { message: 'startTime must be earlier than endTime', path: ['endTime'] }

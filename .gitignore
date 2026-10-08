@@ -48,3 +48,33 @@ venv/
 .venv/
 env/
 Active/
+
+# Generated test artifacts (historical snapshots live under archive/)
+test-results/
+playwright-report/
+blob-report/
+# Historical browser results stay local
+*.tsbuildinfo
+
+# Runtime nurse credential documents and profile uploads
+backend/private/
+backend/public/uploads/
+
+# Local credentials, temporary previews and captured application data
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.dump
+*.backup
+scratch/
+archive/test-results/
+documentation/screenshots/
+documentation/output/
+documentation/inventory/manual_capture_results.json
+
+# Browser captures can contain patient and administrative records
+screenshots/

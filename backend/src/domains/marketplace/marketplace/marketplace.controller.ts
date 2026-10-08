@@ -20,12 +20,12 @@ const checkPatientOwnership = (req: Request, targetPatientId: string) => {
 };
 
 export class MarketplaceController {
-  public static async getActiveListings(_req: Request, res: Response) {
+  public static async getActiveListings(req: Request, res: Response) {
     try {
-      const list = await MarketplaceService.getActiveListings();
+      const list = await MarketplaceService.getActiveListings((req as any).user);
       res.json({ success: true, data: list });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 500).json({ success: false, message: err.message });
     }
   }
 
@@ -43,7 +43,7 @@ export class MarketplaceController {
       const result = await MarketplaceService.submitOffer(id, nurseId, payload);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 
@@ -61,7 +61,7 @@ export class MarketplaceController {
       const result = await MarketplaceService.updateOffer(id, nurseId, payload);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 
@@ -78,17 +78,17 @@ export class MarketplaceController {
       const result = await MarketplaceService.withdrawOffer(id, nurseId);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 
   public static async getListingOffers(req: Request, res: Response) {
     try {
       const { id } = req.params; // Listing ID
-      const list = await MarketplaceService.getListingOffers(id);
+      const list = await MarketplaceService.getListingOffers(id, (req as any).user);
       res.json({ success: true, data: list });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 500).json({ success: false, message: err.message });
     }
   }
 
@@ -140,7 +140,17 @@ export class MarketplaceController {
       const preview = await MarketplaceService.getCostPreview(price, priceType, durationHours);
       res.json({ success: true, data: preview });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
+  }
+
+  public static async rejectOffer(req: Request, res: Response) {
+    try { res.json({ success: true, data: await MarketplaceService.rejectOffer(req.params.id, (req as any).user) }); }
+    catch (err: any) { res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message }); }
+  }
+
+  public static async removeFavoriteNurse(req: Request, res: Response) {
+    try { checkPatientOwnership(req, req.params.id); res.json({ success: true, data: await MarketplaceService.removeFavoriteNurse(req.params.id, req.params.nurseId) }); }
+    catch (err: any) { res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message }); }
   }
 }

@@ -1,26 +1,15 @@
 let getIo: any = () => undefined; try { const { ChatSocketService } = require("../../../../communication/chat/chat.socket"); getIo = () => ChatSocketService.getIo(); } catch(e) {}
-import { prisma } from '../../../../../common/config/database';
+import { DoctorRepository } from '../../../../identity/doctor/doctor.repository';
 import { AppError } from '../../../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../../../common/constants/index';
 
 export class AutomaticDoctorAssignmentUseCase {
   async execute(caseId: string, tx?: any) {
-    const db = tx || prisma;
-
-    // We must run inside a transaction to ensure atomicity
-    return db.$transaction(async (transactionClient: any) => {
-      // 1. Fetch CaseAssignment
-      const caseAssignments = await transactionClient.caseAssignment.findMany({
-        where: { id: caseId }
-      });
-
-      if (!caseAssignments || caseAssignments.length === 0) {
-        throw new AppError('Case not found', HTTP_STATUS.NOT_FOUND);
-      }
-
+    return DoctorRepository.withCaseAssignmentLock(caseId, async (transactionClient: any) => {
       const currentCase = await transactionClient.caseAssignment.findUnique({
         where: { id: caseId }
       });
+      if (!currentCase) throw new AppError('Case not found', HTTP_STATUS.NOT_FOUND);
 
       // Idempotency: If already assigned, return it.
       if (currentCase.status !== 'PENDING' && currentCase.status !== 'UNASSIGNED') {
@@ -28,7 +17,6 @@ export class AutomaticDoctorAssignmentUseCase {
       }
 
       // 2. Fetch eligible doctors and rank them
-      const { DoctorRepository } = require('../../../../identity/doctor/doctor.repository');
       let eligibleDoctors = await DoctorRepository.findEligibleDoctorsWithWorkload(transactionClient, currentCase.riskTier);
 
       // Filter based on real-time availability window
@@ -128,10 +116,10 @@ export class AutomaticDoctorAssignmentUseCase {
       // Auto-create Chat Thread for Normal Doctor Assignment
       try {
         const { ChatAutoCreator } = require('../../../../communication/chat/chat.auto-creator');
-        await ChatAutoCreator.onDoctorAssigned(caseId, doctorUser.userId);
+        await ChatAutoCreator.onDoctorAssigned(caseId, doctorUser.userId, transactionClient);
       } catch (e) {}
 
       return updatedCase;
-    });
+    }, tx);
   }
 }

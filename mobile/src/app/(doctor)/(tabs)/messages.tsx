@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,7 +13,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { Text, Avatar, Button } from 'react-native-paper';
+import { Text, Avatar } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useConversations, useGetOrCreateThread, useSearchUserByPhone } from '../../../hooks/useMessages';
@@ -22,22 +22,22 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function MessagesScreen() {
   const { user } = useAuthStore();
-  const { data: conversations, isLoading } = useConversations();
+  const { data: conversations, isLoading, error, refetch } = useConversations();
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // New Chat Modal States
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [phoneSearchQuery, setPhoneSearchQuery] = useState('');
   const [foundUsers, setFoundUsers] = useState<any[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
-  
+
   const searchUserMutation = useSearchUserByPhone();
   const createThreadMutation = useGetOrCreateThread();
 
   // Extract threads from response (handle both wrapped and unwrapped array)
-  const threads = Array.isArray(conversations) 
-    ? conversations 
-    : (conversations?.data || []);
+  const threads = Array.isArray(conversations)
+    ? conversations
+    : ((conversations as any)?.data || []);
 
   const filteredConversations = threads.filter((c: any) => {
     const nameMatch = c.otherParticipant?.name?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -45,7 +45,7 @@ export default function MessagesScreen() {
     return nameMatch || roleMatch;
   });
 
-  
+
   useEffect(() => {
     if (phoneSearchQuery.trim().length >= 10) {
       const delayDebounceFn = setTimeout(() => {
@@ -81,19 +81,19 @@ export default function MessagesScreen() {
 
   const handleStartChat = (targetUser: any) => {
     if (!targetUser) return;
-    
+
     createThreadMutation.mutate(targetUser.id, {
       onSuccess: (res) => {
-        const thread = res?.data?.data;
+        const thread = res;
         setIsModalVisible(false);
         setPhoneSearchQuery('');
         setFoundUsers([]);
         setHasSearched(false);
         if (thread) {
-          navigate('/(doctor)/messages/chat', { 
-            threadId: thread.threadId, 
-            name: targetUser.fullName || targetUser.name, 
-            role: targetUser.role 
+          navigate('/(doctor)/messages/chat', {
+            threadId: thread.id,
+            name: targetUser.fullName || targetUser.name,
+            role: targetUser.role
           });
         }
       },
@@ -101,7 +101,7 @@ export default function MessagesScreen() {
         setIsModalVisible(false);
         const message = err?.message || 'Unable to start chat. Check connection.';
         const status = err?.statusCode || 500;
-        
+
         if (status === 403 || status === 400) {
           Alert.alert('Communication Not Allowed', message);
         } else if (status === 401) {
@@ -115,9 +115,9 @@ export default function MessagesScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
       <View style={styles.container}>
-        
+
         {/* Header */}
         <View style={styles.headerRow}>
           <Text style={styles.headerTitle}>Messages</Text>
@@ -129,7 +129,7 @@ export default function MessagesScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Search active chats..."
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -137,17 +137,18 @@ export default function MessagesScreen() {
 
         {/* Conversation List */}
         <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
+        {error && <View><Text accessibilityRole="alert" style={styles.errorText}>{(error as Error).message}</Text><TouchableOpacity onPress={() => void refetch()}><Text style={{ color: COLORS.navy }}>Retry</Text></TouchableOpacity></View>}
           {isLoading ? (
-            <ActivityIndicator color="#00E676" size="large" style={{ marginTop: 40 }} />
+            <ActivityIndicator color={COLORS.navy} size="large" style={{ marginTop: 40 }} />
           ) : filteredConversations.length > 0 ? (
             filteredConversations.map((item: any) => (
               <TouchableOpacity
                 key={item.threadId}
                 style={styles.conversationCard}
-                onPress={() => navigate('/(doctor)/messages/chat', { 
-                  threadId: item.threadId, 
-                  name: item.otherParticipant.name, 
-                  role: item.otherParticipant.role 
+                onPress={() => navigate('/(doctor)/messages/chat', {
+                  threadId: item.threadId,
+                  name: item.otherParticipant.name,
+                  role: item.otherParticipant.role
                 })}
                 activeOpacity={0.8}
               >
@@ -155,7 +156,7 @@ export default function MessagesScreen() {
                   size={46}
                   label={item.otherParticipant.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
                   style={styles.avatarBg}
-                  color="#00E676"
+                  color={COLORS.navy}
                 />
                 <View style={styles.chatInfo}>
                   <View style={styles.nameTimeRow}>
@@ -190,14 +191,14 @@ export default function MessagesScreen() {
             </View>
           )}
         </ScrollView>
-        
+
         {/* Floating Action Button */}
-        <TouchableOpacity 
-          style={styles.fab} 
+        <TouchableOpacity
+          style={styles.fab}
           onPress={() => setIsModalVisible(true)}
           activeOpacity={0.8}
         >
-          <Ionicons name="add" size={28} color="#FFFFFF" />
+          <Ionicons name="add" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
 
       </View>
@@ -209,12 +210,12 @@ export default function MessagesScreen() {
         animationType="slide"
         onRequestClose={() => {
           setIsModalVisible(false);
-          setFoundUser(null);
+          setFoundUsers([]);
           setPhoneSearchQuery('');
         }}
       >
-        <KeyboardAvoidingView 
-          style={styles.modalOverlay} 
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
           <View style={styles.modalContent}>
@@ -226,7 +227,7 @@ export default function MessagesScreen() {
                 setHasSearched(false);
                 setPhoneSearchQuery('');
               }}>
-                <Ionicons name="close" size={24} color="#6B8E8A" />
+                <Ionicons name="close" size={24} color={COLORS.textMuted} />
               </TouchableOpacity>
             </View>
 
@@ -235,7 +236,7 @@ export default function MessagesScreen() {
               <TextInput
                 style={styles.phoneInput}
                 placeholder="e.g. 0300"
-                placeholderTextColor="#6B8E8A"
+                placeholderTextColor={COLORS.textMuted}
                 keyboardType="phone-pad"
                 value={phoneSearchQuery}
                 onChangeText={(text) => {
@@ -243,13 +244,13 @@ export default function MessagesScreen() {
                   setHasSearched(false);
                 }}
               />
-              <TouchableOpacity 
-                style={styles.searchBtn} 
+              <TouchableOpacity
+                style={styles.searchBtn}
                 onPress={handleSearchByPhone}
                 disabled={searchUserMutation.isPending || !phoneSearchQuery.trim()}
               >
                 {searchUserMutation.isPending ? (
-                  <ActivityIndicator color="#061C19" size="small" />
+                  <ActivityIndicator color={COLORS.surface} size="small" />
                 ) : (
                   <Text style={styles.searchBtnText}>Search</Text>
                 )}
@@ -263,20 +264,20 @@ export default function MessagesScreen() {
                     size={46}
                     label={(user.fullName || user.name || 'U').split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
                     style={styles.avatarBg}
-                    color="#00E676"
+                    color={COLORS.navy}
                   />
                   <View style={styles.foundUserInfo}>
                     <Text style={styles.chatName}>{user.fullName || user.name}</Text>
                     <Text style={styles.roleText}>{user.role}</Text>
-                    <Text style={{color: '#6B8E8A', fontSize: 10}}>{user.phone}</Text>
+                    <Text style={{color: COLORS.textMuted, fontSize: 10}}>{user.phone}</Text>
                   </View>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.startChatBtn}
                     onPress={() => handleStartChat(user)}
                     disabled={createThreadMutation.isPending}
                   >
                     {createThreadMutation.isPending ? (
-                       <ActivityIndicator color="#FFFFFF" size="small" />
+                       <ActivityIndicator color={COLORS.textDark} size="small" />
                     ) : (
                       <Text style={styles.startChatBtnText}>Message</Text>
                     )}
@@ -300,7 +301,7 @@ export default function MessagesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.surface,
   },
   container: {
     flex: 1,
@@ -313,14 +314,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.md,
     paddingHorizontal: SPACING.md,
     paddingVertical: 8,
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.xs,
   },
   listContainer: {
@@ -342,7 +343,7 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   conversationCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
@@ -351,7 +352,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(0, 230, 118, 0.15)',
   },
   avatarBg: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
     borderColor: 'rgba(0, 230, 118, 0.3)',
   },
@@ -365,12 +366,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   chatName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   chatTime: {
-    color: '#6B8E8A',
+    color: COLORS.textMuted,
     fontSize: 10,
   },
   roleRow: {
@@ -379,7 +380,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   roleText: {
-    color: '#00E676',
+    color: COLORS.navy,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -389,13 +390,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   lastMsg: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     flex: 1,
     marginRight: SPACING.xs,
   },
   unreadBadge: {
-    backgroundColor: '#EF4444',
+    backgroundColor: COLORS.red,
     width: 18,
     height: 18,
     borderRadius: 9,
@@ -403,7 +404,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   unreadBadgeText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 10,
     fontWeight: '800',
   },
@@ -417,12 +418,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emptyTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
   },
   emptySub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     textAlign: 'center',
     marginTop: 6,
@@ -432,14 +433,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 20,
-    backgroundColor: '#0D9488',
+    backgroundColor: COLORS.navy,
     width: 56,
     height: 56,
     borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: COLORS.navyDark,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
@@ -450,7 +451,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.surfaceCard,
     borderTopLeftRadius: RADIUS.lg,
     borderTopRightRadius: RADIUS.lg,
     padding: SPACING.lg,
@@ -465,12 +466,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   modalTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
   },
   modalLabel: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: TYPOGRAPHY.sizes.xs,
     marginBottom: SPACING.sm,
   },
@@ -481,30 +482,30 @@ const styles = StyleSheet.create({
   },
   phoneInput: {
     flex: 1,
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
     borderColor: 'rgba(0, 230, 118, 0.3)',
     borderRadius: RADIUS.sm,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     paddingHorizontal: SPACING.md,
     paddingVertical: 12,
   },
   searchBtn: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.navy,
     borderRadius: RADIUS.sm,
     paddingHorizontal: SPACING.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   searchBtnText: {
-    color: '#061C19',
+    color: COLORS.surface,
     fontWeight: '700',
     fontSize: TYPOGRAPHY.sizes.sm,
   },
   foundUserCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.surfaceMuted,
     padding: SPACING.md,
     borderRadius: RADIUS.md,
     borderWidth: 1,
@@ -515,18 +516,18 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.md,
   },
   startChatBtn: {
-    backgroundColor: '#0D9488',
+    backgroundColor: COLORS.navy,
     paddingHorizontal: SPACING.md,
     paddingVertical: 8,
     borderRadius: RADIUS.sm,
   },
   startChatBtnText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontWeight: '600',
     fontSize: 12,
   },
   errorText: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: TYPOGRAPHY.sizes.xs,
     textAlign: 'center',
     marginTop: SPACING.sm,

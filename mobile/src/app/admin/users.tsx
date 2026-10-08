@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { Card, Button, Chip, Divider } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
 import { useAdminUsers, useUpdateUserStatus } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminUsers() {
   const { data: users_raw, isLoading  } = useAdminUsers(); const users = users_raw?.users || [];
@@ -80,7 +80,7 @@ export default function AdminUsers() {
           <TouchableOpacity onPress={() => navigate('/admin')} style={styles.backBtn}>
             <Text style={styles.backText}>‹ Back to Command Center</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>User Account Management</Text>
+          <Text style={styles.title}>User Account Management</Text><Button onPress={() => navigate('/admin/invitations')}>Invite an administrator or clinician</Button><Button onPress={() => navigate('/auth/security')}>My account security</Button>
           <Text style={styles.subtitle}>Audit, suspend, or reactivate accounts across all platform roles</Text>
         </View>
 

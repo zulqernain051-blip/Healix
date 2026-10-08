@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { api } from '../../store/auth';
 import { useAdminStore } from '../../store/admin';
 import { Search, Eye, AlertTriangle, CheckCircle, Ban, Trash2 } from 'lucide-react';
 
 export default function Users() {
   const { usersData, fetchUsers, fetchUserDetail, userDetail, updateUserStatus, deleteUser, isLoading } = useAdminStore();
+  const [inviteEmail,setInviteEmail] = useState(''), [inviteRole,setInviteRole] = useState('ADMIN'), [inviteToken,setInviteToken] = useState(''), [inviteError,setInviteError] = useState(''), [inviteBusy,setInviteBusy] = useState(false);
+  const [createRole, setCreateRole] = useState<'DOCTOR' | 'PARAMEDIC'>('DOCTOR');
+  const [createForm, setCreateForm] = useState({ fullName: '', email: '', phone: '', password: '', cnic: '', credential: '' });
+  const [createError, setCreateError] = useState('');
+  const [createBusy, setCreateBusy] = useState(false);
+  const [createMessage, setCreateMessage] = useState('');
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
   const [status, setStatus] = useState('');
@@ -70,6 +77,33 @@ export default function Users() {
         <p className="page-subtitle">Search, inspect profiles, activate, deactivate, or soft-delete platform users</p>
       </div>
 
+      <form className="card" onSubmit={async e => { e.preventDefault(); setInviteBusy(true); setInviteError(''); setInviteToken(''); try { const result = await api('POST','/admin/users/invite',{email:inviteEmail,role:inviteRole}); setInviteToken(result.token); } catch(e:any) { setInviteError(e.message); } finally { setInviteBusy(false); } }}>
+        <h3>Invite a Healix user</h3><label>Email<input required type="email" className="form-input" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)}/></label><label>Role<select className="form-input" value={inviteRole} onChange={e => setInviteRole(e.target.value)}>{['ADMIN','DOCTOR','PARAMEDIC','NURSE','PATIENT'].map(r => <option key={r}>{r}</option>)}</select></label><button className="btn btn-primary" disabled={inviteBusy}>Create invitation</button>{inviteError && <p role="alert">{inviteError}</p>}{inviteToken && <p>Share privately. Accept in the Healix app via Sign In → Accept an invitation. Token (expires in seven days): <code>{inviteToken}</code></p>}
+      </form>
+      <form className="card" onSubmit={async e => {
+        e.preventDefault(); setCreateBusy(true); setCreateError(''); setCreateMessage('');
+        try {
+          const path = createRole === 'DOCTOR' ? '/admin/users/doctor' : '/admin/users/paramedic';
+          const credential = createRole === 'DOCTOR' ? { pmdcNumber: createForm.credential } : { certificationNumber: createForm.credential };
+          await api('POST', path, { ...createForm, ...credential });
+          setCreateMessage(`${createRole === 'DOCTOR' ? 'Doctor' : 'Paramedic'} account created. The user can sign in now.`);
+          setCreateForm({ fullName: '', email: '', phone: '', password: '', cnic: '', credential: '' });
+          await fetchUsers({ search, role, status, page, limit: 10 });
+        } catch (error: any) { setCreateError(error.message || 'Account creation failed'); }
+        finally { setCreateBusy(false); }
+      }}>
+        <h3>Create doctor or paramedic account</h3>
+        <p>The account is active as soon as you create it. Share the sign-in details privately.</p>
+        <label>Role<select className="form-input" value={createRole} onChange={e => setCreateRole(e.target.value as 'DOCTOR' | 'PARAMEDIC')}><option value="DOCTOR">Doctor</option><option value="PARAMEDIC">Paramedic</option></select></label>
+        <label>Full name<input required className="form-input" value={createForm.fullName} onChange={e => setCreateForm({ ...createForm, fullName: e.target.value })} /></label>
+        <label>Email<input required type="email" className="form-input" value={createForm.email} onChange={e => setCreateForm({ ...createForm, email: e.target.value })} /></label>
+        <label>Phone<input required className="form-input" value={createForm.phone} onChange={e => setCreateForm({ ...createForm, phone: e.target.value })} /></label>
+        <label>CNIC<input required className="form-input" value={createForm.cnic} onChange={e => setCreateForm({ ...createForm, cnic: e.target.value })} /></label>
+        <label>{createRole === 'DOCTOR' ? 'PMDC number' : 'Certification number'}<input required className="form-input" value={createForm.credential} onChange={e => setCreateForm({ ...createForm, credential: e.target.value })} /></label>
+        <label>Initial password<input required type="password" minLength={8} className="form-input" value={createForm.password} onChange={e => setCreateForm({ ...createForm, password: e.target.value })} /></label>
+        <button className="btn btn-primary" disabled={createBusy}>Create account</button>
+        {createError && <p role="alert">{createError}</p>}{createMessage && <p role="status">{createMessage}</p>}
+      </form>
       <div className="toolbar">
         <div className="search-box">
           <Search />

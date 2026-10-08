@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, SafeAreaView, StatusBar, Platform } from 'react-native';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, Alert, ActivityIndicator, SafeAreaView, StatusBar, Platform } from 'react-native';
 import { Card, Button, Divider, SegmentedButtons, Chip } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { AIChatBubble } from '../../../components/patient/AIChatBubble';
 import { RiskHistoryCard } from '../../../components/patient/RiskHistoryCard';
 import { useAuthStore } from '../../../store/auth';
 import { usePerformRiskAssessment } from '../../../hooks/useClinical';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS } from '../../../theme';
 
 export default function NurseRiskAssessScreen() {
   const router = useRouter();
@@ -16,7 +17,8 @@ export default function NurseRiskAssessScreen() {
   const [confidence, setConfidence] = useState<number>(4);
 
   const handlePerformAssessment = async () => {
-    const targetPatientId = (patientId as string) || 'p1001';
+    const targetPatientId = typeof patientId === 'string' ? patientId : '';
+    if (!targetPatientId) { if (Platform.OS === 'web') alert('Open risk assessment from an assigned patient or visit.'); else appAlert('Select a patient', 'Open risk assessment from an assigned patient or visit.'); return; }
 
     try {
       await performRiskAssessment({
@@ -26,21 +28,21 @@ export default function NurseRiskAssessScreen() {
       });
       
       if (Platform.OS === 'web') {
-        alert('Risk Assessed ✓\nAI clinical risk model evaluation completed successfully.');
+        alert('Risk Assessed ✓\nClinical risk assessment recorded.');
       } else {
-        Alert.alert('Risk Assessed ✓', 'AI clinical risk model evaluation completed successfully.');
+        appAlert('Risk Assessed ✓', 'Clinical risk assessment recorded.');
       }
     } catch (err: any) {
       if (Platform.OS === 'web') {
         alert('Assessment Error: ' + err.message);
       } else {
-        Alert.alert('Assessment Error', err.message);
+        appAlert('Assessment Error', err.message);
       }
     }
   };
 
-  const activeRiskTier = riskAssessment?.riskTier || 'LOW';
-  const scoreVal = riskAssessment?.fusedScore ? Math.round(riskAssessment.fusedScore) : 18;
+  const activeRiskTier = riskAssessment?.riskTier || 'NOT ASSESSED';
+  const scoreVal = riskAssessment?.fusedScore ? Math.round(riskAssessment.fusedScore) : 0;
 
   const getTierColor = (tier: string) => {
     if (tier === 'HIGH') return '#EF4444';

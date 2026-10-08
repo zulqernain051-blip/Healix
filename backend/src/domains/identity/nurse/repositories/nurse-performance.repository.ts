@@ -61,9 +61,16 @@ export class NursePerformanceRepository {
     const experienceScore = Math.min((completedVisits / 50) * 100, 100);
     const performanceScore = (avgRating / 5) * 100;
     
-    // Simple reliability logic: on-time verifications or just basic base value
-    const reliabilityScore = completedVisits > 0 ? 85 : 0;
-    const skillScore = (experienceScore + performanceScore + reliabilityScore) / 3;
+    // On time means checked in within 15 minutes of the agreed/scheduled start.
+    const timedVisits = await prisma.visit.findMany({ where: { nurseId, status: 'COMPLETED' }, select: { agreedStartTime: true, startedAt: true, request: { select: { scheduledAt: true } }, attendanceRecord: { select: { checkInAt: true } } } });
+    const measured = timedVisits.filter(v => (v.attendanceRecord?.checkInAt || v.startedAt) && (v.agreedStartTime || v.request.scheduledAt));
+    const onTime = measured.filter(v => {
+      const start = v.attendanceRecord?.checkInAt || v.startedAt!;
+      return start.getTime() <= (v.agreedStartTime || v.request.scheduledAt)!.getTime() + 15 * 60 * 1000;
+    }).length;
+    const reliabilityScore = measured.length ? onTime / measured.length * 100 : 0;
+    const assessedSkills = await prisma.nurseSpecialization.findMany({ where: { nurseId, certified: true, proficiencyRating: { not: null } } });
+    const skillScore = assessedSkills.length ? assessedSkills.reduce((total, skill) => total + skill.proficiencyRating!, 0) / assessedSkills.length / 5 * 100 : 0;
 
     // Composite score formula
     const compositeScore = (skillScore * 0.4) + (experienceScore * 0.3) + (reliabilityScore * 0.2) + (performanceScore * 0.1);
@@ -78,7 +85,7 @@ export class NursePerformanceRepository {
         performanceScore,
         compositeScore,
         totalVisits: completedVisits,
-        onTimeRate: reliabilityScore, // Mock or simple representation
+        onTimeRate: reliabilityScore,
         avgRating
       },
       update: {
@@ -96,9 +103,10 @@ export class NursePerformanceRepository {
   }
 
   public static async getNurseScore(nurseId: string) {
-    return prisma.nurseScore.findUnique({
-      where: { nurseId }
-    });
+    const score = await this.computeAndUpsertNurseScore(nurseId);
+    const assessedSkills = await prisma.nurseSpecialization.findMany({ where: { nurseId, certified: true, proficiencyRating: { not: null } }, select: { specialization: true, proficiencyRating: true, assessmentNotes: true, assessedAt: true } });
+    const reviews = await prisma.nurseReview.findMany({ where: { nurseId }, select: { recommend: true } });
+    return score ? { ...score, skillAssessmentCount: assessedSkills.length, assessedSkills, skillBasis: 'Average administrator-recorded specialty assessment (1–5), scaled to 100', reviewCount: reviews.length, recommendationRate: reviews.length ? reviews.filter(r => r.recommend).length / reviews.length * 100 : null } : null;
   }
 
   public static async findBadgesByNurseId(nurseId: string) {
@@ -131,7 +139,8 @@ export class NursePerformanceRepository {
     }
     if (completedVisits >= 10) {
       eligibleBadgeTypes.push('TEN_VISITS');
-      eligibleBadgeTypes.push('RELIABLE'); // Reliable milestone (on-time or general)
+      const score = await this.computeAndUpsertNurseScore(nurseId);
+      if (score.onTimeRate >= 90) eligibleBadgeTypes.push('RELIABLE');
     }
     if (completedVisits >= 20 && avgRating >= 4.7) {
       eligibleBadgeTypes.push('TOP_RATED');

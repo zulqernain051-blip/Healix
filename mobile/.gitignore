@@ -42,5 +42,13 @@ example
 # generated native folders
 /ios
 /android
+/dist-audit*/
+/.eslint-audit.json
+/.unused-audit.txt
 
 
+# issue
+# 1 offer but it says compare, it should say see offers instead of compare
+#  when i select an offer and it still says offer avaible it is worng after selecting offer it
+# should automaticly show contract right now i sstill see offers , howevere if i cancel the contract 
+# before agrreing to it then  i should see offers

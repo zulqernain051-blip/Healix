@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useRef, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -38,7 +39,7 @@ export default function NurseChatScreen() {
   const { mutate: markAsRead } = useMarkMessagesAsRead(threadId);
   const { typingUsers, sendTypingEvent } = useChatSocket(threadId);
 
-  const rawMessages = historyData?.data?.messages || (historyData as any)?.messages || [];
+  const rawMessages = (historyData as any)?.data?.messages || historyData?.messages || [];
 
   // Sort messages
   const messages = [...rawMessages].sort((a: any, b: any) => 
@@ -75,14 +76,15 @@ export default function NurseChatScreen() {
         });
       }
     } catch (err: any) {
-      Alert.alert('Message Failed', err.message || 'Error sending message');
+      appAlert('Message Failed', err.message || 'Error sending message');
+      throw err;
     }
   };
 
   
   
   const handleRequestEmergency = async () => {
-    Alert.alert(
+    appAlert(
       'Request Emergency Dispatch',
       'Are you sure you want to request an emergency ambulance dispatch from the doctor?',
       [
@@ -96,9 +98,9 @@ export default function NurseChatScreen() {
                 contentType: 'EMERGENCY_REQUEST',
                 contentUrlOrText: 'NURSE REQUESTED EMERGENCY DISPATCH'
               });
-              Alert.alert('Requested', 'The doctor has been notified.');
+              appAlert('Requested', 'The doctor has been notified.');
             } catch(e: any) {
-              Alert.alert('Error', e.message || 'Failed to send request');
+              appAlert('Error', e.message || 'Failed to send request');
             }
           }
         }
@@ -138,7 +140,7 @@ export default function NurseChatScreen() {
         {/* Banner */}
         <View style={styles.encryptionNotice}>
           <Text style={styles.encryptionText}>
-            🔒 HIPAA Encrypted Channel · Care Notes & Media Attached directly to Patient File
+            Care team conversation · messages and attachments
           </Text>
         </View>
 

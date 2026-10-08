@@ -13,6 +13,9 @@ import { useDashboardSummary } from '../../../hooks/useDashboard';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 const HEALTH_SECTIONS = [
+  { id: 'adherence', path: '/adherence', icon: '📅', title: 'Care Adherence', desc: 'Track due visits and scheduled medication doses', color: COLORS.navy, bgColor: COLORS.quickBlue },
+  { id: 'doctor-visits', path: '/(patient)/health/home-visits', icon: '🩺', title: 'Doctor Home Visits', desc: 'Request an appointment and follow your doctor visit', color: COLORS.navy, bgColor: COLORS.quickBlue },
+  { id: 'payments', path: '/(patient)/health/payments', icon: '💳', title: 'Payment History', desc: 'View recorded pending and paid care payments', color: COLORS.navy, bgColor: COLORS.quickBlue },
   {
     id: 'vitals',
     path: '/(patient)/records/vitals',
@@ -100,9 +103,9 @@ export default function HealthOverviewScreen() {
         {riskData && (
           <View style={[styles.riskBanner, { borderColor: riskColor }]}>
             <View style={styles.riskBannerLeft}>
-              <Text style={styles.riskBannerLabel}>🧠 AI Clinical Risk Score</Text>
+              <Text style={styles.riskBannerLabel}>🧠 Clinical Risk Assessment</Text>
               <Text style={[styles.riskTierText, { color: riskColor }]}>
-                {riskTier} RISK · {riskData.fusedScore ? (riskData.fusedScore * 100).toFixed(0) : 0}% confidence
+                {riskTier} RISK · {Number(riskData.fusedScore).toFixed(2)} risk score
               </Text>
             </View>
             <TouchableOpacity

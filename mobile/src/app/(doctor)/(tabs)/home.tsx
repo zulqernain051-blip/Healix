@@ -1,184 +1,47 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaView, StatusBar, Alert } from 'react-native';
-import { Card, Chip, Button } from 'react-native-paper';
+import { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
+import { Button, Card, Chip } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
-import { useDoctorQueue, useDoctorHighRiskQueue } from '../../../hooks/useDoctor';
+import { useDoctorQueue, useDoctorHighRiskQueue, useStartCaseReview } from '../../../hooks/useDoctor';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function DoctorDashboard() {
-  const { user, accessToken, logout } = useAuthStore();
+  const user = useAuthStore(s => s.user);
   const [filter, setFilter] = useState<'ALL' | 'HIGH'>('ALL');
-
-  const { data: queue = [], isLoading: isLoadingQueue } = useDoctorQueue();
-  const { data: highRiskQueue = [], isLoading: isLoadingHighRisk } = useDoctorHighRiskQueue();
-  
-  const isLoading = isLoadingQueue || isLoadingHighRisk;
-  const activeQueue = filter === 'ALL' ? queue : highRiskQueue;
-
-  const getSlaColor = (remainingMins?: number) => {
-    if (remainingMins === undefined) return '#94A3B8';
-    if (remainingMins <= 5) return '#EF4444';
-    if (remainingMins <= 10) return '#F59E0B';
-    return '#00E676';
+  const [actionError, setActionError] = useState('');
+  const queue = useDoctorQueue();
+  const alerts = useDoctorHighRiskQueue();
+  const start = useStartCaseReview();
+  const selected = filter === 'ALL' ? queue : alerts;
+  const cases = selected.data || [];
+  const refresh = () => Promise.all([queue.refetch(), alerts.refetch()]);
+  const open = async (id: string, status: string) => {
+    setActionError('');
+    try {
+      if (status !== 'IN_REVIEW') await start.mutateAsync(id);
+      navigate(`/(doctor)/reviews/${id}`);
+    } catch (e: any) { setActionError(e.message || 'Unable to open this case'); void refresh(); }
   };
-
-  const getRiskColor = (tier: string) => {
-    return tier === 'HIGH' ? '#EF4444' : '#F59E0B';
-  };
-
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#061C19' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.headerRow}>
-            <View>
-              <Text style={styles.greeting}>Welcome back,</Text>
-              <Text style={styles.docName}>{user?.fullName ?? 'Dr. Physician'}</Text>
-            </View>
-            <View style={styles.pmdcBadge}>
-              <Text style={styles.pmdcBadgeText}>✓ PMDC Verified Doctor</Text>
-            </View>
-          </View>
-          <Text style={styles.subtitle}>High-Risk Patient Escalation Queue | Real-Time SLA Tracker</Text>
-        </View>
-
-        {/* Filter Tabs */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            onPress={() => setFilter('ALL')}
-            style={[styles.tab, filter === 'ALL' && styles.activeTab]}
-          >
-            <Text style={[styles.tabText, filter === 'ALL' && styles.activeTabText]}>
-              All Cases ({queue.length})
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setFilter('HIGH')}
-            style={[styles.tab, filter === 'HIGH' && styles.activeTab]}
-          >
-            <Text style={[styles.tabText, filter === 'HIGH' && styles.activeTabText]}>
-              🚨 High Risk ({highRiskQueue.length})
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Quick Nav Shortcuts */}
-        <View style={styles.navShortcuts}>
-          <Button
-            mode="contained"
-            buttonColor="#00E676"
-            textColor="#061C19"
-            onPress={() => Alert.alert('Action Required', 'Please select a case from the queue first.')}
-            style={{ borderRadius: RADIUS.md, flex: 0.48 }}
-            labelStyle={{ fontWeight: '700' }}
-          >
-            📋 Diagnosis Engine
-          </Button>
-
-          <Button
-            mode="outlined"
-            textColor="#00E676"
-            style={{ borderRadius: RADIUS.md, borderColor: '#00E676', flex: 0.48 }}
-            onPress={() => navigate('/(doctor)/(tabs)/messages')}
-            labelStyle={{ fontWeight: '700' }}
-          >
-            💬 Messages
-          </Button>
-        </View>
-
-        {/* Queue Listing */}
-        <Text style={styles.sectionLabel}>Active Escalation Feed</Text>
-
-        {isLoading && activeQueue.length === 0 ? (
-          <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#00E676" />
-            <Text style={styles.loadingText}>Fetching case assignments...</Text>
-          </View>
-        ) : activeQueue.length === 0 ? (
-          <View style={styles.emptyCard}>
-            <Text style={styles.emptyIcon}>🩺</Text>
-            <Text style={styles.emptyTitle}>Escalation Queue Clean</Text>
-            <Text style={styles.emptyText}>No high-risk patient cases are pending review right now.</Text>
-          </View>
-        ) : (
-          activeQueue.map((item: any) => (
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => navigate(`/(doctor)/reviews/${item.id}`)}
-              activeOpacity={0.85}
-            >
-              <Card style={styles.card}>
-                <Card.Content>
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.patientName}>{item.visit?.request?.patient?.user?.fullName || 'Assigned Patient'}</Text>
-                    <View style={styles.badgeRow}>
-                      <Chip
-                        textStyle={{ color: '#FFF', fontSize: 10, fontWeight: '700' }}
-                        style={{ backgroundColor: getRiskColor(item.riskTier), marginRight: 6 }}
-                      >
-                        {item.riskTier}
-                      </Chip>
-                      <Chip
-                        textStyle={{ color: '#061C19', fontSize: 10, fontWeight: '700' }}
-                        style={{ backgroundColor: getSlaColor(item.remainingMins) }}
-                      >
-                        {item.remainingMins !== undefined ? `${item.remainingMins} MINS SLA` : 'SLA'}
-                      </Chip>
-                    </View>
-                  </View>
-
-                  <View style={styles.divider} />
-
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Escalated Status:</Text>
-                    <Text style={[styles.detailValue, { color: (item.status === 'PENDING' || item.status.includes('BROADCAST')) ? '#F59E0B' : '#00E676' }]}>
-                      {(item.status === 'PENDING' || item.status.includes('BROADCAST')) ? `Broadcast (${item.status})` : `Locked (${item.status})`}
-                    </Text>
-                  </View>
-                </Card.Content>
-              </Card>
-            </TouchableOpacity>
-          ))
-        )}
-      </ScrollView>
-    </SafeAreaView>
-  );
+  return <SafeAreaView style={styles.root} edges={['top']}>
+    <ScrollView contentContainerStyle={styles.content} refreshControl={<RefreshControl refreshing={selected.isRefetching} onRefresh={() => void refresh()} tintColor={COLORS.navy} />}>
+      <View style={styles.header}><Text style={styles.greeting}>Doctor dashboard</Text><Text style={styles.name}>{user?.fullName || 'Doctor'}</Text><Text style={styles.headerText}>Review assigned cases and respond to urgent broadcasts.</Text></View>
+      <View style={styles.row}><Button mode={filter === 'ALL' ? 'contained' : 'outlined'} buttonColor={filter === 'ALL' ? COLORS.navy : undefined} textColor={filter === 'ALL' ? COLORS.headerText : COLORS.navy} onPress={() => setFilter('ALL')}>My cases ({queue.data?.length || 0})</Button><Button mode={filter === 'HIGH' ? 'contained' : 'outlined'} buttonColor={filter === 'HIGH' ? COLORS.navy : undefined} textColor={filter === 'HIGH' ? COLORS.headerText : COLORS.navy} onPress={() => setFilter('HIGH')}>Urgent ({alerts.data?.length || 0})</Button></View>
+      <View style={styles.row}><Button icon="ambulance" textColor={COLORS.navy} onPress={() => navigate('/(doctor)/emergency')}>Emergency transport</Button><Button icon="message-outline" textColor={COLORS.navy} onPress={() => navigate('/(doctor)/(tabs)/messages')}>Messages</Button></View>
+      <Text style={styles.title}>{filter === 'ALL' ? 'Assigned cases' : 'High and critical risk cases'}</Text>
+      {(actionError || selected.error) && <View style={styles.notice}><Text accessibilityRole="alert" style={styles.error}>{actionError || (selected.error as Error).message}</Text><Button onPress={() => void refresh()}>Retry</Button></View>}
+      {selected.isLoading ? <ActivityIndicator color={COLORS.navy} /> : !selected.error && !cases.length ? <Card style={styles.card}><Card.Content><Text style={styles.title}>No cases in this queue</Text><Text style={styles.body}>{filter === 'ALL' ? 'New assignments will appear here. Check Urgent for available broadcast cases.' : 'No eligible urgent cases are awaiting your review.'}</Text></Card.Content></Card> : cases.map(item => {
+        const broadcast = ['PROFESSIONAL_BROADCAST', 'GENERAL_BROADCAST', 'ADMIN_ESCALATED'].includes(item.status);
+        const mins = Math.ceil((Date.parse(item.slaDeadline) - Date.now()) / 60000);
+        const sla = Number.isFinite(mins) ? mins <= 0 ? 'Response overdue' : `${mins} min to respond` : 'No response deadline';
+        return <Card key={item.id} style={styles.card}><Card.Content><Text style={styles.title}>{item.visit?.request?.patient?.user?.fullName || 'Patient'}</Text><View style={styles.row}><Chip textStyle={{ color: ['HIGH', 'CRITICAL'].includes(item.riskTier) ? COLORS.red : COLORS.amber }}>{item.riskTier}</Chip><Text style={styles.body}>{item.status.replaceAll('_', ' ')}</Text></View><Text style={[styles.body, Number.isFinite(mins) && mins <= 5 && styles.error]}>{sla}</Text><Button mode="contained" buttonColor={COLORS.navy} disabled={start.isPending} loading={start.isPending && start.variables === item.id} onPress={() => void open(item.id, item.status)} style={styles.button}>{broadcast ? 'Accept & review' : item.status === 'ASSIGNED' ? 'Start review' : 'Continue review'}</Button><Button textColor={COLORS.navy} onPress={() => navigate(`/(doctor)/reviews/${item.id}`)}>View case details</Button></Card.Content></Card>;
+      })}
+    </ScrollView>
+  </SafeAreaView>;
 }
-
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
-  content: { padding: SPACING.lg, paddingBottom: 40 },
-  header: { marginBottom: 20 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  greeting: { color: '#94A3B8', fontSize: 13 },
-  docName: { color: '#FFFFFF', fontSize: 22, fontWeight: '800', marginTop: 2 },
-  pmdcBadge: { backgroundColor: 'rgba(0, 230, 118, 0.15)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: RADIUS.round, borderWidth: 1, borderColor: '#00E676' },
-  pmdcBadgeText: { color: '#00E676', fontSize: 11, fontWeight: '700' },
-  subtitle: { color: '#94A3B8', fontSize: 12, marginTop: 4 },
-  tabContainer: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  tab: { flex: 1, backgroundColor: '#0A2D28', paddingVertical: 10, borderRadius: RADIUS.md, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
-  activeTab: { backgroundColor: '#0E3630', borderColor: '#00E676' },
-  tabText: { color: '#94A3B8', fontSize: 12, fontWeight: '600' },
-  activeTabText: { color: '#00E676', fontWeight: '800' },
-  navShortcuts: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-  sectionLabel: { color: '#00E676', fontSize: 15, fontWeight: '700', marginBottom: 12 },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: 12 },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  patientName: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  badgeRow: { flexDirection: 'row' },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', height: 1, marginVertical: 10 },
-  detailRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  detailLabel: { color: '#94A3B8', fontSize: 12 },
-  detailValue: { fontSize: 12, fontWeight: '700' },
-  centered: { alignItems: 'center', marginVertical: 40 },
-  loadingText: { color: '#94A3B8', marginTop: 10 },
-  emptyCard: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, padding: 32, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
-  emptyIcon: { fontSize: 36, marginBottom: 10 },
-  emptyTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  emptyText: { color: '#94A3B8', fontSize: 12, textAlign: 'center', marginTop: 4 },
+  root: { flex: 1, backgroundColor: COLORS.surface }, content: { padding: SPACING.lg, gap: SPACING.lg, paddingBottom: SPACING.xxxl },
+  header: { backgroundColor: COLORS.navy, borderRadius: RADIUS.lg, padding: SPACING.xl, gap: SPACING.sm }, greeting: { color: COLORS.headerText, fontSize: TYPOGRAPHY.sizes.md }, name: { color: COLORS.headerText, fontSize: TYPOGRAPHY.sizes.xxl, fontWeight: TYPOGRAPHY.weights.bold }, headerText: { color: COLORS.headerText, fontSize: TYPOGRAPHY.sizes.sm },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, alignItems: 'center' }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold, marginBottom: SPACING.sm }, body: { color: COLORS.textBody, fontSize: TYPOGRAPHY.sizes.sm }, error: { color: COLORS.red }, notice: { backgroundColor: COLORS.surfaceCard, padding: SPACING.lg, borderRadius: RADIUS.md }, button: { marginTop: SPACING.md },
 });
-

@@ -1,0 +1,54 @@
+import { useEffect, useRef } from 'react';
+import { View } from 'react-native';
+import { Button, Text } from 'react-native-paper';
+import { SPACING } from '../../theme';
+
+type GoogleCredentialResponse = { credential?: string };
+type GoogleWindow = Window & { google?: { accounts: { id: {
+  initialize: (options: { client_id: string; callback: (result: GoogleCredentialResponse) => void }) => void;
+  renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+} } } };
+
+export function GoogleSignInButton({ onCredential, onError, disabled }: {
+  onCredential: (credential: string) => void;
+  onError: (message: string) => void;
+  disabled?: boolean;
+}) {
+  const handlers = useRef({ onCredential, onError });
+  handlers.current = { onCredential, onError };
+  const clientId = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID?.trim();
+
+  useEffect(() => {
+    if (!clientId) return;
+    let cancelled = false;
+    const render = () => {
+      if (cancelled) return;
+      const google = (window as GoogleWindow).google;
+      const node = document.getElementById('healix-google-mobile-button');
+      if (!google || !node) return;
+      node.replaceChildren();
+      google.accounts.id.initialize({ client_id: clientId, callback: result => {
+        if (result.credential) handlers.current.onCredential(result.credential);
+        else handlers.current.onError('Google did not return a sign-in credential.');
+      } });
+      google.accounts.id.renderButton(node, { theme: 'outline', size: 'large', text: 'continue_with', width: 320 });
+    };
+    const existing = document.querySelector<HTMLScriptElement>('script[data-healix-google]');
+    if ((window as GoogleWindow).google) render();
+    else if (existing) existing.addEventListener('load', render);
+    else {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.dataset.healixGoogle = 'true';
+      script.addEventListener('load', render);
+      script.addEventListener('error', () => handlers.current.onError('Google sign-in could not load.'));
+      document.head.appendChild(script);
+    }
+    return () => { cancelled = true; existing?.removeEventListener('load', render); };
+  }, [clientId]);
+
+  if (!clientId) return <View style={{ marginTop: SPACING.lg, alignItems: 'center' }}><Button mode="outlined" disabled>Continue with Google</Button><Text>Google sign-in is not configured yet.</Text></View>;
+  return <View nativeID="healix-google-mobile-button" style={{ alignItems: 'center', marginTop: SPACING.lg, opacity: disabled ? 0.5 : 1, pointerEvents: disabled ? 'none' : 'auto' }} />;
+}

@@ -56,7 +56,7 @@ export class SubmitCarePlanUseCase {
         type: 'NURSE_VISIT',
         scheduleType: 'RECURRING',
         durationMinutes: data.durationMinutes || 60,
-        requirements: `Care Plan: \${carePlan.title}`,
+        requirements: `Care Plan: ${carePlan.title}`,
         recurring: {
           frequency: data.frequency, // DAILY, WEEKLY, BIWEEKLY
           startDate: new Date(),

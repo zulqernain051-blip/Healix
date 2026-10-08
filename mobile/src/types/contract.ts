@@ -30,6 +30,9 @@ export interface ContractAuditLog {
   actorId: string;
   actorRole: string;
   details?: any;
+  note?: string | null;
+  beforeValue?: string | null;
+  afterValue?: string | null;
   createdAt: string;
 }
 

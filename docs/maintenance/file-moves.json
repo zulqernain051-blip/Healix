@@ -1,0 +1,332 @@
+[
+  {
+    "from": "Healix arch.docx",
+    "to": "docs/product/Healix arch.docx",
+    "content": "unchanged"
+  },
+  {
+    "from": "healix backend arch.docx",
+    "to": "docs/product/healix backend arch.docx",
+    "content": "unchanged"
+  },
+  {
+    "from": "Healix – Product Breakdown Document (PBD) v2.0.docx",
+    "to": "docs/product/Healix – Product Breakdown Document (PBD) v2.0.docx",
+    "content": "unchanged"
+  },
+  {
+    "from": "Healix_FSD_v1.0.docx",
+    "to": "docs/product/Healix_FSD_v1.0.docx",
+    "content": "unchanged"
+  },
+  {
+    "from": "so far implmentation.docx",
+    "to": "docs/product/so far implmentation.docx",
+    "content": "unchanged"
+  },
+  {
+    "from": "Tech stack 2.docx",
+    "to": "docs/product/Tech stack 2.docx",
+    "content": "unchanged"
+  },
+  {
+    "from": "a offline implmentation.txt",
+    "to": "docs/notes/a offline implmentation.txt",
+    "content": "unchanged"
+  },
+  {
+    "from": "comparison module.txt",
+    "to": "docs/notes/comparison module.txt",
+    "content": "unchanged"
+  },
+  {
+    "from": "Doctor model.txt",
+    "to": "docs/notes/Doctor model.txt",
+    "content": "unchanged"
+  },
+  {
+    "from": "lesson_01_architecture.md",
+    "to": "docs/learning/lesson_01_architecture.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "lesson_02_backend.md",
+    "to": "docs/learning/lesson_02_backend.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "lesson_03_frontend.md",
+    "to": "docs/learning/lesson_03_frontend.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "lesson_04_capstone.md",
+    "to": "docs/learning/lesson_04_capstone.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "Healix_Complete_Implementation_and_Gap_Audit.docx",
+    "to": "docs/audits/Healix_Complete_Implementation_and_Gap_Audit.docx",
+    "content": "unchanged"
+  },
+  {
+    "from": "Healix_Complete_Implementation_and_Gap_Audit.html",
+    "to": "docs/audits/Healix_Complete_Implementation_and_Gap_Audit.html",
+    "content": "unchanged"
+  },
+  {
+    "from": "Healix_Complete_Implementation_and_Gap_Audit.md",
+    "to": "docs/audits/Healix_Complete_Implementation_and_Gap_Audit.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "SLA_AND_EMERGENCY_AUDIT_REPORT.md",
+    "to": "docs/audits/SLA_AND_EMERGENCY_AUDIT_REPORT.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "extract.js",
+    "to": "archive/root-tools/extract.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "patchForms.js",
+    "to": "archive/root-tools/patchForms.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "search_results.json",
+    "to": "archive/root-tools/search_results.json",
+    "content": "unchanged"
+  },
+  {
+    "from": "scratch/refactor_stores.js",
+    "to": "archive/root-tools/refactor_stores.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/fix-chat.js",
+    "to": "backend/archive/patches/fix-chat.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/fix-doctor.js",
+    "to": "backend/archive/patches/fix-doctor.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/fix.js",
+    "to": "backend/archive/patches/fix.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/fix_care_repo.js",
+    "to": "backend/archive/patches/fix_care_repo.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/fix_visit.js",
+    "to": "backend/archive/patches/fix_visit.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/move.js",
+    "to": "backend/archive/patches/move.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/patch_test_e2e.js",
+    "to": "backend/archive/patches/patch_test_e2e.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/patch_test_e2e_2.js",
+    "to": "backend/archive/patches/patch_test_e2e_2.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/audit.ts",
+    "to": "backend/scripts/audit/audit.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/audit-phase6.ts",
+    "to": "backend/scripts/audit/audit-phase6.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/audit-phase7.ts",
+    "to": "backend/scripts/audit/audit-phase7.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/src/audit-phase8.ts",
+    "to": "backend/scripts/audit/audit-phase8.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/src/audit-phase9.ts",
+    "to": "backend/scripts/audit/audit-phase9.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/check-db.ts",
+    "to": "backend/scripts/database/check-db.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/check_db.js",
+    "to": "backend/scripts/database/check_db.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/check_details.js",
+    "to": "backend/scripts/database/check_details.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/check_new_req.js",
+    "to": "backend/scripts/database/check_new_req.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/clear-db.ts",
+    "to": "backend/scripts/database/clear-db.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/repair_listings.js",
+    "to": "backend/scripts/database/repair_listings.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/verify-db.ts",
+    "to": "backend/scripts/database/verify-db.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/seed-users.ts",
+    "to": "backend/scripts/database/seed-users.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/src/seed.ts",
+    "to": "backend/scripts/database/seed.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/src/clean_data.ts",
+    "to": "backend/scripts/database/clean_data.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/test-api.ts",
+    "to": "backend/scripts/manual-tests/test-api.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/test-e2e-api.ts",
+    "to": "backend/scripts/manual-tests/test-e2e-api.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/test-emergency-e2e.ts",
+    "to": "backend/scripts/manual-tests/test-emergency-e2e.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/test-marketplace.ts",
+    "to": "backend/scripts/manual-tests/test-marketplace.ts",
+    "content": "relative imports updated"
+  },
+  {
+    "from": "backend/test_chat.js",
+    "to": "backend/scripts/manual-tests/test_chat.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/test_e2e.ts",
+    "to": "backend/scripts/manual-tests/test_e2e.ts",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/test_marketplace_flow.js",
+    "to": "backend/scripts/manual-tests/test_marketplace_flow.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/test_socket.js",
+    "to": "backend/scripts/manual-tests/test_socket.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/verify_cancel.js",
+    "to": "backend/scripts/manual-tests/verify_cancel.js",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/src/architecture_audit_phase3.5.md",
+    "to": "backend/docs/architecture/architecture_audit_phase3.5.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/backend.txt",
+    "to": "backend/docs/legacy-notes.txt",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/scratch/after_submit_offer.png",
+    "to": "docs/archive/screenshots/after_submit_offer.png",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/scratch/contracts_list.png",
+    "to": "docs/archive/screenshots/contracts_list.png",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/scratch/offer_screen.png",
+    "to": "docs/archive/screenshots/offer_screen.png",
+    "content": "unchanged"
+  },
+  {
+    "from": "backend/scratch/select_offer_screen.png",
+    "to": "docs/archive/screenshots/select_offer_screen.png",
+    "content": "unchanged"
+  },
+  {
+    "from": "mobile/implementation_plan.md",
+    "to": "mobile/docs/history/implementation_plan.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "mobile/task.md",
+    "to": "mobile/docs/history/task.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "mobile/mobile.txt",
+    "to": "mobile/docs/history/mobile.txt",
+    "content": "unchanged"
+  },
+  {
+    "from": "mobile/artifacts/phase10c_completion_report.md",
+    "to": "mobile/docs/reports/phase10c_completion_report.md",
+    "content": "unchanged"
+  },
+  {
+    "from": "test-results/.last-run.json",
+    "to": "archive/test-results/root/.last-run.json",
+    "content": "unchanged"
+  },
+  {
+    "from": "qa-tests/test-results/.last-run.json",
+    "to": "archive/test-results/qa/.last-run.json",
+    "content": "unchanged"
+  },
+  {
+    "from": "qa-tests/test-results/e2e-01-normal-workflow-E2E-0799b--ONE-TIME-LOW-Risk-Workflow-chromium/error-context.md",
+    "to": "archive/test-results/qa/e2e-01-normal-workflow-E2E-0799b--ONE-TIME-LOW-Risk-Workflow-chromium/error-context.md",
+    "content": "unchanged"
+  }
+]

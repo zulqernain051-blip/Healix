@@ -1,137 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { useDoctorStore } from '../../store/doctor';
-import { Calendar, Plus, Save, Clock } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { api } from '../../store/auth';
 
+const transitions: Record<string, string[]> = { REQUESTED: ['SCHEDULED', 'CANCELLED'], SCHEDULED: ['EN_ROUTE', 'CANCELLED'], EN_ROUTE: ['ARRIVED', 'CANCELLED'], ARRIVED: ['COMPLETED', 'CANCELLED'] };
 export default function HomeVisits() {
-  const { homeVisits, fetchHomeVisits, scheduleHomeVisit } = useDoctorStore();
+  const [visits, setVisits] = useState<any[]>([]);
+  const [patients, setPatients] = useState<any[]>([]);
   const [patientId, setPatientId] = useState('');
   const [scheduledAt, setScheduledAt] = useState('');
-  const [purpose, setPurpose] = useState('');
   const [openModal, setOpenModal] = useState(false);
-
-  useEffect(() => {
-    fetchHomeVisits().catch(() => {});
-  }, []);
-
-  const handleScheduleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!patientId || !scheduledAt || !purpose) return;
-    try {
-      await scheduleHomeVisit({ patientId, scheduledAt, purpose });
-      alert('Home visit scheduled successfully');
-      setOpenModal(false);
-      setPatientId('');
-      setScheduledAt('');
-      setPurpose('');
-    } catch (e: any) {
-      alert(e.message || 'Action failed');
-    }
-  };
-
-  return (
-    <div className="page">
-      <div className="page-header" style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <h2 className="page-title">Doctor Home Visits</h2>
-          <p className="page-subtitle">Schedule, track, and document home care visits for patients under active plans</p>
-        </div>
-        <button className="btn btn-primary" onClick={() => setOpenModal(true)}>
-          <Plus size={16} />
-          Schedule Visit
-        </button>
-      </div>
-
-      <div className="card">
-        <div className="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Patient ID</th>
-                <th>Scheduled At</th>
-                <th>Purpose</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {homeVisits.map((visit: any) => (
-                <tr key={visit.id}>
-                  <td style={{ fontWeight: '600' }}>Patient: {visit.patientId.slice(0, 8)}...</td>
-                  <td>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Clock size={14} style={{ color: 'var(--text-muted)' }} />
-                      <span>{new Date(visit.scheduledAt).toLocaleString()}</span>
-                    </div>
-                  </td>
-                  <td>{visit.purpose}</td>
-                  <td>
-                    <span className={`badge ${
-                      visit.status === 'COMPLETED' ? 'badge-green' :
-                      visit.status === 'SCHEDULED' ? 'badge-amber' :
-                      'badge-red'
-                    }`}>
-                      {visit.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {homeVisits.length === 0 && (
-                <tr>
-                  <td colSpan={4} style={{ textAlign: 'center', padding: '24px' }}>No home visits scheduled yet.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {openModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h3 className="modal-title">Schedule New Doctor Home Visit</h3>
-            <form onSubmit={handleScheduleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div className="form-group">
-                <label className="form-label">Patient ID</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter patient ID uuid..."
-                  value={patientId}
-                  onChange={(e) => setPatientId(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Scheduled Date & Time</label>
-                <input
-                  type="datetime-local"
-                  className="form-input"
-                  value={scheduledAt}
-                  onChange={(e) => setScheduledAt(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Purpose of Visit</label>
-                <textarea
-                  className="form-input"
-                  style={{ height: '70px', resize: 'none' }}
-                  placeholder="e.g. Post-stroke follow-up, BP check..."
-                  value={purpose}
-                  onChange={(e) => setPurpose(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="modal-actions">
-                <button type="button" className="btn btn-ghost" onClick={() => setOpenModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">
-                  <Calendar size={15} />
-                  Schedule Visit
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  const [update, setUpdate] = useState<{ id: string; status: string } | null>(null);
+  const [findings, setFindings] = useState('');
+  const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const refresh = useCallback(async () => { try { const [v, p] = await Promise.all([api('GET', '/doctors/home-visits'), api('GET', '/doctors/home-visits/patients')]); setVisits(v); setPatients(p); setError(''); } catch (e: any) { setError(e.message); } finally { setLoading(false); } }, []);
+  useEffect(() => { void refresh(); }, [refresh]);
+  const run = async (task: () => Promise<unknown>) => { setBusy(true); setError(''); try { await task(); setOpenModal(false); setUpdate(null); await refresh(); } catch (e: any) { setError(e.message); } finally { setBusy(false); } };
+  return <div className="page"><div className="page-header"><h2 className="page-title">Doctor Home Visits</h2><p>Schedule visits for patients from your cases and record the outcome.</p><button className="btn btn-primary" disabled={busy || !patients.length} onClick={() => setOpenModal(true)}>Schedule Visit</button><button className="btn btn-ghost" onClick={() => void refresh()}>Refresh</button></div>
+    {error && <p role="alert" style={{ color: 'var(--red)' }}>{error}</p>}
+    {loading ? <p>Loading visits...</p> : <div className="card"><div className="table-container"><table><thead><tr><th>Patient</th><th>Scheduled</th><th>Status</th><th>Clinical notes</th><th>Actions</th></tr></thead><tbody>{visits.map(v => <tr key={v.id}><td>{v.patients?.user?.fullName || 'Patient'}</td><td>{new Date(v.scheduledAt).toLocaleString()}</td><td>{v.status.replaceAll('_', ' ')}</td><td>{v.findings || 'No findings recorded'}{v.outcomeNotes && <p>{v.outcomeNotes}</p>}</td><td>{transitions[v.status]?.map(status => <button key={status} className="btn btn-ghost" disabled={busy} onClick={() => { setFindings(v.findings || ''); setNotes(v.outcomeNotes || ''); setUpdate({ id: v.id, status }); }}>{status.replaceAll('_', ' ')}</button>)}</td></tr>)}{!visits.length && !error && <tr><td colSpan={5}>No visits scheduled.</td></tr>}</tbody></table></div>{!patients.length && !error && <p>Patients become available for scheduling after a case is assigned to you.</p>}</div>}
+    {openModal && <div className="modal-overlay"><form className="modal" onSubmit={e => { e.preventDefault(); void run(() => api('POST', '/doctors/home-visits', { patientId, scheduledAt: new Date(scheduledAt).toISOString() })); }}><h3>Schedule Doctor Visit</h3><label className="form-group">Patient<select className="form-input" required value={patientId} onChange={e => setPatientId(e.target.value)}><option value="">Select your patient</option>{patients.map(p => <option key={p.id} value={p.id}>{p.user.fullName}</option>)}</select></label><label className="form-group">Date & time<input className="form-input" type="datetime-local" required value={scheduledAt} onChange={e => setScheduledAt(e.target.value)} /></label>{error && <p role="alert">{error}</p>}<button type="button" className="btn btn-ghost" disabled={busy} onClick={() => setOpenModal(false)}>Cancel</button><button className="btn btn-primary" disabled={busy}>Schedule</button></form></div>}
+    {update && <div className="modal-overlay"><form className="modal" onSubmit={e => { e.preventDefault(); void run(() => api('PUT', `/doctors/home-visits/${update.id}`, { status: update.status, findings, outcomeNotes: notes })); }}><h3>Mark visit {update.status.replaceAll('_', ' ')}</h3><label>Clinical findings<textarea className="form-input" required={update.status === 'COMPLETED'} value={findings} onChange={e => setFindings(e.target.value)} /></label><label>Outcome notes<textarea className="form-input" value={notes} onChange={e => setNotes(e.target.value)} /></label>{error && <p role="alert">{error}</p>}<button type="button" className="btn btn-ghost" disabled={busy} onClick={() => setUpdate(null)}>Cancel</button><button className="btn btn-primary" disabled={busy}>Confirm</button></form></div>}
+  </div>;
 }

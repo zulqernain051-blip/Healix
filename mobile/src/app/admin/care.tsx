@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Text, Card, Chip, Appbar } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useAdminCareRequests, useAdminOffers, useAdminContracts, useAdminVisits } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 type TabType = 'REQUESTS' | 'OFFERS' | 'CONTRACTS' | 'VISITS';
 

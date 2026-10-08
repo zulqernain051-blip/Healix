@@ -1,56 +1,26 @@
-# Welcome to your Expo app 👋
+# Healix Mobile
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Expo Router app for patient, nurse, doctor, and administrative workflows.
 
-## Get started
+## Run
 
-1. Install dependencies
+From the project root:
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```sh
+pnpm install --frozen-lockfile
+pnpm mobile:start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+From this directory, use `pnpm android`, `pnpm ios`, or `pnpm web` to select a target. Start the backend API separately with `pnpm backend:dev` from the root. API host selection is implemented in `src/api/client.ts`; devices must be able to reach the backend.
 
-### Other setup steps
+## Structure
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+- `src/app/`: Expo Router routes grouped by role, authentication, and administration.
+- `src/components/`: Shared UI and feature components.
+- `src/api/`, `src/hooks/`, `src/types/`: API clients, query hooks, and data contracts.
+- `src/store/`, `src/services/`, `src/utils/`: App state, socket connections, and helpers.
+- `src/theme.ts`: Shared design tokens.
+- `assets/`: Images, icons, and app assets.
+- `docs/history/`, `docs/reports/`: Planning notes and completion reports.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Follow [AGENTS.md](AGENTS.md) and the [design system](../HEALIX_DESIGN_SYSTEM.md) when changing screens. Run `pnpm lint` from this directory to check mobile code. The existing reset-project script restores a starter layout; it is not a routine cleanup command.

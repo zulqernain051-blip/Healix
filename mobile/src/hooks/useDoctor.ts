@@ -6,6 +6,7 @@ export function useDoctorQueue() {
   return useQuery({
     queryKey: ['doctor', 'queue'],
     queryFn: () => doctorApi.getQueue(),
+    refetchInterval: 10000,
   });
 }
 
@@ -13,6 +14,7 @@ export function useDoctorHighRiskQueue() {
   return useQuery({
     queryKey: ['doctor', 'queue', 'high-risk'],
     queryFn: () => doctorApi.getHighRiskQueue(),
+    refetchInterval: 10000,
   });
 }
 
@@ -38,6 +40,7 @@ export function useStartCaseReview() {
     mutationFn: (caseId: string) => doctorApi.startReview(caseId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['doctor', 'queue'] });
+      queryClient.invalidateQueries({ queryKey: ['doctor', 'case'] });
       queryClient.invalidateQueries({ queryKey: ['doctor', 'queue', 'high-risk'] });
     },
   });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,7 +12,7 @@ import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useCareRequests } from '../../../hooks/useCareRequests';
 import { useDashboardSummary } from '../../../hooks/useDashboard';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function NotificationsScreen() {
   const { user } = useAuthStore();
@@ -78,7 +78,7 @@ export default function NotificationsScreen() {
 
   const handleMarkAllRead = () => {
     const allReadMap: Record<string, boolean> = {};
-    dynamicNotifications.forEach(n => { markRead.mutate(n.id); });
+    dynamicNotifications.forEach(n => { allReadMap[n.id] = true; });
     setMarkedRead(allReadMap);
   };
 

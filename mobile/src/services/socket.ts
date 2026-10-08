@@ -5,7 +5,7 @@ let socket: Socket | null = null;
 
 export const initSocket = (token: string) => {
   if (socket) {
-    if (socket.connected) return socket;
+    if ((socket.auth as { token?: string }).token === token) return socket;
     socket.disconnect();
   }
 

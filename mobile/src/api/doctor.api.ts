@@ -33,7 +33,7 @@ export const doctorApi = {
   submitPrescription: (caseId: string, data: { instructions?: string; items: any[]; supersedesId?: string; bypassAllergyCheck?: boolean }) =>
     apiClient.post(`/cases/${caseId}/prescriptions`, data),
 
-  submitClinicalDecision: (caseId: string, data: { decision: string; justification: string; autoDispatch?: boolean }) =>
+  submitClinicalDecision: (caseId: string, data: { decision: string; justification: string; autoDispatch?: boolean; hospitalId?: string }) =>
     apiClient.post(`/cases/${caseId}/decision`, data),
 
   scheduleFollowUp: (caseId: string, data: { targetDate: string; instructions?: string; preferCurrentNurse?: boolean }) =>

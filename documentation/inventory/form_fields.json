@@ -1,0 +1,226 @@
+{
+  "/auth/login": [
+    {
+      "index": 0,
+      "label": "",
+      "near": "Email or Phone Number Email or Phone Number",
+      "placeholder": "",
+      "type": "email",
+      "required": false
+    },
+    {
+      "index": 1,
+      "label": "",
+      "near": "Password Password 󰈈",
+      "placeholder": "",
+      "type": "password",
+      "required": false
+    }
+  ],
+  "/auth/register": [
+    {
+      "index": 0,
+      "label": "",
+      "near": "Full Name Full Name",
+      "placeholder": "",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 1,
+      "label": "",
+      "near": "Email Address Email Address",
+      "placeholder": "",
+      "type": "email",
+      "required": false
+    },
+    {
+      "index": 2,
+      "label": "",
+      "near": "Phone Number Phone Number",
+      "placeholder": "e.g. 03001234567",
+      "type": "tel",
+      "required": false
+    },
+    {
+      "index": 3,
+      "label": "",
+      "near": "Password Password",
+      "placeholder": "",
+      "type": "password",
+      "required": false
+    },
+    {
+      "index": 4,
+      "label": "",
+      "near": "CNIC Number CNIC Number",
+      "placeholder": "e.g. 37405-1234567-1",
+      "type": "input",
+      "required": false
+    }
+  ],
+  "/auth/forgot": [
+    {
+      "index": 0,
+      "label": "",
+      "near": "Email or Phone Number Email or Phone Number",
+      "placeholder": "e.g. user@gmail.com or 03001234567",
+      "type": "input",
+      "required": false
+    }
+  ],
+  "/auth/reset": [
+    {
+      "index": 0,
+      "label": "",
+      "near": "6-Digit OTP Reset Code 6-Digit OTP Reset Code",
+      "placeholder": "e.g. 123456",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 1,
+      "label": "",
+      "near": "New Password New Password",
+      "placeholder": "Min 8 chars, 1 number, 1 symbol",
+      "type": "password",
+      "required": false
+    },
+    {
+      "index": 2,
+      "label": "",
+      "near": "Confirm New Password Confirm New Password",
+      "placeholder": "",
+      "type": "password",
+      "required": false
+    }
+  ],
+  "/(patient)/requests/new": [
+    {
+      "index": 0,
+      "label": "",
+      "near": "Select a Template ✍️ Custom Request Define your own specific needs. 🩺 General Assessment Vital signs monitoring, physical as",
+      "placeholder": "Describe your medical needs...",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "index": 1,
+      "label": "",
+      "near": "Select a Template ✍️ Custom Request Define your own specific needs. 🩺 General Assessment Vital signs monitoring, physical as",
+      "placeholder": "e.g. Female Nurse, Wound Care Specialist",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 2,
+      "label": "",
+      "near": "Select a Template ✍️ Custom Request Define your own specific needs. 🩺 General Assessment Vital signs monitoring, physical as",
+      "placeholder": "45",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 3,
+      "label": "",
+      "near": "Preferred Date * Preferred Time (Choose One) * Morning Afternoon Evening Night Flexible",
+      "placeholder": "",
+      "type": "date",
+      "required": false
+    },
+    {
+      "index": 4,
+      "label": "",
+      "near": "Service location * Home Current GPS Other Choose a saved location, capture GPS, or enter valid coordinates.",
+      "placeholder": "Enter detailed address",
+      "type": "textarea",
+      "required": false
+    }
+  ],
+  "/(patient)/profile/edit": [
+    {
+      "index": 0,
+      "label": "",
+      "near": "Full Name Full Name",
+      "placeholder": "",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 1,
+      "label": "",
+      "near": "Date of Birth (YYYY-MM-DD) Date of Birth (YYYY-MM-DD)",
+      "placeholder": "e.g. 1995-12-30",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 2,
+      "label": "",
+      "near": "Gender Gender",
+      "placeholder": "e.g. Male, Female",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 3,
+      "label": "",
+      "near": "Address Address",
+      "placeholder": "e.g. House 12, Street 5, DHA Phase 6",
+      "type": "textarea",
+      "required": false
+    },
+    {
+      "index": 4,
+      "label": "",
+      "near": "Latitude Latitude",
+      "placeholder": "e.g. 31.5204",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 5,
+      "label": "",
+      "near": "Longitude Longitude",
+      "placeholder": "e.g. 74.3587",
+      "type": "input",
+      "required": false
+    }
+  ],
+  "/(patient)/profile/emergency-contacts": [],
+  "/(nurse)/profile/availability": [],
+  "/admin/config": [
+    {
+      "index": 0,
+      "label": "",
+      "near": "PLATFORM_COMMISSION_FEE Marketplace platform transaction fee (%) Save",
+      "placeholder": "Enter value",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 1,
+      "label": "",
+      "near": "SLA_RESPONSE_TIMEOUT_MINS Doctor escalation response SLA limit (Mins) Save",
+      "placeholder": "Enter value",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 2,
+      "label": "",
+      "near": "GEOFENCE_RADIUS_METERS Nurse GPS check-in proximity radius (Meters) Save",
+      "placeholder": "Enter value",
+      "type": "input",
+      "required": false
+    },
+    {
+      "index": 3,
+      "label": "",
+      "near": "HIPAA_ENCRYPTION_MODE Real-time message payload encryption Save",
+      "placeholder": "Enter value",
+      "type": "input",
+      "required": false
+    }
+  ]
+}

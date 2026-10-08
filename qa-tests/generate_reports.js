@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const patientDir = 'f:/class Data/FYP Project/Proposal/Project/Healix/mobile/src/app/(patient)';
-const reportsDir = 'f:/class Data/FYP Project/Proposal/Project/Healix/qa-tests/reports';
+const patientDir = path.resolve(__dirname, '../mobile/src/app/(patient)');
+const reportsDir = path.join(__dirname, 'reports');
 
 if (!fs.existsSync(reportsDir)) {
   fs.mkdirSync(reportsDir, { recursive: true });

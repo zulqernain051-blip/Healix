@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,11 +14,11 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { Text, Avatar, Button } from 'react-native-paper';
+import { Text, Avatar } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useConversations, useGetOrCreateThread, useSearchUserByPhone } from '../../../hooks/useMessages';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function MessagesScreen() {
@@ -37,7 +38,7 @@ export default function MessagesScreen() {
   // Extract threads from response (handle both wrapped and unwrapped array)
   const threads = Array.isArray(conversations) 
     ? conversations 
-    : (conversations?.data || []);
+    : ((conversations as any)?.data || []);
 
   const filteredConversations = threads.filter((c: any) => {
     const nameMatch = c.otherParticipant?.name?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -84,14 +85,14 @@ export default function MessagesScreen() {
     
     createThreadMutation.mutate(targetUser.id, {
       onSuccess: (res) => {
-        const thread = res?.data?.data;
+        const thread = res;
         setIsModalVisible(false);
         setPhoneSearchQuery('');
         setFoundUsers([]);
         setHasSearched(false);
         if (thread) {
           navigate('/(patient)/messages/chat', { 
-            threadId: thread.threadId, 
+            threadId: thread.id, 
             name: targetUser.fullName || targetUser.name, 
             role: targetUser.role 
           });
@@ -103,11 +104,11 @@ export default function MessagesScreen() {
         const status = err?.statusCode || 500;
         
         if (status === 403 || status === 400) {
-          Alert.alert('Communication Not Allowed', message);
+          appAlert('Communication Not Allowed', message);
         } else if (status === 401) {
-          Alert.alert('Session Expired', 'Your session has expired. Please log out and sign in again.');
+          appAlert('Session Expired', 'Your session has expired. Please log out and sign in again.');
         } else {
-          Alert.alert('Error', message);
+          appAlert('Error', message);
         }
       }
     });
@@ -209,7 +210,7 @@ export default function MessagesScreen() {
         animationType="slide"
         onRequestClose={() => {
           setIsModalVisible(false);
-          setFoundUser(null);
+          setFoundUsers([]);
           setPhoneSearchQuery('');
         }}
       >

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar } from 'react-native';
-import { Card, Button, Divider, Chip } from 'react-native-paper';
+
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
+import { Card, Divider, Button } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
 import { useAuthStore } from '../../store/auth';
 import { useAdminStats, useAdminPendingNurses, useAdminPendingDoctors } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminDashboard() {
   const { logout } = useAuthStore();
@@ -29,23 +29,24 @@ export default function AdminDashboard() {
           </View>
         </View>
 
+        <Button onPress={() => navigate('/analytics')}>Analytics & Reports</Button><Button onPress={() => navigate('/support')}>Permissions, Payments & Support</Button>
         {/* Analytics Summary Grid */}
         <Text style={styles.sectionLabel}>System Performance Summary</Text>
         <View style={styles.statsGrid}>
           <TouchableOpacity style={styles.statCard} onPress={() => navigate('/admin/users')}>
             <Text style={styles.statIcon}>👥</Text>
-            <Text style={styles.statValue}>{stats?.totalUsers ?? 9}</Text>
+            <Text style={styles.statValue}>{stats?.totalUsers ?? '—'}</Text>
             <Text style={styles.statLabel}>Total Users</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.statCard} onPress={() => navigate('/admin/nurses')}>
             <Text style={styles.statIcon}>👩‍⚕️</Text>
-            <Text style={styles.statValue}>{stats?.totalNurses ?? 3}</Text>
+            <Text style={styles.statValue}>{stats?.totalNurses ?? '—'}</Text>
             <Text style={styles.statLabel}>Registered Nurses</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.statCard} onPress={() => navigate('/admin/doctors')}>
             <Text style={styles.statIcon}>👨‍⚕️</Text>
-            <Text style={styles.statValue}>{stats?.totalDoctors ?? 3}</Text>
-            <Text style={styles.statLabel}>Verified Doctors</Text>
+            <Text style={styles.statValue}>{stats?.totalDoctors ?? '—'}</Text>
+            <Text style={styles.statLabel}>Registered Doctors</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.statCard} onPress={() => navigate('/admin/verification')}>
             <Text style={styles.statIcon}>🛡️</Text>
@@ -146,6 +147,10 @@ export default function AdminDashboard() {
               <Text style={styles.moduleSub}>Hospitals & Ambulances CRM</Text>
             </View>
             <Text style={styles.chevron}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.moduleCard} activeOpacity={0.8} onPress={() => navigate('/admin/ambulances')}>
+            <Text style={styles.moduleIcon}>🚑</Text><View style={{ flex: 1 }}><Text style={styles.moduleTitle}>Ambulance Fleet & Dispatches</Text><Text style={styles.moduleSub}>Vehicles, assignments and admission tracking</Text></View><Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.moduleCard} onPress={() => navigate('/admin/reviews')}>

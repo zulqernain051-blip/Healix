@@ -1,14 +1,13 @@
 packages:
   - 'backend'
   - 'mobile'
-  - 'ai-service'
 allowBuilds:
   '@prisma/client': true
   '@prisma/engines': true
   bcrypt: true
   esbuild: true
   prisma: true
-  unrs-resolver: set this to true or false
+  unrs-resolver: false
 minimumReleaseAgeExclude:
   - '@expo/cli@57.0.8'
   - '@expo/config-plugins@57.0.5'
@@ -57,3 +56,9 @@ minimumReleaseAgeExclude:
   - expo-web-browser@57.0.1
   - expo@57.0.6
   - expo-image-picker@57.0.15
+
+# Worklets Babel plugin imports traverse without declaring it.
+packageExtensions:
+  react-native-worklets@0.10.1:
+    dependencies:
+      "@babel/traverse": "^7.29.0"

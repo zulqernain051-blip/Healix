@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { marketplaceApi } from '../api/marketplace.api';
 import { SubmitOfferDto, UpdateOfferDto } from '../types/marketplace';
 import { CARE_REQUESTS_KEY } from './useCareRequests';
+import { CONTRACT_KEYS } from './useContracts';
 
 // ─────────────────────────────────────────────
 // Query Keys
@@ -19,10 +20,11 @@ export const MARKETPLACE_KEYS = {
 // ─────────────────────────────────────────────
 
 /** Fetch all OPEN marketplace listings (used by Nurse marketplace) */
-export const useMarketplaceListings = () => {
+export const useMarketplaceListings = (options?: { pollingInterval?: number }) => {
   return useQuery({
     queryKey: MARKETPLACE_KEYS.listings(),
     queryFn: () => marketplaceApi.getActiveListings(),
+    refetchInterval: options?.pollingInterval ?? 5000,
   });
 };
 
@@ -94,6 +96,17 @@ export const useSelectOffer = () => {
       queryClient.invalidateQueries({ queryKey: MARKETPLACE_KEYS.offers(variables.listingId) });
       queryClient.invalidateQueries({ queryKey: MARKETPLACE_KEYS.listings() });
       queryClient.invalidateQueries({ queryKey: CARE_REQUESTS_KEY });
+      queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.all });
     },
   });
+};
+
+export const useFavoriteNurses = (patientId: string) => useQuery({ queryKey: MARKETPLACE_KEYS.favorites(patientId), queryFn: () => marketplaceApi.getFavoriteNurses(patientId), enabled: !!patientId });
+export const useToggleFavoriteNurse = (patientId: string) => {
+ const client = useQueryClient();
+ return useMutation({ mutationFn: ({ nurseId, remove }: { nurseId: string; remove: boolean }) => remove ? marketplaceApi.removeFavoriteNurse(patientId, nurseId) : marketplaceApi.addFavoriteNurse(patientId, nurseId), onSuccess: () => client.invalidateQueries({ queryKey: MARKETPLACE_KEYS.favorites(patientId) }) });
+};
+export const useRejectOffer = () => {
+ const client = useQueryClient();
+ return useMutation({ mutationFn: marketplaceApi.rejectOffer, onSuccess: () => client.invalidateQueries({ queryKey: MARKETPLACE_KEYS.all }) });
 };

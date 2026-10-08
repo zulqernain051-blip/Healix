@@ -1,3 +1,4 @@
+import { appAlert } from '../../../components/common/AppDialogs';
 import React from 'react';
 import {
   StyleSheet,
@@ -12,7 +13,7 @@ import {
 import { Text, Avatar } from 'react-native-paper';
 import { useAuthStore } from '../../../store/auth';
 import { navigate } from '../../../utils/navigation';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
@@ -22,6 +23,8 @@ export default function ProfileScreen() {
   const userEmail = user?.email || 'Not provided';
 
   const menuItems = [
+    { id: 'support', title: 'Refunds & Care Concerns', icon: '💬', route: '/support' },
+    { id: 'analytics', title: 'Analytics & Reports', icon: '📈', route: '/analytics' },
     {
       id: 'personal',
       title: 'Personal Information',
@@ -41,10 +44,10 @@ export default function ProfileScreen() {
       route: '/(patient)/health/medical',
     },
     {
-      id: 'insurance',
-      title: 'Insurance Information',
+      id: 'payments',
+      title: 'Payment History',
       icon: '💳',
-      route: '/(patient)/profile/edit',
+      route: '/(patient)/health/payments',
     },
     {
       id: 'settings',
@@ -54,18 +57,9 @@ export default function ProfileScreen() {
     },
   ];
 
-  const handleLogout = async () => {
-    if (Platform.OS === 'web') {
-      if (window.confirm('Are you sure you want to log out?')) {
-        await logout();
-      }
-    } else {
-      Alert.alert('Sign Out', 'Are you sure you want to log out?', [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Sign Out', style: 'destructive', onPress: () => logout() },
-      ]);
-    }
-  };
+  const handleLogout = () => appAlert('Sign Out', 'Sign out of your Healix account?', [
+    {text:'Cancel',style:'cancel'}, {text:'Sign Out',onPress:()=>void logout()}
+  ]);
 
   return (
     <SafeAreaView style={styles.safeArea}>

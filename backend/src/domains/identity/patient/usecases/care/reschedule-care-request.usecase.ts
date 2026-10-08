@@ -14,7 +14,7 @@ export class RescheduleCareRequestUseCase {
       throw new AppError('Access forbidden. You do not own this request.', HTTP_STATUS.FORBIDDEN);
     }
 
-    const timeDiffMs = new Date(request.scheduledAt || new Date()).getTime() - Date.now();
+    const timeDiffMs = new Date(request.scheduledAt || request.preferredDate || new Date()).getTime() - Date.now();
     const twoHoursMs = 2 * 60 * 60 * 1000;
     if (timeDiffMs < twoHoursMs) {
       throw new AppError(

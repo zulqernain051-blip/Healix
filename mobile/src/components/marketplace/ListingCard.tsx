@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Card, Text, Chip } from 'react-native-paper';
 import { MarketplaceListing } from '../../types/marketplace';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
@@ -33,11 +33,23 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, style }) => {
           <Text style={styles.label}>Service Type:</Text>
           <Text style={styles.value}>{req.requirements || req.type.replace(/_/g, ' ')}</Text>
         </View>
+        <Text style={styles.offerState}>
+          {listing.offers?.some(offer => offer.status === 'PENDING')
+            ? 'Your offer submitted — tap to review or update'
+            : 'No offer submitted — tap to bid'}
+        </Text>
         <View style={styles.row}>
           <Text style={styles.label}>Scheduled:</Text>
           <Text style={styles.value}>
-            {new Date(req.scheduledAt).toLocaleDateString()} at{' '}
-            {new Date(req.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {req.scheduledAt || req.preferredDate
+              ? `${new Date(req.scheduledAt || req.preferredDate!).toLocaleDateString()}${
+                  req.preferredStartTime
+                    ? ` at ${req.preferredStartTime}`
+                    : req.preferredTimeWindow
+                    ? ` (${req.preferredTimeWindow.toLowerCase()})`
+                    : ''
+                }`
+              : 'Flexible / As needed'}
           </Text>
         </View>
         {!!listing.specializationRequired && (
@@ -59,10 +71,10 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, style }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: COLORS.card,
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.inputBorder,
     marginBottom: SPACING.md,
   },
   header: {
@@ -76,11 +88,11 @@ const styles = StyleSheet.create({
   },
   patientName: {
     ...TYPOGRAPHY.h3,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
   },
   zoneText: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.textBody,
     marginTop: 2,
   },
   statusChip: {
@@ -88,7 +100,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   statusText: {
-    color: COLORS.primary,
+    color: COLORS.navy,
     fontSize: 10,
     fontWeight: 'bold',
     marginVertical: 0,
@@ -99,22 +111,23 @@ const styles = StyleSheet.create({
   },
   label: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.textBody,
     width: 90,
   },
   value: {
     ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
     flex: 1,
     fontWeight: '500',
   },
   notes: {
     ...TYPOGRAPHY.bodySmall,
-    color: COLORS.textSecondary,
+    color: COLORS.textBody,
     fontStyle: 'italic',
     marginTop: SPACING.sm,
     backgroundColor: 'rgba(255,255,255,0.03)',
     padding: SPACING.sm,
     borderRadius: RADIUS.sm,
   },
+  offerState: { ...TYPOGRAPHY.bodySmall, color: COLORS.navy, fontWeight: '700', marginBottom: SPACING.sm },
 });

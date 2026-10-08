@@ -1,19 +1,15 @@
 import { apiClient } from './client';
-import { 
-  AdminStats, AdminUser, AdminNurse, AdminDoctor, AuditLog, 
-  AdminCareRequest, AdminOffer, AdminContract, AdminVisit,
-  AdminHospital, AdminAmbulance, AdminEmergency, AdminReview
-} from '../types/admin';
+import { AdminStats, AdminUser, AdminNurse, AdminDoctor, AuditLog, AdminCareRequest, AdminOffer, AdminContract, AdminVisit, AdminHospital, AdminEmergency, AdminReview } from '../types/admin';
 
 export const adminApi = {
   getDashboardStats: () => apiClient.get<AdminStats>('/admin/stats'),
 
-  getUsers: (role?: string) => apiClient.get<AdminUser[]>('/admin/users' + (role ? `?role=${role}` : '')),
+  getUsers: (role?: string) => apiClient.get<{ users: AdminUser[]; total: number; page: number; limit: number; pages: number }>('/admin/users' + (role ? `?role=${role}` : '')),
 
   updateUserStatus: (userId: string, status: string, reason: string = 'Status updated by admin') =>
     apiClient.put(`/admin/users/${userId}/status`, { status, reason }),
 
-  deleteUser: (userId: string, reason: string = 'Deleted by admin') => apiClient.delete(`/admin/users/${userId}`, { data: { reason } }),
+  deleteUser: (userId: string, reason: string = 'Deleted by admin') => apiClient.delete(`/admin/users/${userId}`, { body: JSON.stringify({ reason }) }),
 
   getNurses: () => apiClient.get<AdminNurse[]>('/admin/nurses'),
 
@@ -63,8 +59,11 @@ export const adminApi = {
 
   // Emergencies
   getActiveEmergencies: () => apiClient.get<AdminEmergency[]>('/admin/emergencies?slaStatus=active'),
-  escalateEmergency: (emergencyId: string) => apiClient.put(`/admin/emergencies/${emergencyId}/escalate`, {}), // TODO: Backend doesn't support this
+  escalateEmergency: (emergencyId: string) => apiClient.put(`/admin/emergencies/${emergencyId}/escalate`, {}),
+  resolveEmergency: (emergencyId: string, notes?: string) => apiClient.put(`/admin/emergencies/${emergencyId}/resolve`, { notes }),
   assignEmergencyDoctor: (emergencyId: string, doctorId: string) => apiClient.post(`/admin/emergencies/${emergencyId}/assign-doctor`, { doctorId }),
+  assignEmergencyParamedic: (dispatchId: string, paramedicId: string) => apiClient.post(`/admin/emergencies/${dispatchId}/assign-paramedic`, { paramedicId }),
+  assignEmergencyAmbulance: (dispatchId: string, ambulanceId: string) => apiClient.post(`/admin/emergencies/${dispatchId}/assign-ambulance`, { ambulanceId }),
 
   // Network (Hospitals & Ambulances)
   getHospitals: () => apiClient.get<AdminHospital[]>('/admin/hospitals'),

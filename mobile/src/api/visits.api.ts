@@ -1,4 +1,5 @@
 import { apiClient } from './client';
+import { clinicalDrafts } from '../services/clinicalDrafts';
 import {
   Visit,
   VerifyQrDto,
@@ -47,18 +48,22 @@ export const visitsApi = {
   // ─── Clinical Mutations ───────────────────────────────────
 
   submitVitals: (visitId: string, data: SubmitVitalsDto) =>
-    apiClient.post<{ message: string }>(`/visits/${visitId}/vitals`, data),
+    clinicalDrafts.submit(visitId, 'VITALS', data),
 
   submitSymptoms: (visitId: string, data: SubmitSymptomsDto) =>
-    apiClient.post<{ message: string }>(`/visits/${visitId}/symptoms`, data),
+    clinicalDrafts.submit(visitId, 'SYMPTOMS', data),
 
   submitClinicalRemarks: (visitId: string, data: SubmitClinicalRemarkDto) =>
     apiClient.post<{ message: string }>(`/visits/${visitId}/clinical-remarks`, data),
 
+  acceptVisit: (visitId: string) => apiClient.post(`/visits/${visitId}/accept`, {}),
+  submitReview: (visitId: string, data: { stars: number; reviewText?: string; recommend: boolean }) => apiClient.post(`/visits/${visitId}/rating`, data),
   // ─── Lifecycle Mutations ──────────────────────────────────
 
-  completeVisit: (visitId: string) =>
-    apiClient.post<{ message: string }>(`/visits/${visitId}/complete`, {}),
+  completeVisit: async (visitId: string) => {
+    if ((await clinicalDrafts.list()).some(item => item.visitId === visitId && !item.archivedAt)) throw new Error('Sync your pending clinical drafts before completing this visit.');
+    return apiClient.post<{ message: string }>(`/visits/${visitId}/complete`, {});
+  },
 
   saveNotes: (visitId: string, notes: string) =>
     apiClient.put<{ message: string }>(`/visits/${visitId}/notes`, { notes }),

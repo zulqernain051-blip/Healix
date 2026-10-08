@@ -1,52 +1,52 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { VerificationService } from './verification.service';
 
 export class VerificationController {
-  static async checkIn(req: Request, res: Response): Promise<void> {
+  static async checkIn(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const nurseId = (req as any).user?.nurse?.id || (req as any).user?.nurseId;
       const attendance = await VerificationService.checkIn(id, nurseId);
       res.status(200).json({ success: true, data: attendance });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async checkOut(req: Request, res: Response): Promise<void> {
+  static async checkOut(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const nurseId = (req as any).user?.nurse?.id || (req as any).user?.nurseId;
       const attendance = await VerificationService.checkOut(id, nurseId);
       res.status(200).json({ success: true, data: attendance });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async confirmArrival(req: Request, res: Response): Promise<void> {
+  static async confirmArrival(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
       const result = await VerificationService.confirmArrival(id, userId);
       res.status(200).json({ success: true, data: result });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async completeVisit(req: Request, res: Response): Promise<void> {
+  static async completeVisit(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const nurseId = (req as any).user?.nurse?.id || (req as any).user?.nurseId;
       const result = await VerificationService.completeVisit(id, nurseId);
       res.status(200).json({ success: true, data: result });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async uploadEvidence(req: Request, res: Response): Promise<void> {
+  static async uploadEvidence(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const nurseId = (req as any).user?.nurse?.id || (req as any).user?.nurseId;
@@ -58,22 +58,22 @@ export class VerificationController {
       const evidence = await VerificationService.uploadEvidence(id, nurseId, type, urlOrText, !!consentGiven);
       res.status(200).json({ success: true, data: evidence });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async getQrToken(req: Request, res: Response): Promise<void> {
+  static async getQrToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const userId = (req as any).user?.id;
       const token = await VerificationService.getQrToken(id, userId);
       res.status(200).json({ success: true, data: token });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async verifyWithQr(req: Request, res: Response): Promise<void> {
+  static async verifyWithQr(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const nurseId = (req as any).user?.nurse?.id || (req as any).user?.nurseId;
@@ -81,11 +81,11 @@ export class VerificationController {
       const visit = await VerificationService.verifyWithQr(id, nurseId, token);
       res.status(200).json({ success: true, data: visit });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async verifyWithGps(req: Request, res: Response): Promise<void> {
+  static async verifyWithGps(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const nurseId = (req as any).user?.nurse?.id || (req as any).user?.nurseId;
@@ -93,38 +93,38 @@ export class VerificationController {
       const visit = await VerificationService.verifyWithGps(id, nurseId, lat, lng);
       res.status(200).json({ success: true, data: visit });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async verifyManual(req: Request, res: Response): Promise<void> {
+  static async verifyManual(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
       const nurseId = (req as any).user?.nurse?.id || (req as any).user?.nurseId;
-      const visit = await VerificationService.verifyManual(id, nurseId);
+      const visit = await VerificationService.verifyManual(id, nurseId, req.body.reason);
       res.status(200).json({ success: true, data: visit });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async getEvidence(req: Request, res: Response): Promise<void> {
+  static async getEvidence(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const evidence = await VerificationService.getEvidence(id);
+      const evidence = await VerificationService.getEvidence(id, (req as any).user);
       res.status(200).json({ success: true, data: evidence });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 
-  static async getAttendance(req: Request, res: Response): Promise<void> {
+  static async getAttendance(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = req.params;
-      const attendance = await VerificationService.getAttendance(id);
+      const attendance = await VerificationService.getAttendance(id, (req as any).user);
       res.status(200).json({ success: true, data: attendance });
     } catch (e: any) {
-      res.status(500).json({ success: false, message: e.message });
+      next(e);
     }
   }
 }

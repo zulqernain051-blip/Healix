@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { Card, Button, Chip, Divider } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
 import { useAdminPendingNurses, useAdminPendingDoctors, useApproveNurse, useRejectNurse, useApproveDoctor, useRejectDoctor } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminVerification() {
-  const { data: pendingNurses_raw, isLoading: isLoadingNurses  } = useAdminPendingNurses(); const pendingNurses = pendingNurses_raw?.users || [];
-  const { data: pendingDoctors_raw, isLoading: isLoadingDoctors  } = useAdminPendingDoctors(); const pendingDoctors = pendingDoctors_raw?.users || [];
+  const { data: pendingNurses_raw, isLoading: isLoadingNurses } = useAdminPendingNurses();
+  const pendingNurses: any[] = Array.isArray(pendingNurses_raw) ? pendingNurses_raw : (pendingNurses_raw as any)?.users || [];
+  const { data: pendingDoctors_raw, isLoading: isLoadingDoctors } = useAdminPendingDoctors();
+  const pendingDoctors: any[] = Array.isArray(pendingDoctors_raw) ? pendingDoctors_raw : (pendingDoctors_raw as any)?.users || [];
 
   const { mutateAsync: approveNurse } = useApproveNurse();
   const { mutateAsync: rejectNurse } = useRejectNurse();
@@ -17,9 +19,9 @@ export default function AdminVerification() {
   const isLoading = isLoadingNurses || isLoadingDoctors;
 
   const pendingList = [
-    ...pendingNurses.map(n => ({ ...n, type: 'NURSE' })),
-    ...pendingDoctors.map(d => ({ ...d, type: 'DOCTOR' }))
-  ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    ...pendingNurses.map((n: any) => ({ ...n, type: 'NURSE' })),
+    ...pendingDoctors.map((d: any) => ({ ...d, type: 'DOCTOR' }))
+  ].sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   const handleApprove = async (item: any) => {
     try {
@@ -83,6 +85,7 @@ export default function AdminVerification() {
         </View>
 
         <Divider style={styles.divider} />
+        {item.type === 'NURSE' && <Button onPress={() => navigate(`/admin/nurse-review/${item.id}` as any)}>Review uploaded documents</Button>}
 
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>{item.type === 'NURSE' ? 'PNC Registration No:' : 'PMDC Registration No:'}</Text>

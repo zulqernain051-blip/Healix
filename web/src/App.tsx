@@ -1,8 +1,11 @@
+import Operations from './pages/admin/Operations';
+import Analytics from './pages/Analytics';
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './store/auth';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
+import AccountSecurity from './pages/AccountSecurity';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
@@ -17,6 +20,7 @@ import AuditLogs from './pages/admin/AuditLogs';
 import DoctorDashboard from './pages/doctor/Dashboard';
 import HomeVisits from './pages/doctor/HomeVisits';
 import CaseReview from './pages/doctor/CaseReview';
+import EmergencyOperations from './pages/EmergencyOperations';
 
 import './styles/index.css';
 
@@ -36,11 +40,15 @@ function AdminLayout() {
       <main className="main-content">
         {activeTab === 'dashboard' && <AdminDashboard />}
         {activeTab === 'users' && <AdminUsers />}
+        {activeTab === 'operations' && <Operations />}
         {activeTab === 'nurses' && <NurseVerification />}
         {activeTab === 'doctors' && <DoctorVerification />}
         {activeTab === 'marketplace' && <MarketplaceMonitor />}
         {activeTab === 'config' && <PlatformConfig />}
         {activeTab === 'audit' && <AuditLogs />}
+        {activeTab === 'emergency' && <EmergencyOperations />}
+        {activeTab === 'security' && <AccountSecurity />}
+        {activeTab === 'analytics' && <Analytics />}
       </main>
     </div>
   );
@@ -52,7 +60,7 @@ function DoctorLayout() {
 
   return (
     <div className="app-layout">
-      <Sidebar role="DOCTOR" activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar role="DOCTOR" activeTab={activeTab} setActiveTab={tab => { setSelectedCaseId(null); setActiveTab(tab); }} />
       <main className="main-content">
         {selectedCaseId ? (
           <CaseReview caseId={selectedCaseId} onBack={() => setSelectedCaseId(null)} />
@@ -60,6 +68,9 @@ function DoctorLayout() {
           <>
             {activeTab === 'dashboard' && <DoctorDashboard onSelectCase={setSelectedCaseId} />}
             {activeTab === 'homevisits' && <HomeVisits />}
+            {activeTab === 'emergency' && <EmergencyOperations />}
+        {activeTab === 'security' && <AccountSecurity />}
+        {activeTab === 'analytics' && <Analytics />}
           </>
         )}
       </main>

@@ -10,9 +10,7 @@ export default function ReviewsStack() {
         contentStyle: { backgroundColor: COLORS.bg },
       }}
     >
-      <Stack.Screen name="index" />
       <Stack.Screen name="[id]" />
-      <Stack.Screen name="second-opinion" />
     </Stack>
   );
 }

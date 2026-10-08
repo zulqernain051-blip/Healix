@@ -1,0 +1,779 @@
+[
+  {
+    "from": "/",
+    "to": "/auth/login",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/index.tsx"
+  },
+  {
+    "from": "/(doctor)/(tabs)/home",
+    "to": "/(doctor)/(tabs)/messages",
+    "action": "Active Escalation Feed",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/(tabs)/home.tsx"
+  },
+  {
+    "from": "/(doctor)/(tabs)/home",
+    "to": "/(doctor)/reviews/[id]",
+    "action": "Escalation Queue Clean",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/(tabs)/home.tsx"
+  },
+  {
+    "from": "/(doctor)/(tabs)/messages",
+    "to": "/(doctor)/messages/chat",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/(tabs)/messages.tsx"
+  },
+  {
+    "from": "/(doctor)/(tabs)/profile",
+    "to": "/(doctor)/(tabs)/home",
+    "action": "High-Risk Escalation Queue",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(doctor)/(tabs)/profile",
+    "to": "/(doctor)/(tabs)/messages",
+    "action": "Messages & Tele-Consults",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(doctor)/(tabs)/profile",
+    "to": "/auth/change-password",
+    "action": "Account Settings & Security",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(doctor)/action/[id]",
+    "to": "/(doctor)/(tabs)/home",
+    "action": "Clinical Actions",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/action/[id].tsx"
+  },
+  {
+    "from": "/(doctor)/reviews/[id]",
+    "to": "/(doctor)/action/[id]",
+    "action": "Clinical Tools Menu",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(doctor)/reviews/[id].tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/(tabs)/visits",
+    "action": "More menu / tab bar \u2192 My Visits",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/patients",
+    "action": "More menu / tab bar \u2192 Patients",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/(tabs)/marketplace",
+    "action": "More menu / tab bar \u2192 Marketplace",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/(tabs)/messages",
+    "action": "More menu / tab bar \u2192 Messages",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/visits/[id]",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/home.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/marketplace",
+    "to": "/(nurse)/marketplace/[id]",
+    "action": "Finding available care requests...",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/marketplace.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/marketplace",
+    "to": "/(nurse)/marketplace/contracts",
+    "action": "Browse and submit offers",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/marketplace.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/messages",
+    "to": "/(nurse)/messages/chat",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/messages.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/profile",
+    "to": "/(nurse)/profile/availability",
+    "action": "Availability & Shift Schedule",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/profile",
+    "to": "/(nurse)/profile/earnings",
+    "action": "My Earnings & Financial Payouts",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/profile",
+    "to": "/(nurse)/profile/performance",
+    "action": "Performance Score & Badges",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/profile",
+    "to": "/(nurse)/profile/reviews",
+    "action": "Patient Reviews & Feedback",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/visits",
+    "to": "/(nurse)/visits/[id]",
+    "action": "No Visits",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/visits.tsx"
+  },
+  {
+    "from": "/(nurse)/ai",
+    "to": "/(patient)/(tabs)/home",
+    "action": "Healix AI Assistant",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/ai/index.tsx"
+  },
+  {
+    "from": "/(nurse)/marketplace/contracts",
+    "to": "/(nurse)/marketplace/contracts/[id]",
+    "action": "Failed to load contracts",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/marketplace/contracts/index.tsx"
+  },
+  {
+    "from": "/(nurse)/patients",
+    "to": "/(nurse)/patients/[id]",
+    "action": "Assigned Patients Directory",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/patients/index.tsx"
+  },
+  {
+    "from": "/(nurse)/patients/[id]",
+    "to": "/(nurse)/patients",
+    "action": "Loading...",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/patients/[id].tsx"
+  },
+  {
+    "from": "/(nurse)/visits/risk-assess",
+    "to": "/(nurse)/visits/[id]",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/visits/risk-assess.tsx"
+  },
+  {
+    "from": "/(nurse)/visits/[id]",
+    "to": "/(nurse)/(tabs)/visits",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(nurse)/visits/[id].tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/(tabs)/profile",
+    "action": "More menu / tab bar \u2192 Profile",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(patient)/_layout.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/notifications",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/home.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/(tabs)/requests",
+    "action": "More menu / tab bar \u2192 Requests",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(patient)/_layout.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/requests/new",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/home.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/(tabs)/records",
+    "action": "More menu / tab bar \u2192 Records",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(patient)/_layout.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/(tabs)/messages",
+    "action": "More menu / tab bar \u2192 Messages",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(patient)/_layout.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/health",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/home.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/health/prescriptions",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/home.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/messages",
+    "to": "/(patient)/messages/chat",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/messages.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/profile",
+    "to": "/(patient)/profile/edit",
+    "action": "Personal Information",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/profile",
+    "to": "/(patient)/profile/emergency-contacts",
+    "action": "Emergency Contacts",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/profile",
+    "to": "/(patient)/health/medical",
+    "action": "Medical Information",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/profile",
+    "to": "/(patient)/profile/settings",
+    "action": "Account Settings",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/profile.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/records",
+    "to": "/(patient)/health/clinical-outcomes",
+    "action": "Clinical Outcomes & Diagnoses",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/records.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/records",
+    "to": "/(patient)/records/vitals",
+    "action": "Vitals & Biometrics",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/records.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/records",
+    "to": "/(patient)/health/prescriptions",
+    "action": "Prescriptions & Medications",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/records.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/records",
+    "to": "/(patient)/health/medical",
+    "action": "Medical Timeline & Labs",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/records.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/records",
+    "to": "/(patient)/(tabs)/requests",
+    "action": "Care Visits & History",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/records.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/records",
+    "to": "/(patient)/health/careplans",
+    "action": "Active Care Plans",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/records.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/records",
+    "to": "/(patient)/records/risk-history",
+    "action": "AI Risk History",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/records.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/requests",
+    "to": "/(patient)/requests/new",
+    "action": "Loading your care requests...",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/requests.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/requests",
+    "to": "/(patient)/requests/[id]",
+    "action": "We couldn't load your care requests.",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/requests.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/requests",
+    "to": "/(patient)/visits/[id]",
+    "action": "We couldn't load your care requests.",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/requests.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/requests",
+    "to": "/(patient)/marketplace/[id]",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/requests.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/requests",
+    "to": "/(patient)/marketplace/contracts/[id]",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/(tabs)/requests.tsx"
+  },
+  {
+    "from": "/(patient)/ai",
+    "to": "/(patient)/(tabs)/home",
+    "action": "Healix AI Assistant",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/ai/index.tsx"
+  },
+  {
+    "from": "/(patient)/health",
+    "to": "/(patient)/records/vitals",
+    "action": "View",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/health/index.tsx"
+  },
+  {
+    "from": "/(patient)/health",
+    "to": "/(patient)/health/medical",
+    "action": "Medical Timeline",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/health/index.tsx"
+  },
+  {
+    "from": "/(patient)/health",
+    "to": "/(patient)/health/careplans",
+    "action": "Active Care Plans",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/health/index.tsx"
+  },
+  {
+    "from": "/(patient)/health",
+    "to": "/(patient)/health/prescriptions",
+    "action": "Prescriptions",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/health/index.tsx"
+  },
+  {
+    "from": "/(patient)/health",
+    "to": "/(patient)/health/caregivers",
+    "action": "Family Caregivers",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/health/index.tsx"
+  },
+  {
+    "from": "/(patient)/health",
+    "to": "/(patient)/health/recurring",
+    "action": "Recurring Visits",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/health/index.tsx"
+  },
+  {
+    "from": "/(patient)/health/recurring",
+    "to": "/(patient)/requests/new",
+    "action": "(automatic redirect)",
+    "kind": "redirect",
+    "viaFile": "mobile/src/app/(patient)/health/recurring.tsx"
+  },
+  {
+    "from": "/(patient)/marketplace",
+    "to": "/(patient)/marketplace/[id]",
+    "action": "Failed to load requests",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/marketplace/index.tsx"
+  },
+  {
+    "from": "/(patient)/marketplace",
+    "to": "/(patient)/marketplace/contracts",
+    "action": "Review offers from nurses",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/marketplace/index.tsx"
+  },
+  {
+    "from": "/(patient)/marketplace/[id]",
+    "to": "/(patient)/marketplace/contracts/[id]",
+    "action": "Loading offers...",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/marketplace/[id].tsx"
+  },
+  {
+    "from": "/(patient)/marketplace/[id]",
+    "to": "/(patient)/(tabs)/requests",
+    "action": "Loading offers...",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/marketplace/[id].tsx"
+  },
+  {
+    "from": "/(patient)/marketplace/contracts",
+    "to": "/(patient)/marketplace/contracts/[id]",
+    "action": "Failed to load contracts",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/marketplace/contracts/index.tsx"
+  },
+  {
+    "from": "/(patient)/marketplace/contracts/[id]",
+    "to": "/(patient)/(tabs)/requests",
+    "action": "Contract not found",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/marketplace/contracts/[id].tsx"
+  },
+  {
+    "from": "/(patient)/notifications",
+    "to": "/(patient)/records/risk-history",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/notifications/index.tsx"
+  },
+  {
+    "from": "/(patient)/notifications",
+    "to": "/(patient)/requests/[id]",
+    "action": "Notifications",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/notifications/index.tsx"
+  },
+  {
+    "from": "/(patient)/profile/edit",
+    "to": "/(patient)/(tabs)/profile",
+    "action": "Edit Profile",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/profile/edit.tsx"
+  },
+  {
+    "from": "/(patient)/requests/[id]",
+    "to": "/(patient)/visits/[id]",
+    "action": "View Visit Check-In & Details",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/requests/[id].tsx"
+  },
+  {
+    "from": "/(patient)/visits",
+    "to": "/(patient)/visits/[id]",
+    "action": "No Visits Yet",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/(patient)/visits/index.tsx"
+  },
+  {
+    "from": "/admin/audit",
+    "to": "/admin",
+    "action": "System Audit Trail",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/audit.tsx"
+  },
+  {
+    "from": "/admin/config",
+    "to": "/admin",
+    "action": "System Parameters",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/config.tsx"
+  },
+  {
+    "from": "/admin/doctors",
+    "to": "/admin",
+    "action": "Doctor Credential Governance",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/doctors.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/users",
+    "action": "Total Users",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/nurses",
+    "action": "Registered Nurses",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/doctors",
+    "action": "Verified Doctors",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/verification",
+    "action": "Pending Queue",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/patients",
+    "action": "Patients Management",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/paramedics",
+    "action": "Paramedics Management",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/care",
+    "action": "Care Operations",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/clinical",
+    "action": "Clinical Operations",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/emergency",
+    "action": "Emergency Center",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/network",
+    "action": "Healthcare Network",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/reviews",
+    "action": "Review Moderation",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin",
+    "to": "/admin/config",
+    "action": "Platform Config & Audit Logs",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/index.tsx"
+  },
+  {
+    "from": "/admin/nurses",
+    "to": "/admin",
+    "action": "Nurse Credential Governance",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/nurses.tsx"
+  },
+  {
+    "from": "/admin/paramedics",
+    "to": "/admin",
+    "action": "Paramedic Management",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/paramedics.tsx"
+  },
+  {
+    "from": "/admin/patients",
+    "to": "/admin",
+    "action": "Patient Management",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/patients.tsx"
+  },
+  {
+    "from": "/admin/users",
+    "to": "/admin",
+    "action": "User Account Management",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/users.tsx"
+  },
+  {
+    "from": "/admin/verification",
+    "to": "/admin",
+    "action": "Verification Queue",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/admin/verification.tsx"
+  },
+  {
+    "from": "/auth/change-password",
+    "to": "/auth/login",
+    "action": "Update your account security credentials",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/change-password.tsx"
+  },
+  {
+    "from": "/auth/forgot",
+    "to": "/auth/reset",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/forgot.tsx"
+  },
+  {
+    "from": "/auth/login",
+    "to": "/auth/mfa-verify",
+    "action": "Healix",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/login.tsx"
+  },
+  {
+    "from": "/auth/login",
+    "to": "/auth/verify-otp",
+    "action": "Healix",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/login.tsx"
+  },
+  {
+    "from": "/auth/login",
+    "to": "/auth/role-select",
+    "action": "Sign Up",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/login.tsx"
+  },
+  {
+    "from": "/auth/login",
+    "to": "/auth/forgot",
+    "action": "Sign Up",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/login.tsx"
+  },
+  {
+    "from": "/auth/register",
+    "to": "/auth/verify-otp",
+    "action": "Register Profile",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/register.tsx"
+  },
+  {
+    "from": "/auth/register",
+    "to": "/auth/login",
+    "action": "Sign In",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/register.tsx"
+  },
+  {
+    "from": "/auth/reset",
+    "to": "/auth/login",
+    "action": null,
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/reset.tsx"
+  },
+  {
+    "from": "/auth/role-select",
+    "to": "/auth/register",
+    "action": "Join Healix As",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/role-select.tsx"
+  },
+  {
+    "from": "/auth/role-select",
+    "to": "/auth/login",
+    "action": "Support emergency dispatch and ambulance response",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/role-select.tsx"
+  },
+  {
+    "from": "/auth/verify-otp",
+    "to": "/auth/login",
+    "action": "Verify Account",
+    "kind": "push/replace/link",
+    "viaFile": "mobile/src/app/auth/verify-otp.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/ai",
+    "action": "More menu / tab bar \u2192 AI Assistant",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/schedule",
+    "action": "More menu / tab bar \u2192 Schedule",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/sync",
+    "action": "More menu / tab bar \u2192 Data Sync",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/(tabs)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/(tabs)/profile",
+    "action": "More menu / tab bar \u2192 Profile",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(nurse)/_layout.tsx"
+  },
+  {
+    "from": "/(doctor)/(tabs)/home",
+    "to": "/(doctor)/(tabs)/profile",
+    "action": "More menu / tab bar \u2192 Profile & PMDC",
+    "kind": "layout-menu",
+    "viaFile": "mobile/src/app/(doctor)/_layout.tsx"
+  },
+  {
+    "from": "/(patient)/(tabs)/home",
+    "to": "/(patient)/(tabs)/more",
+    "action": "Bottom tab bar \u2192 More",
+    "kind": "tab",
+    "viaFile": "(tabs)/_layout.tsx"
+  },
+  {
+    "from": "/(nurse)/(tabs)/home",
+    "to": "/(nurse)/(tabs)/more",
+    "action": "Bottom tab bar \u2192 More",
+    "kind": "tab",
+    "viaFile": "(tabs)/_layout.tsx"
+  }
+]

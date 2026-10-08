@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
+import { useLocalSearchParams } from 'expo-router';
 import { navigate } from '../../utils/navigation';
 import { useLogin } from '../../hooks/useAuth';
 import { ApiError } from '../../types/api';
+import { GoogleSignInButton } from '../../components/auth/GoogleSignInButton';
+import { authApi } from '../../api/auth.api';
+import { useAuthStore } from '../../store/auth';
 
 /**
  * Premium Login Screen.
@@ -11,9 +15,13 @@ import { ApiError } from '../../types/api';
  * redirects unverified users to OTP verification.
  */
 export default function LoginScreen() {
+  const params = useLocalSearchParams<{ message?: string }>();
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [googleBusy, setGoogleBusy] = useState(false);
+  const [googleError, setGoogleError] = useState('');
+  const setSession = useAuthStore(state => state.setSession);
   
   const loginMutation = useLogin();
   const isLoading = loginMutation.isPending;
@@ -38,6 +46,23 @@ export default function LoginScreen() {
     );
   };
 
+  const handleGoogleCredential = async (credential: string) => {
+    setGoogleBusy(true);
+    setGoogleError('');
+    try {
+      const result = await authApi.googleLogin({ credential });
+      if (result.mfaRequired) {
+        navigate('/auth/mfa-verify', { emailOrPhone: result.email });
+      } else {
+        await setSession(result.user, result.tokens.accessToken, result.tokens.refreshToken);
+      }
+    } catch (err: any) {
+      setGoogleError(err.message || 'Google sign-in failed.');
+    } finally {
+      setGoogleBusy(false);
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -48,6 +73,7 @@ export default function LoginScreen() {
       <View style={styles.card}>
         <Text style={styles.title}>Welcome Back</Text>
         <Text style={styles.hint}>Sign in to access your secure portal</Text>
+        {!!params.message && <HelperText type="info" visible>{params.message}</HelperText>}
 
         <TextInput
           label="Email or Phone Number"
@@ -100,6 +126,8 @@ export default function LoginScreen() {
           buttonColor="#0D9488">
           Sign In
         </Button>
+        <GoogleSignInButton onCredential={handleGoogleCredential} onError={setGoogleError} disabled={googleBusy || isLoading} />
+        {!!googleError && <HelperText type="error" visible>{googleError}</HelperText>}
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account? </Text>
@@ -124,7 +152,7 @@ export default function LoginScreen() {
             Forgot Password?
           </Text>
         </TouchableOpacity>
-      </View>
+      <Button onPress={() => navigate('/auth/invited')}>Accept an invitation</Button></View>
     </ScrollView>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface AddMedicationModalProps {
   visible: boolean;
@@ -15,18 +15,21 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({ visible,
   const [dosage, setDosage] = useState('');
   const [frequency, setFrequency] = useState('');
 
+  const [formError, setFormError] = useState('');
   const handleSubmit = async () => {
     if (!name.trim() || !dosage.trim() || !frequency.trim()) return;
-    await onSubmit(name, dosage, frequency);
+    setFormError('');
+    try { await onSubmit(name, dosage, frequency);
     setName(''); setDosage(''); setFrequency('');
     onClose();
+    } catch(e: any) { setFormError(e.message || 'Could not save. Please try again.'); }
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <Text style={styles.title}>Add Medication</Text>
+          {!!formError && <Text accessibilityRole="alert" style={{color:COLORS.red}}>{formError}</Text>}<Text style={styles.title}>Add Medication</Text>
           <TextInput style={styles.input} placeholder="Medication Name" placeholderTextColor="#6B8E8A" value={name} onChangeText={setName} />
           <TextInput style={styles.input} placeholder="Dosage (e.g. 500mg)" placeholderTextColor="#6B8E8A" value={dosage} onChangeText={setDosage} />
           <TextInput style={styles.input} placeholder="Frequency (e.g. Twice daily)" placeholderTextColor="#6B8E8A" value={frequency} onChangeText={setFrequency} />

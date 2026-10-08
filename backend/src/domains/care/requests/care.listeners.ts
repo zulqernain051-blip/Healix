@@ -25,6 +25,7 @@ export function registerCareListeners() {
       }
     } catch (err: any) {
       console.error(`[Care Domain] Failed to process VISIT_CANCELLED:`, err.message);
+      throw err;
     }
   });
 }

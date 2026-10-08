@@ -4,9 +4,11 @@ import { ApiError } from '../types/api';
 import { secureStorage } from '../utils/secureStorage';
 
 export const getApiUrl = () => {
+  const configured = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (configured) return configured.replace(/\/+$/, '');
   if (Platform.OS === 'web') return 'http://localhost:3000/api/v1';
 
-  const hostUri = Constants.expoConfig?.hostUri || (Constants as any).manifest2?.extra?.expoGo?.developer?.tool;
+  const hostUri = Constants.expoConfig?.hostUri;
   if (hostUri) {
     const ip = hostUri.split(':')[0];
     if (ip && ip !== 'localhost' && ip !== '127.0.0.1') {
@@ -26,83 +28,35 @@ interface FetchOptions extends RequestInit {
   retry?: boolean;
 }
 
-let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
-
-const subscribeTokenRefresh = (cb: (token: string) => void) => {
-  refreshSubscribers.push(cb);
-};
-
-const onRefreshed = (token: string) => {
-  refreshSubscribers.forEach((cb) => cb(token));
-  refreshSubscribers = [];
-};
+let refreshPromise: Promise<boolean> | null = null;
 
 export const apiClient = {
   async fetch(endpoint: string, options: FetchOptions = {}): Promise<Response> {
     const { retry = true, ...customOptions } = options;
+    const { getSessionVersion } = await import('../store/auth');
+    const version = getSessionVersion();
     const token = await secureStorage.getItemAsync('token');
-
-    const headers: Record<string, string> = {
-      ...((customOptions.headers as Record<string, string>) || {}),
-    };
-
-    if (!(customOptions.body instanceof FormData) && !headers['Content-Type']) {
-      headers['Content-Type'] = 'application/json';
-    }
-
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
-
-    const config: RequestInit = {
-      ...customOptions,
-      headers,
-    };
-
-    const url = endpoint.startsWith('http') ? endpoint : `${API_URL}${endpoint}`;
+    const headers = new Headers(customOptions.headers);
+    if (customOptions.body instanceof FormData) headers.delete('Content-Type');
+    else if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+    if (token) headers.set('Authorization', 'Bearer ' + token);
+    const config: RequestInit = { ...customOptions, headers };
+    const url = endpoint.startsWith('http') ? endpoint : API_URL + endpoint;
     let response = await fetch(url, config);
-
-    if (response.status === 401 && retry) {
-      return new Promise((resolve, reject) => {
-        subscribeTokenRefresh(async (newToken: string) => {
-          if (!newToken) {
-            reject(new ApiError('Authentication failed', 401));
-            return;
-          }
-          headers.Authorization = `Bearer ${newToken}`;
-          config.headers = headers;
-          try {
-            const retryResponse = await fetch(url, config);
-            if (!retryResponse.ok) {
-              const err = await this.parseError(retryResponse);
-              reject(err);
-              return;
-            }
-            resolve(retryResponse);
-          } catch (e) {
-            reject(e);
-          }
-        });
-
-        if (!isRefreshing) {
-          isRefreshing = true;
-          this.refreshToken().then((success) => {
-            isRefreshing = false;
-            if (success) {
-              secureStorage.getItemAsync('token').then((t) => onRefreshed(t || ''));
-            } else {
-              onRefreshed('');
-            }
-          });
-        }
-      });
+    if (version !== getSessionVersion()) throw new ApiError('Session changed', 401);
+    if (response.status === 401 && retry && token) {
+      const currentToken = await secureStorage.getItemAsync('token');
+      // A slow response may arrive after another request has already rotated tokens.
+      if (currentToken === token) {
+        if (!refreshPromise) refreshPromise = this.refreshToken().finally(() => { refreshPromise = null; });
+        if (!await refreshPromise) throw await this.parseError(response);
+      }
+      const refreshedToken = await secureStorage.getItemAsync('token');
+      if (!refreshedToken) throw await this.parseError(response);
+      headers.set('Authorization', 'Bearer ' + refreshedToken);
+      response = await fetch(url, config);
     }
-
-    if (!response.ok) {
-      throw await this.parseError(response);
-    }
-
+    if (!response.ok) throw await this.parseError(response);
     return response;
   },
 
@@ -111,13 +65,14 @@ export const apiClient = {
     let fieldErrors = undefined;
     let rawErrors = null;
 
+    const text = await response.text();
     try {
-      const data = await response.json();
+      const data = JSON.parse(text);
       errorMessage = data.message || errorMessage;
       fieldErrors = data.errors;
       rawErrors = data;
-    } catch (e) {
-      errorMessage = await response.text();
+    } catch {
+      errorMessage = text || response.statusText || errorMessage;
     }
 
     return new ApiError(errorMessage, response.status, fieldErrors, rawErrors);
@@ -126,36 +81,39 @@ export const apiClient = {
   async refreshToken(): Promise<boolean> {
     try {
       const refreshTokenStr = await secureStorage.getItemAsync('refreshToken');
-      if (!refreshTokenStr) return false;
-
-      const response = await fetch(`${API_URL}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const { useAuthStore, getSessionVersion } = await import('../store/auth');
+      const version = getSessionVersion();
+      if (!refreshTokenStr) { await useAuthStore.getState().clearSession(); return false; }
+      const response = await fetch(API_URL + '/auth/refresh', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: refreshTokenStr }),
       });
-
+      // Never revive a signed-out session or overwrite a different account.
+      if (getSessionVersion() !== version || await secureStorage.getItemAsync('refreshToken') !== refreshTokenStr) return false;
       if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data && data.data.accessToken) {
-          await secureStorage.setItemAsync('token', data.data.accessToken);
-          if (data.data.refreshToken) {
-            await secureStorage.setItemAsync('refreshToken', data.data.refreshToken);
-          }
+        const result = await response.json();
+        if (getSessionVersion() !== version) return false;
+        const tokens = result.data;
+        if (result.success && tokens?.accessToken && tokens?.refreshToken) {
+          await secureStorage.setItemAsync('token', tokens.accessToken);
+          await secureStorage.setItemAsync('refreshToken', tokens.refreshToken);
+          useAuthStore.setState({ accessToken: tokens.accessToken });
           return true;
         }
       }
-      
-      // If refresh fails, clear tokens
-      await secureStorage.deleteItemAsync('token');
-      await secureStorage.deleteItemAsync('refreshToken');
+      if (response.status === 401 || response.status === 403 || response.ok) {
+        await useAuthStore.getState().clearSession();
+      }
       return false;
-    } catch (e) {
+    } catch {
+      // Keep the stored session when the network is temporarily unavailable.
       return false;
     }
   },
 
   async get<T = any>(endpoint: string, options?: FetchOptions): Promise<T> {
     const response = await this.fetch(endpoint, { ...options, method: 'GET' });
+    if (response.status === 204) return undefined as T;
     const data = await response.json();
     return data.success ? data.data : data;
   },
@@ -164,9 +122,9 @@ export const apiClient = {
     const isFormData = body instanceof FormData;
     
     // Automatically remove Content-Type if it's FormData so fetch sets boundary correctly
-    const headers = options?.headers as Record<string, string> || {};
-    if (isFormData && headers['Content-Type'] === 'multipart/form-data') {
-      delete headers['Content-Type'];
+    const headers = new Headers(options?.headers);
+    if (isFormData) {
+      headers.delete('Content-Type');
     }
 
     const response = await this.fetch(endpoint, {
@@ -175,6 +133,7 @@ export const apiClient = {
       method: 'POST',
       body: isFormData ? body : JSON.stringify(body),
     });
+    if (response.status === 204) return undefined as T;
     const data = await response.json();
     return data.success ? data.data : data;
   },
@@ -185,12 +144,14 @@ export const apiClient = {
       method: 'PUT',
       body: JSON.stringify(body),
     });
+    if (response.status === 204) return undefined as T;
     const data = await response.json();
     return data.success ? data.data : data;
   },
 
   async delete<T = any>(endpoint: string, options?: FetchOptions): Promise<T> {
     const response = await this.fetch(endpoint, { ...options, method: 'DELETE' });
+    if (response.status === 204) return undefined as T;
     const data = await response.json();
     return data.success ? data.data : data;
   },

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { Text, Card, Chip, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -99,6 +99,7 @@ export default function PatientMarketplaceScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
+        <Button onPress={() => router.push('/(patient)/marketplace/favorites' as any)}>Favorites</Button>
         <View style={styles.headerTextWrap}>
           <Text style={styles.title}>Marketplace</Text>
           <Text style={styles.subtitle}>Review offers from nurses</Text>

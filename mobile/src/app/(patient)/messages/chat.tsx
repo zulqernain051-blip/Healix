@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { voiceFileInfo } from '../../../hooks/useVoiceRecorder';
+import { useState, useRef, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -54,7 +56,7 @@ export default function WhatsAppStyleChatScreen() {
   };
 
   // Unpack messages correctly based on API response structure
-  const rawMessages = historyData?.data?.messages || (historyData as any)?.messages || [];
+  const rawMessages = (historyData as any)?.data?.messages || historyData?.messages || [];
 
   // Transform raw messages to UI components MessageItem format
   const messages: MessageItem[] = [...rawMessages]
@@ -105,7 +107,7 @@ export default function WhatsAppStyleChatScreen() {
       setMediaPreview(null);
       setShowAttachMenu(false);
     } catch (err: any) {
-      Alert.alert('Failed to send message', err.message || 'Please try again.');
+      appAlert('Failed to send message', err.message || 'Please try again.');
     }
   };
 
@@ -183,7 +185,7 @@ export default function WhatsAppStyleChatScreen() {
         {/* Encrypted Notice Banner */}
         <View style={styles.encryptionNotice}>
           <Text style={styles.encryptionText}>
-            🔒 End-to-end encrypted · WhatsApp-Style Media Sharing · HIPAA Compliant
+            Care team conversation · messages and attachments
           </Text>
         </View>
 
@@ -209,12 +211,12 @@ export default function WhatsAppStyleChatScreen() {
               await sendMediaMessageMutation({
                 threadId,
                 uri,
-                mimeType: 'audio/m4a',
-                filename: `voice-${Date.now()}.m4a`,
+                mimeType: voiceFileInfo().mimeType,
+                filename: voiceFileInfo().name,
                 durationMs
               });
             } catch (err: any) {
-              Alert.alert('Failed to send voice message', err.message);
+              appAlert('Failed to send voice message', err.message);
             }
           }}
         />

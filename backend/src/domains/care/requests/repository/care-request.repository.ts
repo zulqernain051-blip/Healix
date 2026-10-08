@@ -13,9 +13,9 @@ export class CareRequestRepository {
     });
   }
   public static async createCareRequest(data: CreateCareRequestDto, priority: string, fallbackLocation: { address: string; latitude: number; longitude: number }) {
-    const address = data.location?.address || fallbackLocation.address;
-    const latitude = data.location?.latitude || fallbackLocation.latitude;
-    const longitude = data.location?.longitude || fallbackLocation.longitude;
+    const address = data.location?.address ?? fallbackLocation.address;
+    const latitude = data.location?.latitude ?? fallbackLocation.latitude;
+    const longitude = data.location?.longitude ?? fallbackLocation.longitude;
 
     if (data.scheduleType === 'RECURRING' && data.recurring) {
       // Create pattern and request in a Care-domain transaction

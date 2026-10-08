@@ -1,73 +1,34 @@
-// f:/class Data/FYP Project/Proposal/Project/Healix/mobile/src/app/(nurse)/sync/index.tsx
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { OfflineSyncStatusBanner } from '../../../components/common/OfflineSyncStatusBanner';
-import { EmptyState } from '../../../components/common/EmptyState';
-import { LoadingState } from '../../../components/common/LoadingState';
-import { ErrorState } from '../../../components/common/ErrorState';
-
-// Mock sync queue data
-const initialQueue = [
-  { id: '1', description: 'Vitals for Visit #101', status: 'Pending' },
-  { id: '2', description: 'Symptom checklist for Visit #102', status: 'Failed' },
-];
+import { Appbar, Button, Card, Text } from 'react-native-paper';
+import { clinicalDrafts, ClinicalDraft } from '../../../services/clinicalDrafts';
+import { confirmAction } from '../../../components/common/AppDialogs';
+import { goBack } from '../../../utils/navigation';
+import { COLORS, SPACING, RADIUS } from '../../../theme';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function NurseSyncScreen() {
-  const [queue, setQueue] = useState(initialQueue);
-  const [loading, setLoading] = useState(false);
-  const [error] = useState<string | null>(null);
-
-  const retry = (id: string) => {
-    setLoading(true);
-    setTimeout(() => {
-      setQueue(prev =>
-        prev.map(item => (item.id === id ? { ...item, status: 'Pending' } : item))
-      );
-      setLoading(false);
-    }, 800);
-  };
-
-  if (loading) return <LoadingState />;
-  if (error) return <ErrorState error={error} />;
-
-  const pendingCount = queue.filter(i => i.status !== 'Success').length;
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <OfflineSyncStatusBanner isOnline={false} pendingSyncCount={pendingCount} />
-      <View style={styles.content}>
-        {queue.length === 0 ? (
-          <EmptyState title="All data synced" subtitle="No pending uploads." />
-        ) : (
-          <FlatList
-            data={queue}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.item}>
-                <Text style={styles.desc}>{item.description}</Text>
-                <Text style={[styles.status, item.status === 'Failed' && styles.failed]}>{item.status}</Text>
-                {item.status === 'Failed' && (
-                  <TouchableOpacity onPress={() => retry(item.id)} style={styles.retryBtn}>
-                    <Text style={styles.retryText}>Retry</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            )}
-          />
-        )}
-      </View>
-    </SafeAreaView>
-  );
+ const [drafts, setDrafts] = useState<ClinicalDraft[]>([]);
+ const [busy, setBusy] = useState(true); const [error, setError] = useState('');
+ const query = useQueryClient();
+ const pending = drafts.filter(item => !item.archivedAt);
+ const archive = async (item: ClinicalDraft) => { if (!item.archivedAt && !await confirmAction('Archive undelivered draft', 'This observation will remain on this device, but will not be sent. Review it with your care team before archiving.')) return; setBusy(true); try { setDrafts(await clinicalDrafts.archive(item.id, !item.archivedAt)); } catch(e) { setError(e instanceof Error ? e.message : 'Could not archive draft'); } finally { setBusy(false); } }; 
+ const refresh = async () => { setBusy(true); setError(''); try { setDrafts(await clinicalDrafts.list()); } catch (e) { setError(e instanceof Error ? e.message : 'Could not read drafts'); } finally { setBusy(false); } };
+ useEffect(() => { void refresh(); }, []);
+ const sync = async () => { setBusy(true); setError(''); try { const remaining = await clinicalDrafts.sync(); setDrafts(remaining); if (remaining.some(item => !item.archivedAt)) setError('Some drafts need attention. Review the messages below.'); await query.invalidateQueries({ queryKey: ['visits'] }); } catch (e) { setError(e instanceof Error ? e.message : 'Could not sync drafts'); } finally { setBusy(false); } };
+ return <SafeAreaView style={styles.page}><Appbar.Header style={{ backgroundColor: COLORS.surfaceCard }}><Appbar.BackAction onPress={goBack}/><Appbar.Content title="Offline drafts" /></Appbar.Header><ScrollView contentContainerStyle={styles.content}>
+  <Text variant="headlineSmall" style={styles.title}>Offline clinical drafts</Text>
+  <Text style={styles.body}>Vitals and symptoms with unconfirmed delivery are saved on this device for your account. Clinical decisions, verification and emergency escalation require a connection. Sync drafts before completing a visit.</Text>
+  <View style={styles.actions}><Button mode="contained" buttonColor={COLORS.navy} textColor={COLORS.headerText} onPress={sync} loading={busy} disabled={busy || !pending.length}>Sync drafts ({pending.length})</Button><Button textColor={COLORS.navy} onPress={refresh} disabled={busy}>Refresh</Button></View>
+  {!!error && <Text style={styles.error}>{error}</Text>}
+  {!busy && !drafts.length && !error && <Text style={styles.body}>No pending clinical drafts.</Text>}
+  {drafts.map(item => <Card key={item.id} style={styles.card}><Card.Content>
+   <Text style={styles.title}>{item.kind === 'VITALS' ? 'Vitals' : 'Symptoms'} · {item.archivedAt ? 'Archived on device' : 'awaiting delivery'}</Text>
+   <Text style={styles.body}>Visit: {item.visitId}</Text><Text style={styles.body}>Captured: {new Date(item.capturedAt).toLocaleString()}</Text>
+   <Text style={styles.body}>{JSON.stringify(item.data, null, 2)}</Text>
+   {!!item.error && <Text style={styles.error}>{item.error}</Text>}<Button disabled={busy} textColor={COLORS.navy} onPress={() => void archive(item)}>{item.archivedAt ? 'Restore for sync' : 'Archive on device'}</Button>
+  </Card.Content></Card>)}
+ </ScrollView></SafeAreaView>;
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
-  content: { flex: 1, padding: 16 },
-  item: { backgroundColor: '#0A2D28', padding: 12, marginBottom: 10, borderRadius: 6 },
-  desc: { color: '#00E676', fontSize: 14 },
-  status: { color: '#FFFFFF', marginTop: 4 },
-  failed: { color: '#FF5252' },
-  retryBtn: { marginTop: 6, alignSelf: 'flex-start', backgroundColor: '#00E676', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 4 },
-  retryText: { color: '#061C19', fontWeight: '600' },
-});
+const styles = StyleSheet.create({ page: { flex: 1, backgroundColor: COLORS.surface }, content: { padding: SPACING.lg, gap: SPACING.lg }, title: { color: COLORS.textDark }, body: { color: COLORS.textBody, marginTop: SPACING.sm }, error: { color: COLORS.red }, actions: { flexDirection: 'row', gap: SPACING.sm, flexWrap: 'wrap' }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg } });

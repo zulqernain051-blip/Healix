@@ -1,32 +1,23 @@
-# React + TypeScript + Vite
+# Healix Web
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React and Vite dashboard for administrative and doctor workflows.
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+From the project root:
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```sh
+npm --prefix web ci
+npm --prefix web run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Start the backend separately with `pnpm backend:dev`. See `vite.config.ts` for the development API proxy. This package uses its own npm lockfile and is separate from the backend/mobile pnpm workspace.
+
+## Structure
+
+- `src/pages/`: Login, administrative pages, and doctor workflows.
+- `src/components/`: Shared dashboard components.
+- `src/store/`: Authentication and role state.
+- `src/styles/`, `src/assets/`: Styling and visual assets.
+
+Build with `npm --prefix web run build` from the project root; preview the build with `npm --prefix web run preview`. Follow the [shared design system](../HEALIX_DESIGN_SYSTEM.md) for UI changes.

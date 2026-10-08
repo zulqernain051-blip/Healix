@@ -29,6 +29,9 @@ export interface NurseQualification {
 }
 
 export interface NurseSpecialization {
+  proficiencyRating?: number | null;
+  assessmentNotes?: string | null;
+  assessedAt?: string | null;
   id: string;
   nurseId: string;
   specialization: string;
@@ -48,6 +51,7 @@ export interface AvailabilitySlot {
 }
 
 export interface VerificationCheck {
+  id?: string;
   status: 'NOT_SUBMITTED' | 'PENDING' | 'APPROVED' | 'REJECTED';
   fileUrl?: string;
   rejectionReason?: string | null;
@@ -61,6 +65,7 @@ export interface VerificationStatus {
 }
 
 export interface NurseEarnings {
+  basis?: string;
   totalEarned: number;
   pendingAmount: number;
   completedCount: number;
@@ -69,6 +74,12 @@ export interface NurseEarnings {
 }
 
 export interface NurseScore {
+  skillAssessmentCount?: number;
+  skillBasis?: string;
+  assessedSkills?: { specialization: string; proficiencyRating: number; assessmentNotes: string; assessedAt: string }[];
+  recommendationRate?: number | null;
+  reviewCount?: number;
+  onTimeRate?: number;
   skillScore: number;
   experienceScore: number;
   reliabilityScore: number;

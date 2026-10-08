@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, TextInput, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { Card, Button, Chip, Divider } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
 import { useAdminParamedics, useUpdateUserStatus } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { COLORS, SPACING, RADIUS } from '../../theme';
 
 export default function AdminParamedics() {
   const { data: users_raw, isLoading  } = useAdminParamedics(); const users = users_raw?.users || [];

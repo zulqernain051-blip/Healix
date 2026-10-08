@@ -9,6 +9,20 @@ import { registerContractListeners } from './domains/marketplace/contracts/contr
 import { registerCareListeners } from './domains/care/requests/care.listeners';
 import { outboxService } from './common/events/outbox.service';
 import { ChatSocketService } from './domains/communication/chat/chat.socket';
+import { MaintenanceWorker } from './common/workers/maintenance.worker';
+import { ContractService } from './domains/marketplace/contracts/contract.service';
+import { MarketplaceRepository } from './domains/marketplace/marketplace/marketplace.repository';
+import { SlaTimeoutWorker } from './domains/care/clinical/workers/sla-timeout.worker';
+import { registerEmergencyListeners } from './domains/care/emergency/emergency.listeners';
+import { registerClinicalListeners } from './domains/care/clinical/clinical.listeners';
+import { CaseAssignmentWorker } from './domains/care/clinical/workers/case-assignment.worker';
+
+const maintenance = new MaintenanceWorker([
+  { name: 'contracts', run: () => ContractService.sweepExpiredContracts() },
+  { name: 'offers', run: () => MarketplaceRepository.expireExpiredOffers() },
+  { name: 'case assignments', run: () => CaseAssignmentWorker.processPendingCases() },
+  { name: 'clinical SLA', run: () => SlaTimeoutWorker.processTimeouts() }
+]);
 
 // Initialize HTTP port listener
 const server = app.listen(config.PORT, async () => {
@@ -19,18 +33,11 @@ const server = app.listen(config.PORT, async () => {
   registerVisitListeners();
   registerContractListeners();
   registerCareListeners();
+  registerEmergencyListeners();
+  registerClinicalListeners();
   outboxService.start();
 
-  // Active expiration sweepers
-  const { ContractService } = require('./domains/marketplace/contracts/contract.service');
-  const { MarketplaceRepository } = require('./domains/marketplace/marketplace/marketplace.repository');
-  const { SlaTimeoutWorker } = require('./domains/care/clinical/workers/sla-timeout.worker');
-  
-  setInterval(async () => {
-    await ContractService.sweepExpiredContracts();
-    await MarketplaceRepository.expireExpiredOffers();
-    await SlaTimeoutWorker.processTimeouts();
-  }, 60 * 1000); // run every 1 minute
+  maintenance.start();
 });
 
 /**
@@ -39,9 +46,13 @@ const server = app.listen(config.PORT, async () => {
  */
 const gracefulShutdown = async (signal: string) => {
   logger.warn(`Received ${signal}. Shutting down server gracefully...`);
+  await maintenance.stop();
+  outboxService.stop();
+  const io = ChatSocketService.getIo();
+  if (io) io.disconnectSockets(true);
   server.close(async () => {
     logger.info('HTTP server closed.');
-    outboxService.stop();
+    if (io) io.close();
     await prisma.$disconnect();
     logger.info('Database disconnected. exiting process.');
     process.exit(0);

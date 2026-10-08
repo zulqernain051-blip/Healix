@@ -24,10 +24,12 @@ import {
   getEarningsController
 } from './nurse.controller';
 
+import nurseAssets from './nurse-assets.routes';
 const router = Router();
 
 // All nurse routes require authentication
 router.use(protect);
+router.use(nurseAssets);
 
 // Nurse profile routes
 router.get('/:id/profile', getNurseProfileController);

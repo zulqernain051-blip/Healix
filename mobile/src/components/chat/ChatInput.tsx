@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useVoiceRecorder, voiceFileInfo } from '../../hooks/useVoiceRecorder';
 import { View, TextInput, TouchableOpacity, StyleSheet, Modal, Text } from 'react-native';
-import { COLORS, RADIUS, SPACING } from '../../theme';
+import { RADIUS, SPACING } from '../../theme';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
-const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 interface ChatInputProps {
-  onSend: (text: string, mediaPreview?: any) => void;
+  onSend: (text: string, mediaPreview?: any) => void | Promise<void>;
   disabled?: boolean;
   onTyping?: (isTyping: boolean) => void;
 }
@@ -16,18 +16,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [mediaPreview, setMediaPreview] = useState<any>(null);
 
-  // Audio Recording State
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingDuration, setRecordingDuration] = useState(0);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isRecording) {
-      timer = setInterval(() => setRecordingDuration(prev => prev + 1000), 1000);
-    }
-    return () => clearInterval(timer);
-  }, [isRecording]);
+  const { isRecording, recordingDuration, busy, startRecording, stopRecording } = useVoiceRecorder((uri, durationMs) => onSend('', { type: 'audio', uri, durationMs, ...voiceFileInfo() }));
 
   const handleTextChange = (text: string) => {
     setInputText(text);
@@ -36,59 +25,23 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
     }
   };
 
-  const handleSend = () => {
+  const [sending, setSending] = useState(false);
+  const handleSend = async () => {
     const content = inputText.trim();
-    if (!content && !mediaPreview) return;
+    if (sending || (!content && !mediaPreview)) return;
     
     if (onTyping) onTyping(false);
-    onSend(content, mediaPreview);
-    setInputText('');
-    setMediaPreview(null);
-    setShowAttachMenu(false);
-  };
-
-  const startRecording = async () => {
+    setSending(true);
     try {
-      const permission = await Audio.requestPermissionsAsync();
-      if (permission.status === 'granted') {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-        const { recording: newRecording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY
-        );
-        setRecording(newRecording);
-        setIsRecording(true);
-        setRecordingDuration(0);
-      } else {
-        alert('Microphone permission is required to record a voice message.');
-      }
-    } catch (err) {
-      console.error('Failed to start recording', err);
+      await onSend(content, mediaPreview);
+      setInputText('');
+      setMediaPreview(null);
+      setShowAttachMenu(false);
+    } catch {
+      // The screen reports the error; retain the draft for retry.
+    } finally {
+      setSending(false);
     }
-  };
-
-  const stopRecording = async (cancel: boolean = false) => {
-    if (!recording) return;
-    setIsRecording(false);
-    try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
-      if (!cancel && uri) {
-        onSend('', {
-          type: 'audio',
-          uri,
-          mimeType: 'audio/m4a',
-          name: `voice-${Date.now()}.m4a`,
-          durationMs: recordingDuration
-        });
-      }
-    } catch (err) {
-      console.error('Failed to stop recording', err);
-    }
-    setRecording(null);
-    setRecordingDuration(0);
   };
 
   const formatDuration = (ms: number) => {
@@ -169,7 +122,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
         </View>
       ) : (
         <View style={styles.inputRow}>
-          <TouchableOpacity style={styles.attachBtn} onPress={() => setShowAttachMenu(true)} disabled={disabled}>
+          <TouchableOpacity style={styles.attachBtn} onPress={() => setShowAttachMenu(true)} disabled={disabled || busy || sending}>
             <Text style={styles.attachIcon}>+</Text>
           </TouchableOpacity>
           
@@ -187,7 +140,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
           <TouchableOpacity 
             style={[styles.sendBtn, (!inputText.trim() && !mediaPreview) && { backgroundColor: '#1E2D4A' }]} 
             onPress={inputText.trim() || mediaPreview ? handleSend : startRecording}
-            disabled={disabled}
+            disabled={disabled || busy || sending}
           >
             <Text style={styles.sendIcon}>{(inputText.trim() || mediaPreview) ? '➤' : '🎤'}</Text>
           </TouchableOpacity>

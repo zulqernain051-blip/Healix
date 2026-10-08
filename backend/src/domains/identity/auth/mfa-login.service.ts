@@ -1,18 +1,18 @@
 import { AppError } from '../../../common/errors/AppError';
 import { AuthRepository } from './auth.repository';
 import { config } from '../../../common/config';
-import { logger } from '../../../common/utils/logger';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { OtpAttempts } from './otp';
 
 export class MfaLoginService {
   private static hashRefreshToken(token: string): string {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
 
-  private static generateAccessToken(user: any): string {
+  private static generateAccessToken(user: any, sessionId: string): string {
     return jwt.sign(
-      { id: user.id, role: user.role, fullName: user.fullName },
+      { id: user.id, role: user.role, fullName: user.fullName, sid: sessionId },
       config.JWT_SECRET,
       { expiresIn: config.JWT_EXPIRES_IN as any }
     );
@@ -22,34 +22,31 @@ export class MfaLoginService {
     return crypto.randomBytes(40).toString('hex');
   }
 
-  private static mfaAttempts = new Map<string, number>();
-
   static async verifyMfaLogin(emailOrPhone: string, code: string, deviceInfo: string, ipAddress: string) {
     emailOrPhone = emailOrPhone.toLowerCase();
     const user = await AuthRepository.findUserByEmailOrPhone(emailOrPhone);
     if (!user) throw new AppError('User not found', 404);
 
+    if (user.emailVerificationRequired && !user.emailVerifiedAt) throw new AppError('Verify your email before using Healix.', 403);
+    if (user.deletedAt) throw new AppError('Account is unavailable.', 403);
     if (!user.mfaEnabled) throw new AppError('MFA is not enabled for this user', 400);
 
-    const attempts = this.mfaAttempts.get(user.id) || 0;
-    if (attempts >= 5) {
-      throw new AppError('Too many failed attempts. Please request a new code.', 429);
-    }
+    if (user.status !== 'ACTIVE' && !(user.role === 'NURSE' && user.status === 'PENDING_VERIFICATION')) throw new AppError('Your account is not active.', 403);
+    OtpAttempts.check(user.id, 'MFA_LOGIN');
 
-    const activeOtp = await AuthRepository.findActiveOtp(user.id, code);
+    const activeOtp = await AuthRepository.findActiveOtp(user.id, code, 'MFA_LOGIN');
     if (!activeOtp) {
-      this.mfaAttempts.set(user.id, attempts + 1);
+      OtpAttempts.fail(user.id, 'MFA_LOGIN');
       throw new AppError('Invalid or expired MFA code', 400);
     }
 
-    this.mfaAttempts.delete(user.id);
     await AuthRepository.consumeOtp(activeOtp.id);
+    OtpAttempts.reset(user.id, 'MFA_LOGIN');
 
-    const accessToken = this.generateAccessToken(user);
     const rawRefreshToken = this.generateRefreshToken();
     const refreshTokenHash = this.hashRefreshToken(rawRefreshToken);
 
-    await AuthRepository.createSession(
+    const session = await AuthRepository.createSession(
       user.id,
       refreshTokenHash,
       deviceInfo,
@@ -57,12 +54,12 @@ export class MfaLoginService {
     );
 
     return {
-      tokens: { accessToken, refreshToken: rawRefreshToken },
+      tokens: { accessToken: this.generateAccessToken(user, session.id), refreshToken: rawRefreshToken },
       user: {
         id: user.id, email: user.email, phone: user.phone, fullName: user.fullName,
         role: user.role, status: user.status, createdAt: user.createdAt,
         patientId: user.patient?.id, nurseId: user.nurse?.id, doctorId: user.doctor?.id,
-        paramedicId: (user as any).paramedic?.id
+        paramedicId: user.paramedic?.id
       }
     };
   }

@@ -1,6 +1,8 @@
 import { ContractRepository } from './contract.repository';
 import { AppError } from '../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../common/constants/index';
+import { prisma } from '../../../common/config/database';
+import { CreateContractFromOfferUseCase } from './usecases/create-contract-from-offer.usecase';
 
 export class ContractService {
   public static async createContract(
@@ -15,6 +17,13 @@ export class ContractService {
     },
     user: any
   ) {
+    if (!(user.role === 'ADMIN' || (user.role === 'PATIENT' && user.patient?.id === data.patientId))) throw new AppError('Only the patient can draft their agreement', HTTP_STATUS.FORBIDDEN);
+    if (data.sourceOfferId) {
+      const offer = await prisma.offer.findUnique({where:{id:data.sourceOfferId},include:{listing:{include:{careRequest:true}}}});
+      if (!offer || offer.nurseId !== data.nurseId || offer.listing.careRequest.patientId !== data.patientId) throw new AppError('Offer does not match the contract parties', HTTP_STATUS.CONFLICT);
+      return new CreateContractFromOfferUseCase().execute(offer.listingId, offer.id);
+    }
+    if (!await prisma.nurse.findFirst({where:{id:data.nurseId,verificationStatus:'VERIFIED',user:{status:'ACTIVE',deletedAt:null}}})) throw new AppError('Active verified nurse not found', HTTP_STATUS.NOT_FOUND);
     return ContractRepository.createContract({
       ...data,
       actorId: user.id,
@@ -22,9 +31,10 @@ export class ContractService {
     });
   }
 
-  public static async getContract(id: string) {
+  public static async getContract(id: string, user: any) {
     const contract = await ContractRepository.findContractById(id);
     if (!contract) return null;
+    if (!(user.role === 'ADMIN' || user.patient?.id === contract.patientId || user.nurse?.id === contract.nurseId)) throw new AppError('Contract access forbidden', HTTP_STATUS.FORBIDDEN);
 
     // Active sweeper will handle expiration, but we can keep lazy eval as fallback
     if (contract.status === 'PENDING_APPROVAL' && new Date() > contract.expiresAt) {
@@ -82,7 +92,7 @@ export class ContractService {
     const isAuthorized =
       (user.patient && contract.patientId === user.patient.id) ||
       (user.nurse && contract.nurseId === user.nurse.id) ||
-      user.role === 'ADMINISTRATOR';
+      user.role === 'ADMIN';
 
     if (!isAuthorized) throw new AppError('Unauthorized: You cannot cancel this contract', HTTP_STATUS.FORBIDDEN);
 
@@ -96,7 +106,7 @@ export class ContractService {
     const isAuthorized =
       (user.patient && contract.patientId === user.patient.id) ||
       (user.nurse && contract.nurseId === user.nurse.id) ||
-      user.role === 'ADMINISTRATOR';
+      user.role === 'ADMIN';
 
     if (!isAuthorized) throw new AppError('Unauthorized to view audit trail', HTTP_STATUS.FORBIDDEN);
 

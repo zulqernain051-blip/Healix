@@ -47,6 +47,7 @@ export const marketplaceApi = {
    */
   withdrawOffer: (offerId: string) =>
     apiClient.delete<any>(`/offers/${offerId}`),
+  rejectOffer: (offerId: string) => apiClient.post<NurseOffer>(`/offers/${offerId}/reject`, {}),
 
   /** POST /marketplace/listings/:id/select — patient selects an offer */
   selectOffer: (listingId: string, data: SelectOfferDto) =>
@@ -61,6 +62,7 @@ export const marketplaceApi = {
   /** GET /patients/:id/favorite-nurses */
   getFavoriteNurses: (patientId: string) =>
     apiClient.get<FavoriteNurse[]>(`/patients/${patientId}/favorite-nurses`),
+  removeFavoriteNurse: (patientId: string, nurseId: string) => apiClient.delete(`/patients/${patientId}/favorite-nurses/${nurseId}`),
 
   // ─── Cost Preview ────────────────────────────
 

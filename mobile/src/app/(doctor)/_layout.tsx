@@ -2,23 +2,23 @@ import React from 'react';
 import { View, StyleSheet, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { Stack, usePathname } from 'expo-router';
 import { navigate } from '../../utils/navigation';
-import { Text, Avatar } from 'react-native-paper';
+import { Text, Avatar, Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
 import { useAuthStore } from '../../store/auth';
 import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 
-export default function DoctorRootLayout() {
+function DoctorRootLayout() {
   const { user } = useAuthStore();
   const { width } = useWindowDimensions();
   const pathname = usePathname();
 
-  const isLargeScreen = Platform.OS === 'web' || width > 768;
+  const isLargeScreen = width > 768;
 
   if (isLargeScreen) {
     const navItems = [
       { name: 'Case Queue', path: '/(doctor)/(tabs)/home', icon: 'medkit-outline' },
-      { name: 'Diagnosis Engine', path: '/(doctor)/diagnosis', icon: 'bulb-outline' },
       { name: 'Messages & Consults', path: '/(doctor)/(tabs)/messages', icon: 'chatbubbles-outline' },
+      { name: 'Emergency Transport', path: '/(doctor)/emergency', icon: 'car-outline' },
       { name: 'Profile & PMDC', path: '/(doctor)/(tabs)/profile', icon: 'person-outline' },
     ];
 
@@ -34,23 +34,24 @@ export default function DoctorRootLayout() {
           </View>
 
           <View style={styles.sidebarProfile}>
-            <Avatar.Icon size={40} icon="stethoscope" color="#00E676" style={styles.avatarBg} />
+            <Avatar.Icon size={40} icon="stethoscope" color={COLORS.headerText} style={styles.avatarBg} />
             <View style={styles.profileTextWrap}>
-              <Text style={styles.sidebarProfileName} numberOfLines={1}>Dr. {user?.fullName ?? 'Doctor'}</Text>
-              <Text style={styles.sidebarProfileRole}>Verified PMDC</Text>
+              <Text style={styles.sidebarProfileName} numberOfLines={1}>{user?.fullName ?? 'Doctor'}</Text>
+              <Text style={styles.sidebarProfileRole}>Doctor account</Text>
             </View>
           </View>
 
           <View style={styles.navMenu}>
             {navItems.map((item: any) => {
-              const isActive = currentActive.startsWith(item.path) || (item.path === '/(doctor)/(tabs)/home' && (currentActive === '/' || currentActive === '/(doctor)'));
+              const leaf = item.path.split('/').pop();
+              const isActive = currentActive.includes(`/${leaf}`) || (leaf === 'home' && !['messages', 'profile', 'emergency'].some(part => currentActive.includes(part)));
               return (
                 <TouchableOpacity
                   key={item.path}
                   style={[styles.sidebarNavItem, isActive && styles.sidebarNavItemActive]}
                   onPress={() => navigate(item.path as any)}
                 >
-                  <Ionicons name={item.icon} size={20} color={isActive ? '#00E676' : '#94A3B8'} style={{ width: 24 }} />
+                  <Ionicons name={item.icon} size={20} color={isActive ? COLORS.headerText : COLORS.headerText} style={{ width: 24 }} />
                   <Text style={[styles.sidebarNavLabel, isActive && styles.sidebarNavLabelActive]}>
                     {item.name}
                   </Text>
@@ -60,7 +61,7 @@ export default function DoctorRootLayout() {
           </View>
 
           <View style={styles.sidebarFooter}>
-            <Text style={styles.encryptionNotice}>?? HIPAA Secure Connection</Text>
+            <Text style={styles.encryptionNotice}>Healix clinical workspace</Text>
           </View>
         </View>
 
@@ -72,8 +73,7 @@ export default function DoctorRootLayout() {
             <Stack.Screen name="careplan" />
             <Stack.Screen name="diagnosis" />
             <Stack.Screen name="reviews" />
-            <Stack.Screen name="messages" />
-    </Stack>
+          </Stack>
         </View>
       </View>
     );
@@ -87,29 +87,30 @@ export default function DoctorRootLayout() {
       <Stack.Screen name="careplan" />
       <Stack.Screen name="diagnosis" />
       <Stack.Screen name="reviews" />
-      <Stack.Screen name="messages" />
     </Stack>
   );
 }
 
 const styles = StyleSheet.create({
-  webContainer: { flex: 1, flexDirection: 'row', backgroundColor: '#031210' },
-  sidebar: { width: 250, backgroundColor: '#061C19', borderRightWidth: 1, borderRightColor: 'rgba(0, 230, 118, 0.1)', paddingVertical: SPACING.xl, paddingHorizontal: SPACING.md, justifyContent: 'space-between' },
+  webContainer: { flex: 1, flexDirection: 'row', backgroundColor: COLORS.surface },
+  sidebar: { width: 250, backgroundColor: COLORS.navyDark, borderRightWidth: 1, borderRightColor: COLORS.inputBorder, paddingVertical: SPACING.xl, paddingHorizontal: SPACING.md, justifyContent: 'space-between' },
   sidebarHeader: { marginBottom: SPACING.xl, paddingHorizontal: SPACING.sm },
-  brandTitle: { ...TYPOGRAPHY.h2, color: COLORS.primary, fontWeight: 'bold', letterSpacing: -0.5 },
+  brandTitle: { ...TYPOGRAPHY.h2, color: COLORS.headerText, fontWeight: 'bold', letterSpacing: -0.5 },
   brandSub: { marginTop: 2 },
-  sidebarProfile: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, backgroundColor: '#0E3630', borderRadius: RADIUS.md, marginBottom: SPACING.xl, borderWidth: 0.5, borderColor: 'rgba(0, 230, 118, 0.2)' },
-  avatarBg: { backgroundColor: 'rgba(0, 230, 118, 0.15)' },
+  sidebarProfile: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, backgroundColor: COLORS.navy, borderRadius: RADIUS.md, marginBottom: SPACING.xl, borderWidth: 0.5, borderColor: COLORS.navy },
+  avatarBg: { backgroundColor: COLORS.navy },
   profileTextWrap: { marginLeft: SPACING.sm, flex: 1 },
-  sidebarProfileName: { color: '#FFFFFF', fontSize: TYPOGRAPHY.sizes.sm, fontWeight: 'bold' },
-  sidebarProfileRole: { color: '#00E676', fontSize: 10, marginTop: 2 },
+  sidebarProfileName: { color: COLORS.headerText, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: 'bold' },
+  sidebarProfileRole: { color: COLORS.headerText, fontSize: 10, marginTop: 2 },
   navMenu: { flex: 1, gap: SPACING.xs },
   sidebarNavItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, paddingHorizontal: SPACING.md, borderRadius: RADIUS.sm, backgroundColor: 'transparent' },
-  sidebarNavItemActive: { backgroundColor: 'rgba(0, 230, 118, 0.15)' },
-  sidebarNavLabel: { color: '#94A3B8', fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '500', marginLeft: SPACING.sm },
-  sidebarNavLabelActive: { color: '#00E676', fontWeight: 'bold' },
+  sidebarNavItemActive: { backgroundColor: COLORS.navy },
+  sidebarNavLabel: { color: COLORS.headerText, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '500', marginLeft: SPACING.sm },
+  sidebarNavLabelActive: { color: COLORS.headerText, fontWeight: 'bold' },
   sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.08)', paddingTop: SPACING.md },
-  encryptionNotice: { color: '#6B8E8A', fontSize: 11, textAlign: 'center' },
-  webContent: { flex: 1, backgroundColor: '#061C19' },
+  encryptionNotice: { color: COLORS.headerText, fontSize: 11, textAlign: 'center' },
+  webContent: { flex: 1, backgroundColor: COLORS.surface },
 });
 
+
+export default function DoctorLayout() { return <PaperProvider theme={{ ...MD3LightTheme, colors: { ...MD3LightTheme.colors, primary: COLORS.navy } }}><DoctorRootLayout /></PaperProvider>; }

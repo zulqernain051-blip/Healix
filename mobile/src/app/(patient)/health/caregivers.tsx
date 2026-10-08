@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, ActivityIndicator, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar } from 'react-native';
 import { Text, Card, Avatar, Chip } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useCaregivers } from '../../../hooks/useHealth';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
 

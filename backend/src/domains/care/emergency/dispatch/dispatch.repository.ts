@@ -17,22 +17,55 @@ export class DispatchRepository {
     });
   }
 
-  static async createDispatch(patientId: string, hospitalId: string, triggeredByUserId: string, etaMinutes: number) {
-    return prisma.ambulanceDispatch.create({
+  static async createDispatch(data: {
+    patientId: string;
+    hospitalId: string;
+    triggeredByUserId: string;
+    ambulanceId?: string;
+    paramedicId?: string;
+    emergencyEventId?: string;
+    etaMinutes: number;
+  }, tx?: any) {
+    const db = tx || prisma;
+    return db.ambulanceDispatch.create({
       data: {
-        patientId,
-        triggeredByUserId,
-        hospitalId,
+        patientId: data.patientId,
+        triggeredByUserId: data.triggeredByUserId,
+        hospitalId: data.hospitalId,
+        ambulanceId: data.ambulanceId || null,
+        paramedicId: data.paramedicId || null,
+        emergencyEventId: data.emergencyEventId || null,
         status: 'DISPATCHED',
-        etaMinutes
+        etaMinutes: data.etaMinutes
       }
     });
   }
 
-  static async findDispatchWithDetails(dispatchId: string) {
-    return prisma.ambulanceDispatch.findUnique({
+  static async findDispatchWithDetails(dispatchId: string, tx?: any) {
+    const db = tx || prisma;
+    return db.ambulanceDispatch.findUnique({
       where: { id: dispatchId },
-      include: { hospital: true, patient: { include: { user: true } } }
+      include: {
+        hospital: true,
+        ambulance: true,
+        paramedic: { include: { user: { select: { id: true, fullName: true, phone: true } } } },
+        patient: { include: { user: { select: { id: true, fullName: true, phone: true } } } },
+        emergencyEvent: true,
+        admissions: true
+      }
+    });
+  }
+
+  static async updateDispatch(dispatchId: string, data: any, tx?: any) {
+    const db = tx || prisma;
+    return db.ambulanceDispatch.update({
+      where: { id: dispatchId },
+      data,
+      include: {
+        hospital: true,
+        ambulance: true,
+        paramedic: { include: { user: { select: { id: true, fullName: true, phone: true } } } }
+      }
     });
   }
 }

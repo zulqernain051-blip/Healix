@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, RefreshControl, StatusBar } from 'react-native';
+import { COLORS } from '../../../theme';
 import { Text } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
@@ -19,13 +20,13 @@ export default function NurseHomeScreen() {
   const nurseId = user?.nurseId;
   const token = accessToken;
   const { data: profile, isLoading: loadingProfile, error: profileError, refetch: refetchProfile } = useNurseProfile(nurseId || '');
-  const { data: assignedVisits, isLoading: loadingVisits, refetch: refetchVisits } = useNurseVisits(nurseId || '');
-  const { data: nurseScore, refetch: refetchScore } = useNurseScore(nurseId || '');
-  const { data: nurseReviews, refetch: refetchReviews } = useNurseReviews(nurseId || '');
+  const { data: assignedVisits, isLoading: loadingVisits, error: visitsError, refetch: refetchVisits } = useNurseVisits(nurseId || '');
+  const { data: nurseScore, error: scoreError, refetch: refetchScore } = useNurseScore(nurseId || '');
+  const { data: nurseReviews, error: reviewsError, refetch: refetchReviews } = useNurseReviews(nurseId || '');
 
   const visits = assignedVisits || [];
   const loading = loadingProfile || loadingVisits;
-  const error = profileError?.message;
+  const error = profileError?.message || visitsError?.message || scoreError?.message || reviewsError?.message;
 
   const [filter, setFilter] = useState('ALL');
   const [refreshing, setRefreshing] = useState(false);
@@ -58,7 +59,7 @@ export default function NurseHomeScreen() {
   const latestReview = nurseReviews && nurseReviews.length > 0 ? nurseReviews[0] : null;
 
   if (loading && !profile) return <LoadingState />;
-  if (error && !profile) return <ErrorState error={error} />;
+  if (error) return <ErrorState error={error} onRetry={onRefresh} />;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,7 +69,7 @@ export default function NurseHomeScreen() {
       <View style={styles.headerBox}>
         <Text style={styles.greetingTitle}>Welcome back, {user?.fullName || 'Nurse'}</Text>
         <Text style={styles.greetingSub}>
-          PNC Registered Nurse · {profile?.available ? '🟢 Available for Visits' : '🔴 Currently Unavailable'}
+          Nurse account · {profile?.available ? '🟢 Available for Visits' : '🔴 Currently Unavailable'}
         </Text>
       </View>
 
@@ -76,7 +77,7 @@ export default function NurseHomeScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00E676" colors={['#00E676']} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00E676" colors={[COLORS.navy]} />}
       >
         {/* Quick Actions */}
         <View style={styles.section}>
@@ -88,11 +89,12 @@ export default function NurseHomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Performance Summary</Text>
           <NurseScoreCard
-            compositeScore={nurseScore?.compositeScore ?? 85.0}
-            skillScore={nurseScore?.skillScore ?? 85}
-            experienceScore={nurseScore?.experienceScore ?? 80}
-            reliabilityScore={nurseScore?.reliabilityScore ?? 90}
-            performanceScore={nurseScore?.performanceScore ?? 85}
+            compositeScore={nurseScore?.compositeScore ?? 0}
+            skillScore={nurseScore?.skillScore ?? 0}
+            skillAssessmentCount={nurseScore?.skillAssessmentCount ?? 0}
+            experienceScore={nurseScore?.experienceScore ?? 0}
+            reliabilityScore={nurseScore?.reliabilityScore ?? 0}
+            performanceScore={nurseScore?.performanceScore ?? 0}
           />
         </View>
 
@@ -102,8 +104,8 @@ export default function NurseHomeScreen() {
             <Text style={styles.sectionTitle}>Recent Patient Review</Text>
             <NurseReviewCard
               patientName={latestReview.patient?.user?.fullName || 'Verified Patient'}
-              rating={latestReview.stars || 5}
-              comment={latestReview.reviewText || 'Excellent clinical care and clear instructions.'}
+              rating={latestReview.stars}
+              comment={latestReview.reviewText || 'No written comment.'}
               reviewedAt={new Date(latestReview.createdAt).toLocaleDateString()}
             />
           </View>
@@ -149,17 +151,17 @@ export default function NurseHomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
-  headerBox: { padding: 20, paddingBottom: 30, backgroundColor: '#061C19' },
-  greetingTitle: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
-  greetingSub: { color: '#00E676', fontSize: 14, marginTop: 6, fontWeight: '600' },
-  scroll: { flex: 1, backgroundColor: '#F8FAFC', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
+  container: { flex: 1, backgroundColor: COLORS.navyDark },
+  headerBox: { padding: 20, paddingBottom: 30, backgroundColor: COLORS.navyDark },
+  greetingTitle: { color: COLORS.surfaceCard, fontSize: 24, fontWeight: '800' },
+  greetingSub: { color: COLORS.navy, fontSize: 14, marginTop: 6, fontWeight: '600' },
+  scroll: { flex: 1, backgroundColor: COLORS.surface, borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
   scrollContent: { padding: 20, paddingBottom: 40, paddingTop: 30 },
   section: { marginBottom: 28 },
-  sectionTitle: { color: '#1E293B', fontSize: 18, fontWeight: '800', marginBottom: 16 },
-  emptyReviewCard: { backgroundColor: '#FFFFFF', padding: 24, borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  sectionTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: '800', marginBottom: 16 },
+  emptyReviewCard: { backgroundColor: COLORS.surfaceCard, padding: 24, borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: COLORS.inputBorder, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   emptyReviewIcon: { fontSize: 28, marginBottom: 8 },
-  emptyReviewTitle: { color: '#1E293B', fontSize: 15, fontWeight: '700' },
-  emptyReviewSub: { color: '#64748B', fontSize: 13, textAlign: 'center', marginTop: 4 },
+  emptyReviewTitle: { color: COLORS.textDark, fontSize: 15, fontWeight: '700' },
+  emptyReviewSub: { color: COLORS.textMuted, fontSize: 13, textAlign: 'center', marginTop: 4 },
 });
 

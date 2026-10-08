@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { appAlert } from '../../common/AppDialogs';
 import { View, StyleSheet, TextInput, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Text, Button, Card, Divider } from 'react-native-paper';
 import { useSubmitSymptoms } from '../../../hooks/useVisits';
@@ -28,7 +29,9 @@ const emptySymptom = (): SymptomEntry => ({ symptomName: '', severity: 'MILD', n
 
 export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, existingSymptoms }) => {
   const [symptoms, setSymptoms] = useState<SymptomEntry[]>(
-    existingSymptoms?.map((s) => ({ symptomName: s.symptomName, severity: s.severity, notes: s.notes || '' })) || [emptySymptom()]
+    existingSymptoms && existingSymptoms.length > 0
+      ? existingSymptoms.map((s) => ({ symptomName: s.symptomName, severity: s.severity, notes: s.notes || '' }))
+      : [emptySymptom()]
   );
   const [error, setError] = useState('');
   const submitSymptoms = useSubmitSymptoms();
@@ -53,7 +56,7 @@ export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, 
     setError('');
 
     try {
-      await submitSymptoms.mutateAsync({
+      const result = await submitSymptoms.mutateAsync({
         visitId,
         data: {
           symptoms: valid.map((s) => ({
@@ -64,22 +67,16 @@ export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, 
         },
       });
       onSuccess();
-      setTimeout(() => {
-        if (Platform.OS === 'web') {
-          alert('✅ Symptoms Saved');
-        } else {
-          Alert.alert('✅ Symptoms Saved', 'Patient symptoms have been recorded.');
-        }
-      }, 100);
+      appAlert(result.queued ? 'Symptoms saved as a draft' : 'Symptoms saved', result.queued ? 'Not yet delivered. Open Offline drafts to retry. Sync before finishing the visit.' : 'The observation has been saved to the visit.');
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to submit symptoms.');
+      appAlert('Could not save observation', err.message || 'Please try again.');
     }
   };
 
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Text style={styles.title}>ðŸ“‹ Symptoms Checklist</Text>
+        <Text style={styles.title}>📋 Symptoms Checklist</Text>
         <Divider style={styles.divider} />
         {symptoms.map((symptom, idx) => (
           <View key={idx} style={styles.symptomBlock}>
@@ -87,7 +84,7 @@ export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, 
               <Text style={styles.symptomLabel}>Symptom #{idx + 1}</Text>
               {symptoms.length > 1 && (
                 <TouchableOpacity onPress={() => removeSymptom(idx)}>
-                  <Text style={styles.removeBtn}>âœ• Remove</Text>
+                  <Text style={styles.removeBtn}>✕ Remove</Text>
                 </TouchableOpacity>
               )}
             </View>

@@ -9,14 +9,14 @@ import * as SecureStore from 'expo-secure-store';
 export const secureStorage = {
   async getItemAsync(key: string): Promise<string | null> {
     if (Platform.OS === 'web') {
-      return localStorage.getItem(key);
+      return typeof localStorage === 'undefined' ? null : localStorage.getItem(key);
     }
     return SecureStore.getItemAsync(key);
   },
 
   async setItemAsync(key: string, value: string): Promise<void> {
     if (Platform.OS === 'web') {
-      localStorage.setItem(key, value);
+      if (typeof localStorage !== 'undefined') localStorage.setItem(key, value);
       return;
     }
     return SecureStore.setItemAsync(key, value);
@@ -24,7 +24,7 @@ export const secureStorage = {
 
   async deleteItemAsync(key: string): Promise<void> {
     if (Platform.OS === 'web') {
-      localStorage.removeItem(key);
+      if (typeof localStorage !== 'undefined') localStorage.removeItem(key);
       return;
     }
     return SecureStore.deleteItemAsync(key);

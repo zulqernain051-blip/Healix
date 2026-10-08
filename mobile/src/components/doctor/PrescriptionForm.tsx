@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import { COLORS } from '../../theme';
+import { useState } from 'react';
 import { View, StyleSheet, TextInput, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Button, Text, Card } from 'react-native-paper';
 import { useSubmitPrescription } from '../../hooks/useDoctor';
 
-const COLORS = {
-  bg: '#0A1628', card: '#111D35', border: '#1E2D4A', teal: '#0D9488',
-  red: '#EF4444', textPrimary: '#F1F5F9', textSecondary: '#94A3B8', textMuted: '#475569'
-};
 
 export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: string, onComplete: () => void, onCancel: () => void }) {
   const { mutateAsync: submitPrescription, isPending } = useSubmitPrescription();
@@ -34,6 +31,11 @@ export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: str
       return;
     }
 
+    if (validItems.some(i => !i.frequency.trim() || !Number.isInteger(Number(i.durationDays)) || Number(i.durationDays) <= 0)) {
+      const message = 'Every medication needs a frequency and a positive whole number of days.';
+      if (Platform.OS === 'web') alert(message); else Alert.alert('Validation Error', message);
+      return;
+    }
     try {
       await submitPrescription({ 
         caseId, 
@@ -42,24 +44,29 @@ export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: str
           bypassAllergyCheck,
           items: validItems.map(i => ({
             ...i,
-            durationDays: parseInt(i.durationDays, 10) || 7
+            durationDays: Number(i.durationDays)
           })) 
         } 
       });
       if (Platform.OS === 'web') alert('Prescription added successfully.'); else Alert.alert('Success', 'Prescription added successfully.');
       onComplete();
     } catch (err: any) {
-      if (err.response?.status === 409) {
+      if ((err.statusCode || err.response?.status) === 409) {
+        if (Platform.OS === 'web') {
+          if (window.confirm(`${err.message || 'Allergy conflict detected'}. Override and prescribe?`)) void handleSubmit(true);
+          return;
+        }
         Alert.alert(
           'Allergy Conflict Detected',
-          err.response?.data?.message || 'A medication conflicts with a known patient allergy.',
+          err.message || err.response?.data?.message || 'A medication conflicts with a known patient allergy.',
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Override & Prescribe', style: 'destructive', onPress: () => handleSubmit(true) }
           ]
         );
       } else {
-        Alert.alert('Error', err.response?.data?.message || err.message || 'Failed to submit prescription');
+        const message = err.message || 'Failed to submit prescription';
+        if (Platform.OS === 'web') alert(message); else Alert.alert('Error', message);
       }
     }
   };
@@ -88,14 +95,14 @@ export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: str
           </View>
         ))}
 
-        <Button mode="text" onPress={addItem} textColor={COLORS.teal} style={{ alignSelf: 'flex-start' }}>+ Add Medication</Button>
+        <Button mode="text" onPress={addItem} textColor={COLORS.navy} style={{ alignSelf: 'flex-start' }}>+ Add Medication</Button>
 
         <Text style={[styles.label, { marginTop: 16 }]}>General Instructions (Optional)</Text>
         <TextInput style={[styles.input, { height: 60, textAlignVertical: 'top' }]} placeholder="Take after meals..." placeholderTextColor={COLORS.textMuted} multiline value={instructions} onChangeText={setInstructions} />
 
         <View style={styles.actions}>
-          <Button mode="text" onPress={onCancel} textColor={COLORS.textSecondary} disabled={isPending}>Cancel</Button>
-          <Button mode="contained" onPress={() => handleSubmit(false)} buttonColor={COLORS.teal} loading={isPending} disabled={isPending}>Save Prescription</Button>
+          <Button mode="text" onPress={onCancel} textColor={COLORS.textBody} disabled={isPending}>Cancel</Button>
+          <Button mode="contained" onPress={() => handleSubmit(false)} buttonColor={COLORS.navy} loading={isPending} disabled={isPending}>Save Prescription</Button>
         </View>
       </Card.Content>
     </Card>
@@ -103,12 +110,12 @@ export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: str
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: COLORS.card, borderColor: COLORS.border, borderWidth: 1, marginBottom: 16 },
-  title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
-  label: { color: COLORS.textSecondary, marginBottom: 6, fontSize: 14 },
-  input: { backgroundColor: COLORS.bg, color: COLORS.textPrimary, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border, marginBottom: 12 },
+  card: { backgroundColor: COLORS.surfaceCard, borderColor: COLORS.inputBorder, borderWidth: 1, marginBottom: 16 },
+  title: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  label: { color: COLORS.textBody, marginBottom: 6, fontSize: 14 },
+  input: { backgroundColor: COLORS.surface, color: COLORS.textDark, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.inputBorder, marginBottom: 12 },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 16 },
-  itemBlock: { backgroundColor: COLORS.bg, padding: 12, borderRadius: 8, marginBottom: 12, borderWidth: 1, borderColor: COLORS.border },
-  itemTitle: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600', marginBottom: 8 },
+  itemBlock: { backgroundColor: COLORS.surface, padding: 12, borderRadius: 8, marginBottom: 12, borderWidth: 1, borderColor: COLORS.inputBorder },
+  itemTitle: { color: COLORS.textDark, fontSize: 14, fontWeight: '600', marginBottom: 8 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
 });

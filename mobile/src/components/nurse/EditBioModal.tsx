@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useUpdateProfile } from '../../hooks/useNurse';
@@ -16,6 +16,7 @@ interface Props {
 export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExperience, initialPhotoUrl }: Props) {
   const [bio, setBio] = useState(initialBio);
   const [experience, setExperience] = useState(initialExperience);
+  const [formError, setFormError] = useState('');
   const [photoUrl, setPhotoUrl] = useState(initialPhotoUrl);
   
   const { mutate: updateProfile, isPending: savingBio } = useUpdateProfile();
@@ -29,12 +30,14 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
   }, [visible, initialBio, initialExperience, initialPhotoUrl]);
 
   const handleSaveBio = () => {
+    if (bio.trim().length < 20 || !Number.isInteger(Number(experience)) || Number(experience) < 0 || Number(experience) > 50) { setFormError('Enter a biography of at least 20 characters and 0–50 whole years of experience.'); return; }
+    setFormError('');
     updateProfile(
       {
         nurseId,
         data: {
           bio: bio.trim(),
-          experience: parseInt(experience, 10) || 0,
+          experience: Number(experience),
           photoUrl: photoUrl.trim() || undefined,
         },
       },
@@ -44,7 +47,7 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
           onClose();
         },
         onError: (err: any) => {
-          Alert.alert('Error', err.message || 'Failed to update profile.');
+          setFormError(err.message || 'Failed to update profile.');
         },
       }
     );
@@ -89,6 +92,7 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
             activeOutlineColor="#00E676"
           />
 
+          {!!formError && <Text style={{ color: COLORS.red }}>{formError}</Text>}
           <View style={styles.modalActions}>
             <Button mode="text" onPress={onClose} textColor="#64748B">Cancel</Button>
             <Button
@@ -109,7 +113,7 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
 const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: SPACING.md },
   modalContent: { backgroundColor: '#FFF', borderRadius: RADIUS.lg, padding: SPACING.lg },
-  modalTitle: { ...TYPOGRAPHY.h3, marginBottom: SPACING.md, color: COLORS.text },
+  modalTitle: { ...TYPOGRAPHY.h3, marginBottom: SPACING.md, color: COLORS.textDark },
   input: { marginBottom: SPACING.sm, backgroundColor: '#FFF' },
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: SPACING.md, gap: SPACING.sm },
 });

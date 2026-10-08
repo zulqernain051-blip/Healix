@@ -1,165 +1,19 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
-import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
+import { View } from 'react-native';
+import { Button, Text } from 'react-native-paper';
+import * as DocumentPicker from 'expo-document-picker';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../../store/auth';
-import { useNurseVerification, useUploadDocument } from '../../../hooks/useNurse';
-import {
-  CHECK_ITEMS,
-  DocKey,
-  DocStatus,
-  PALETTE,
-  DocumentPreview,
-  DocumentUploadStep,
-  VerificationHeader,
-  VerificationSubmit,
-} from '../../../components/nurse/verification';
-
-export default function NurseVerificationScreen() {
-  const { user } = useAuthStore();
-  const nurseId = user?.nurseId || user?.id || '';
-  
-  const { data: verificationStatus, isLoading } = useNurseVerification(nurseId);
-  const { mutateAsync: uploadDocument } = useUploadDocument();
-
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDocKey, setSelectedDocKey] = useState<DocKey | null>(null);
-
-  const handleOpenModal = (key: DocKey) => {
-    setSelectedDocKey(key);
-    setModalVisible(true);
-  };
-
-  const handleUpload = async (url: string) => {
-    if (!selectedDocKey || !nurseId) return;
-    await uploadDocument({
-      nurseId,
-      data: {
-        documentType: selectedDocKey,
-        fileUrl: url,
-      },
-    });
-  };
-
-  const isFullyVerified =
-    verificationStatus &&
-    CHECK_ITEMS.every(
-      (item) => (verificationStatus.checks?.[item.key] as { status: DocStatus })?.status === 'APPROVED',
-    );
-
-  return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
-
-      {/* Background gradient blobs */}
-      <View style={styles.blobTop} />
-      <View style={styles.blobBottom} />
-
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <VerificationHeader
-          userName={user?.fullName ?? 'Nurse'}
-          isFullyVerified={isFullyVerified ?? null}
-        />
-
-        {/* Section label */}
-        <Text style={styles.sectionLabel}>Required Documents</Text>
-
-        {/* Loading state */}
-        {isLoading && (
-          <View style={styles.loadingWrap}>
-            <ActivityIndicator size="large" color={PALETTE.teal} />
-            <Text style={styles.loadingText}>Fetching verification status…</Text>
-          </View>
-        )}
-
-        {/* Document Cards */}
-        {!isLoading &&
-          CHECK_ITEMS.map((item, index) => {
-            const entry = verificationStatus?.checks?.[item.key] as
-              | { status: DocStatus; rejectionReason?: string }
-              | undefined;
-            const status: DocStatus = entry?.status ?? 'NOT_SUBMITTED';
-            const rejectionReason = entry?.rejectionReason;
-
-            return (
-              <DocumentPreview
-                key={item.key}
-                item={item}
-                status={status}
-                rejectionReason={rejectionReason}
-                onSubmit={() => handleOpenModal(item.key)}
-                index={index}
-              />
-            );
-          })}
-
-        {/* Footer note */}
-        {!isLoading && <VerificationSubmit />}
-      </ScrollView>
-
-      {/* Upload Modal */}
-      <DocumentUploadStep
-        visible={modalVisible}
-        docKey={selectedDocKey}
-        onClose={() => setModalVisible(false)}
-        onUpload={handleUpload}
-      />
-    </View>
-  );
+import { useNurseVerification } from '../../../hooks/useNurse';
+import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
+import { uploadFile, downloadPrivateFile } from '../../../utils/fileTransfer';
+import { navigate } from '../../../utils/navigation';
+import { Linking } from 'react-native';
+const documents = [['CNIC_FRONT', 'Identity document (front)'], ['CNIC_BACK', 'Identity document (back)'], ['NURSE_LICENSE', 'Nursing license'], ['DEGREE', 'Degree'], ['BACKGROUND_CHECK', 'Background check']];
+export default function VerificationScreen() {
+  const user = useAuthStore(state => state.user); const logout = useAuthStore(state => state.logout); const id = user?.nurseId || ''; const q = useNurseVerification(id); const qc = useQueryClient();
+  const [busy, setBusy] = useState(''); const [error, setError] = useState('');
+  const upload = async (documentType: string) => { setError(''); try { const selected = await DocumentPicker.getDocumentAsync({ type: ['application/pdf', 'image/png', 'image/jpeg'], copyToCacheDirectory: true }); if (selected.canceled) return; setBusy(documentType); await uploadFile(`/nurses/${id}/verification/file`, selected.assets[0], { documentType }); await qc.invalidateQueries({ queryKey: ['nurse', id, 'verification'] }); } catch(e: any) { setError(e.message); } finally { setBusy(''); } };
+  const view = async (url: string, key: string) => { setBusy(key); setError(''); try { const parsed = new URL(url); if (parsed.pathname.startsWith(`/api/v1/nurses/${id}/documents/`)) await downloadPrivateFile(parsed.pathname.replace('/api/v1', ''), parsed.pathname.split('/').pop()!); else if (['https:', 'http:'].includes(parsed.protocol)) await Linking.openURL(url); } catch(e: any) { setError(e.message); } finally { setBusy(''); } };
+  return <WorkflowPage title="Professional Verification" loading={q.isLoading} error={error || q.error?.message} retry={() => void q.refetch()}><Text style={s.body}>{q.data?.isFullyVerified ? 'All required documents are approved.' : 'Submit each document for administrator review. Pending accounts cannot accept care work.'}</Text><Button onPress={() => navigate('/(nurse)/(tabs)/profile')}>Complete professional profile</Button>{documents.map(([key, label]) => { const check = q.data?.checks[key]; return <View key={key} style={s.card}><Text style={s.title}>{label}</Text><Text style={s.body}>{check?.status || 'NOT SUBMITTED'}</Text>{check?.rejectionReason && <Text style={s.body}>Review note: {check.rejectionReason}</Text>}{check?.fileUrl && <Button disabled={!!busy} onPress={() => void view(check.fileUrl!, key)}>View submitted document</Button>}<Button mode="contained" loading={busy === key} disabled={!!busy} onPress={() => void upload(key)}>{check?.fileUrl ? 'Replace document' : 'Choose & upload document'}</Button></View>; })}<Button onPress={() => void useAuthStore.getState().loadUser()}>Refresh account approval</Button><Button onPress={() => void logout()}>Sign out</Button></WorkflowPage>;
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: PALETTE.bg,
-  },
-  blobTop: {
-    position: 'absolute',
-    top: -80,
-    right: -60,
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    backgroundColor: PALETTE.teal + '18',
-  },
-  blobBottom: {
-    position: 'absolute',
-    bottom: -60,
-    left: -40,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: PALETTE.blue + '14',
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 48,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: PALETTE.muted,
-    textTransform: 'uppercase',
-    letterSpacing: 1.2,
-    marginBottom: 12,
-  },
-  loadingWrap: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    gap: 14,
-  },
-  loadingText: {
-    color: PALETTE.muted,
-    fontSize: 14,
-  },
-});
-
-

@@ -1,7 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
-import { SPACING, TYPOGRAPHY } from '../../theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { COLORS, SPACING, TYPOGRAPHY } from '../../theme';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const HEADER_HEIGHT = 260;
 
 interface DashboardHeaderProps {
   userName: string;
@@ -15,93 +19,101 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   userName,
   greeting,
   onProfilePress,
-  onNotificationPress,
-  unreadCount = 0,
 }) => {
   const initials = userName
-    ? userName.split(' ').map(n => n[0]).join('').substring(0, 2)
+    ? userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
     : 'AH';
 
   return (
-    <View style={styles.header}>
-      <View style={styles.profileRow}>
-        <TouchableOpacity onPress={onProfilePress} activeOpacity={0.8}>
-          <Avatar.Text
-            size={48}
-            label={initials}
-            style={styles.avatarBg}
-            color="#00E676"
-          />
-        </TouchableOpacity>
-        <View style={styles.greetingWrap}>
-          <Text style={styles.greetingText}>{greeting}</Text>
-          <Text style={styles.userNameText}>{userName}</Text>
-        </View>
-      </View>
-
-      <TouchableOpacity
-        style={styles.notificationBellBtn}
-        onPress={onNotificationPress}
-        activeOpacity={0.8}
-        accessibilityLabel="Notifications"
-        accessibilityRole="button"
+    <View style={styles.headerContainer}>
+      <ImageBackground
+        source={require('../../../assets/images/home-header-bg.jpg')}
+        style={styles.headerImage}
+        resizeMode="cover"
       >
-        <Text style={styles.bellIcon}>🔔</Text>
-        {unreadCount > 0 && <View style={styles.unreadBadgeDot} />}
-      </TouchableOpacity>
+        <LinearGradient
+          colors={['rgba(6, 41, 75, 0.85)', 'rgba(11, 66, 104, 0.6)', 'rgba(11, 66, 104, 0.3)']}
+          style={styles.gradientOverlay}
+        >
+          <View style={styles.headerContent}>
+            <View style={styles.textSection}>
+              <Text style={styles.greetingText}>{greeting}</Text>
+              <Text style={styles.userNameText}>{userName}</Text>
+              <Text style={styles.subtitleText}>
+                Your health matters. We're here{'\n'}for you.
+              </Text>
+            </View>
+
+            <TouchableOpacity onPress={onProfilePress} activeOpacity={0.8} style={styles.avatarContainer}>
+              <Avatar.Text
+                size={50}
+                label={initials}
+                style={styles.avatar}
+                labelStyle={styles.avatarLabel}
+                color={COLORS.surfaceCard}
+              />
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </ImageBackground>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
+  headerContainer: {
+    height: HEADER_HEIGHT,
+    width: SCREEN_WIDTH,
+    marginLeft: -SPACING.lg,
+    marginTop: -SPACING.lg,
+  },
+  headerImage: {
+    width: '100%',
+    height: '100%',
+  },
+  gradientOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    paddingHorizontal: SPACING.xl,
+    paddingBottom: 60,
+  },
+  headerContent: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: SPACING.xl,
+    alignItems: 'flex-start',
   },
-  profileRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatarBg: {
-    backgroundColor: '#0A332C',
-    borderWidth: 1.5,
-    borderColor: '#00E676',
-  },
-  greetingWrap: {
-    marginLeft: SPACING.md,
+  textSection: {
+    flex: 1,
+    paddingRight: SPACING.md,
   },
   greetingText: {
-    color: '#94A3B8',
-    fontSize: TYPOGRAPHY.sizes.xs,
-    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontSize: TYPOGRAPHY.sizes.md,
+    fontWeight: TYPOGRAPHY.weights.regular,
+    marginBottom: 2,
   },
   userNameText: {
     color: '#FFFFFF',
-    fontSize: TYPOGRAPHY.sizes.lg,
-    fontWeight: '700',
+    fontSize: TYPOGRAPHY.sizes.xxl,
+    fontWeight: TYPOGRAPHY.weights.bold,
+    marginBottom: SPACING.xs,
   },
-  notificationBellBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#0E3630',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+  subtitleText: {
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.regular,
+    lineHeight: 20,
   },
-  bellIcon: {
+  avatarContainer: {
+    marginTop: SPACING.xs,
+  },
+  avatar: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.5)',
+  },
+  avatarLabel: {
     fontSize: 18,
-  },
-  unreadBadgeDot: {
-    position: 'absolute',
-    top: 10,
-    right: 12,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#EF4444',
+    fontWeight: '700',
   },
 });

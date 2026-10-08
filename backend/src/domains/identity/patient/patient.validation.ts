@@ -1,19 +1,27 @@
 import { z } from 'zod';
 
+function historicalDate(value: unknown) {
+ if (value === '') return undefined;
+ if (typeof value !== 'string') return value;
+ const date = new Date(value), calendar = value.slice(0,10);
+ if (!/^\d{4}-\d{2}-\d{2}$/.test(calendar) || !Number.isFinite(date.getTime()) || date.toISOString().slice(0,10) !== calendar) return value;
+ return date;
+}
 const phoneRegex = /^((\+92)|(0092)|(92)|0)?3\d{9}$/;
 
 export const updateProfileSchema = z.object({
   fullName: z.string().trim().min(3, 'Full name must be at least 3 characters long').optional(),
   dob: z.preprocess(
-    (val) => (typeof val === 'string' && val ? new Date(val) : val),
-    z.date().optional()
+    historicalDate,
+    z.date().refine(value => value.getTime() <= Date.now(), 'Choose a date in the past or today').optional()
   ),
   gender: z.string().trim().min(1, 'Gender cannot be empty').optional(),
   address: z.string().trim().min(1, 'Address cannot be empty').optional(),
-  latitude: z.number().min(-90).max(90).optional(),
-  longitude: z.number().min(-180).max(180).optional(),
+  city: z.string().trim().min(2).max(100).regex(/^[\p{L}\s'.-]+$/u,'Use a city name, without a street address').nullable().optional(),
+  latitude: z.number().min(-90).max(90).nullable().optional(),
+  longitude: z.number().min(-180).max(180).nullable().optional(),
   photoUrl: z.string().trim().url('Invalid photo URL').optional()
-});
+}).refine(value => (value.latitude===undefined && value.longitude===undefined) || (typeof value.latitude==='number' && typeof value.longitude==='number') || (value.latitude===null && value.longitude===null),'Provide both coordinates, or clear both');
 
 export const emergencyContactSchema = z.object({
   name: z.string().trim().min(3, 'Contact name must be at least 3 characters long'),
@@ -24,8 +32,8 @@ export const emergencyContactSchema = z.object({
 export const chronicConditionSchema = z.object({
   name: z.string().trim().min(2, 'Condition name must be at least 2 characters long'),
   diagnosedDate: z.preprocess(
-    (val) => (typeof val === 'string' && val ? new Date(val) : val),
-    z.date().optional()
+    historicalDate,
+    z.date().refine(value => value.getTime() <= Date.now(), 'Choose a date in the past or today').optional()
   ),
   notes: z.string().trim().optional()
 });

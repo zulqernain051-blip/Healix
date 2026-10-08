@@ -1,7 +1,10 @@
-import React from 'react';
+import { ContractHistory } from '../../../../components/contracts/ContractHistory';
+import { appAlert, confirmAction } from '../../../../components/common/AppDialogs';
+import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
-import { Text } from 'react-native-paper';
-import { useLocalSearchParams } from 'expo-router';
+import { Text, TextInput, Button } from 'react-native-paper';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { navigate } from '../../../../utils/navigation';
 import { useContract, useApproveContract, useRejectContract, useCancelContract } from '../../../../hooks/useContracts';
 import { ContractApprovalPanel } from '../../../../components/contracts/ContractApprovalPanel';
 import { ContractStatusBadge } from '../../../../components/contracts/ContractStatusBadge';
@@ -10,6 +13,7 @@ import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '../../../../theme';
 export default function PatientContractDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const contractId = id || '';
+  const router = useRouter();
 
   const { data: contract, isLoading, isError, error } = useContract(contractId, {
     pollingInterval: 10000, // Poll every 10s to see if nurse approves
@@ -18,32 +22,42 @@ export default function PatientContractDetailScreen() {
   const approveContract = useApproveContract();
   const rejectContract = useRejectContract();
   const cancelContract = useCancelContract();
+  const [reason, setReason] = useState('');
 
   const handleApprove = async (cid: string) => {
+    if (!await confirmAction('Approve this agreement?', 'Review the rate and scope above. Your approval is recorded; the agreement activates when both parties approve.')) return;
     try {
-      await approveContract.mutateAsync(cid);
-      Alert.alert('Success', 'Contract approved. Waiting for nurse to approve.');
+      const approved = await approveContract.mutateAsync(cid);
+      appAlert('Success', approved.status === 'ACTIVE' ? 'Both parties approved. The contract is active.' : 'Your approval is recorded. Waiting for the other party.');
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to approve contract');
+      appAlert('Error', err.message || 'Failed to approve contract');
     }
   };
 
   const handleReject = async (cid: string) => {
+    if (!reason.trim()) { appAlert('Reason required', 'Enter your rejection reason below.'); return; }
+    if (!await confirmAction('Reject agreement?', reason.trim())) return;
     try {
       // In a real app, you might want to show a prompt to collect a reason.
-      await rejectContract.mutateAsync({ id: cid, data: { reason: 'Patient rejected' } });
-      Alert.alert('Rejected', 'Contract has been rejected.');
+      await rejectContract.mutateAsync({ id: cid, data: { reason: reason.trim() } });
+      appAlert('Rejected', 'Contract has been rejected.', [
+        { text: 'OK', onPress: () => router.replace('/(patient)/(tabs)/requests') }
+      ]);
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to reject contract');
+      appAlert('Error', err.message || 'Failed to reject contract');
     }
   };
 
   const handleCancel = async () => {
+    if (!reason.trim()) { appAlert('Reason required', 'Enter a cancellation reason below.'); return; }
+    if (!await confirmAction('Cancel agreement?',reason.trim())) return;
     try {
-      await cancelContract.mutateAsync({ id: contractId, data: { reason: 'Patient cancelled' } });
-      Alert.alert('Cancelled', 'Contract has been cancelled.');
+      await cancelContract.mutateAsync({ id: contractId, data: { reason: reason.trim() } });
+      appAlert('Cancelled', 'Contract has been cancelled.', [
+        { text: 'OK', onPress: () => router.replace('/(patient)/(tabs)/requests') }
+      ]);
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to cancel contract');
+      appAlert('Error', err.message || 'Failed to cancel contract');
     }
   };
 
@@ -88,6 +102,7 @@ export default function PatientContractDetailScreen() {
         <Text style={styles.scopeText}>{contract.scopeText}</Text>
       </View>
 
+      { ['PENDING_APPROVAL','ACTIVE'].includes(contract.status) && <TextInput mode="outlined" label="Reason for rejection or cancellation" multiline maxLength={2000} value={reason} onChangeText={setReason} textColor={COLORS.textDark} /> }
       <ContractApprovalPanel
         contract={contract}
         isPatientView={true}
@@ -97,6 +112,12 @@ export default function PatientContractDetailScreen() {
         isRejecting={rejectContract.isPending}
         style={styles.approvalPanel}
       />
+      {contract.status === 'ACTIVE' && <View style={styles.infoBox}>
+        <Text style={styles.infoValue}>Both parties approved. Your visit is being prepared and should appear in My Visits shortly.</Text>
+        <Button onPress={() => navigate('/(patient)/visits')}>Open my visits and QR code</Button>
+      </View>}
+      {['PENDING_APPROVAL','ACTIVE'].includes(contract.status) && <Button disabled={cancelContract.isPending || approveContract.isPending || rejectContract.isPending} onPress={handleCancel}>Cancel contract</Button>}
+      <ContractHistory contract={contract} />
     </ScrollView>
   );
 }

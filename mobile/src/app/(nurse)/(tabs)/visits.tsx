@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, RefreshControl, TouchableOpacity, StatusBar } from 'react-native';
 import { Text } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useNurseVisits } from '../../../hooks/useVisits';
 import { VisitSummaryCard } from '../../../components/visits/VisitSummaryCard';
-import { Visit, VisitStatus } from '../../../types/visit';
+import { Visit } from '../../../types/visit';
 import { SPACING } from '../../../theme';
 
 const FILTERS: Array<{ key: string; label: string }> = [

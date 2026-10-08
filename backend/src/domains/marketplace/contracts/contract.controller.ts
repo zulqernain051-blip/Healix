@@ -31,14 +31,14 @@ export class ContractController {
       const contract = await ContractService.createContract(payload, user);
       res.json({ success: true, data: contract });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 
   public static async getContract(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const contract = await ContractService.getContract(id);
+      const contract = await ContractService.getContract(id, (req as any).user);
       if (!contract) {
         res.status(404).json({ success: false, message: 'Contract not found' });
         return;
@@ -49,7 +49,7 @@ export class ContractController {
         checkPatientOwnership(req, contract.patientId);
       } else if (user.role === 'NURSE') {
         checkNurseOwnership(req, contract.nurseId);
-      } else {
+      } else if (user.role !== 'ADMIN') {
         res.status(403).json({ success: false, message: 'Forbidden' });
         return;
       }
@@ -92,7 +92,7 @@ export class ContractController {
       const contract = await ContractService.approveContract(id, user);
       res.json({ success: true, data: contract });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 
@@ -104,7 +104,7 @@ export class ContractController {
       const contract = await ContractService.rejectContract(id, reason, user);
       res.json({ success: true, data: contract });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 
@@ -116,7 +116,7 @@ export class ContractController {
       const contract = await ContractService.cancelContract(id, reason || 'Cancelled', user);
       res.json({ success: true, data: contract });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 
@@ -127,7 +127,7 @@ export class ContractController {
       const logs = await ContractService.getContractAuditTrail(id, user);
       res.json({ success: true, data: logs });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err instanceof AppError ? err.statusCode : 400).json({ success: false, message: err.message });
     }
   }
 }

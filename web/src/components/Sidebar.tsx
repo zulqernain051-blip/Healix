@@ -29,8 +29,12 @@ export default function Sidebar({ role, activeTab, setActiveTab }: SidebarProps)
   };
 
   const adminNav = [
+    { id: 'analytics', label: 'Analytics & Reports', icon: LayoutDashboard },
+    { id: 'security', label: 'Account Security', icon: Settings },
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'emergency', label: 'Emergency & Ambulance Fleet', icon: LayoutDashboard },
     { id: 'users', label: 'User Directory', icon: Users },
+    { id: 'operations', label: 'Permissions, Payments & Support', icon: Settings },
     { id: 'nurses', label: 'Nurse Verification', icon: CheckSquare },
     { id: 'doctors', label: 'Doctor Verification', icon: CheckSquare },
     { id: 'marketplace', label: 'Marketplace Monitor', icon: Layers },
@@ -39,7 +43,10 @@ export default function Sidebar({ role, activeTab, setActiveTab }: SidebarProps)
   ];
 
   const doctorNav = [
+    { id: 'analytics', label: 'Analytics & Reports', icon: LayoutDashboard },
+    { id: 'security', label: 'Account Security', icon: Settings },
     { id: 'dashboard', label: 'Case Queue', icon: ClipboardList },
+    { id: 'emergency', label: 'Dispatches & Admissions', icon: ClipboardList },
     { id: 'homevisits', label: 'Home Visits', icon: Calendar },
   ];
 

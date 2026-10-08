@@ -79,7 +79,7 @@ export const QrScanner: React.FC<QrScannerProps> = ({ visitId, onSuccess, onCanc
       )}
 
       <Button mode="text" textColor="#94A3B8" onPress={onCancel} style={{ marginTop: 12 }}>
-        ‹ Back to Method Selection
+        Back to Method Selection
       </Button>
     </View>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING } from '../../theme';
+
 
 interface VisitFilterPillsProps {
   activeFilter: string;

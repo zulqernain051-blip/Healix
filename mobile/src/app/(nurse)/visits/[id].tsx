@@ -1,4 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import { VisitCompletionPanel } from '../../../components/visits/VisitCompletionPanel';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useState, useCallback, useEffect } from 'react';
 import { View, ScrollView, StyleSheet, SafeAreaView, StatusBar, Alert, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { Text, Button, ActivityIndicator } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -12,6 +14,7 @@ import { ManualVerification } from '../../../components/visits/verification/Manu
 import { VitalsForm } from '../../../components/visits/clinical/VitalsForm';
 import { SymptomsForm } from '../../../components/visits/clinical/SymptomsForm';
 import { ClinicalRemarksForm } from '../../../components/visits/clinical/ClinicalRemarksForm';
+import { visitsApi } from '../../../api/visits.api';
 import { RADIUS, SPACING } from '../../../theme';
 
 type ActivePanel = 'none' | 'verify' | 'qr' | 'vitals' | 'symptoms' | 'remarks';
@@ -31,11 +34,10 @@ export default function NurseVisitDetailScreen() {
   const [notes, setNotes] = useState('');
   const [notesInitialized, setNotesInitialized] = useState(false);
 
-  // Sync notes from server on first load
-  if (visit?.notes && !notesInitialized) {
-    setNotes(visit.notes);
-    setNotesInitialized(true);
-  }
+  const [actionError, setActionError] = useState('');
+  const [accepting, setAccepting] = useState(false);
+  useEffect(() => { if (visit && !notesInitialized) { setNotes(visit.notes || ''); setNotesInitialized(true); } }, [visit, notesInitialized]);
+  const accept = async () => { setAccepting(true); setActionError(''); try { await visitsApi.acceptVisit(visitId); await refetch(); } catch(e: any) { setActionError(e.message); } finally { setAccepting(false); } };
 
   const handleVerificationSuccess = useCallback(() => {
     setActivePanel('none');
@@ -50,17 +52,17 @@ export default function NurseVisitDetailScreen() {
   const handleComplete = async () => {
     if (!visit || !visit.vitals || visit.vitals.length === 0) {
       if (Platform.OS === 'web') alert('Error: Vitals must be recorded before completing the visit.');
-      else Alert.alert('Error', 'Vitals must be recorded before completing the visit.');
+      else appAlert('Error', 'Vitals must be recorded before completing the visit.');
       return;
     }
     if (!visit.symptoms || visit.symptoms.length === 0) {
       if (Platform.OS === 'web') alert('Error: Symptoms must be recorded before completing the visit.');
-      else Alert.alert('Error', 'Symptoms must be recorded before completing the visit.');
+      else appAlert('Error', 'Symptoms must be recorded before completing the visit.');
       return;
     }
     if (!visit.clinicalRemark) {
       if (Platform.OS === 'web') alert('Error: Clinical remarks must be recorded before completing the visit.');
-      else Alert.alert('Error', 'Clinical remarks must be recorded before completing the visit.');
+      else appAlert('Error', 'Clinical remarks must be recorded before completing the visit.');
       return;
     }
 
@@ -76,17 +78,17 @@ export default function NurseVisitDetailScreen() {
         }
       }
     } else {
-      Alert.alert('Complete Visit', 'Are you sure you want to complete this visit?', [
+      appAlert('Complete Visit', 'Are you sure you want to complete this visit?', [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Complete',
           onPress: async () => {
             try {
               await completeVisit.mutateAsync(visitId);
-              Alert.alert('Completed', 'The visit has been completed successfully.');
+              appAlert('Completed', 'The visit has been completed successfully.');
               router.replace('/(nurse)/(tabs)/visits');
             } catch (err: any) {
-              Alert.alert('Error', err.message || 'Failed to complete visit. Ensure clinical data is recorded.');
+              appAlert('Error', err.message || 'Failed to complete visit. Ensure clinical data is recorded.');
             }
           },
         },
@@ -97,9 +99,9 @@ export default function NurseVisitDetailScreen() {
   const handleSaveNotes = async () => {
     try {
       await saveNotes.mutateAsync({ visitId, notes });
-      Alert.alert('Saved', 'Visit notes updated.');
+      appAlert('Saved', 'Visit notes updated.');
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to save notes.');
+      appAlert('Error', err.message || 'Failed to save notes.');
     }
   };
 
@@ -153,8 +155,11 @@ export default function NurseVisitDetailScreen() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        {!!actionError && <Text style={{ color: '#EF4444' }}>{actionError}</Text>}
+        {visit.status === 'SCHEDULED' && <Button mode="contained" loading={accepting} disabled={accepting} onPress={() => void accept()}>Accept assigned visit</Button>}
         {/* Visit Info */}
         <VisitInfoCard visit={visit} />
+        <VisitCompletionPanel visit={visit} onChanged={refetch} />
 
         {/* Verification Selector (when in verify mode) */}
         {activePanel === 'verify' && (visit.status === 'SCHEDULED' || visit.status === 'ACCEPTED') && (
@@ -177,7 +182,7 @@ export default function NurseVisitDetailScreen() {
             <ManualVerification visitId={visitId} onSuccess={handleVerificationSuccess} />
 
             <Button mode="text" textColor="#94A3B8" onPress={() => setActivePanel('none')}>
-              â€¹ Cancel
+              Back to verification methods
             </Button>
           </View>
         )}
@@ -207,9 +212,9 @@ export default function NurseVisitDetailScreen() {
         )}
 
         {/* Notes Section */}
-        {visit.status !== 'DECLINED' && (
+        {['SCHEDULED', 'ACCEPTED', 'IN_PROGRESS'].includes(visit.status) && (
           <View style={styles.notesCard}>
-            <Text style={styles.notesTitle}>📝 Visit Notes</Text>
+            <Text style={styles.notesTitle}>Visit Notes</Text>
             <TextInput
               style={styles.notesInput}
               placeholder="Enter clinical notes..."

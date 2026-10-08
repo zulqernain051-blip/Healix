@@ -1,0 +1,62 @@
+[
+  {
+    "file": "backend/src/domains/identity/auth/auth.repository.ts",
+    "method": "createResetToken"
+  },
+  {
+    "file": "backend/src/domains/identity/auth/auth.repository.ts",
+    "method": "findActiveResetToken"
+  },
+  {
+    "file": "backend/src/domains/identity/auth/auth.repository.ts",
+    "method": "useResetToken"
+  },
+  {
+    "file": "backend/src/domains/identity/auth/auth.repository.ts",
+    "method": "updatePassword"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "findExistingRequestInWindow"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "mergeNotes"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "createRecurringPattern"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "createRequest"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "createRecurringRequestsAndVisits"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "updateCareRequestNotes"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "findAvailableNurses"
+  },
+  {
+    "file": "backend/src/domains/care/requests/care.repository.ts",
+    "method": "findUserWithClinicalRoles"
+  },
+  {
+    "file": "backend/src/domains/care/visit/visit.repository.ts",
+    "method": "acceptVisit"
+  },
+  {
+    "file": "backend/src/domains/care/visit/visit.repository.ts",
+    "method": "declineVisit"
+  },
+  {
+    "file": "backend/src/domains/care/visit/shared/policies/verification.policy.ts",
+    "method": "isValidQrToken"
+  }
+]

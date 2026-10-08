@@ -13,12 +13,14 @@ router.post('/marketplace/listings/:id/offers', MarketplaceController.submitOffe
 // Offers operations
 router.put('/offers/:id', MarketplaceController.updateOffer);
 router.delete('/offers/:id', MarketplaceController.withdrawOffer);
+router.post('/offers/:id/reject', MarketplaceController.rejectOffer);
 router.get('/marketplace/listings/:id/offers', MarketplaceController.getListingOffers);
 router.post('/marketplace/listings/:id/select', MarketplaceController.selectOffer);
 
 // Patient Favorites
 router.post('/patients/:id/favorite-nurses', MarketplaceController.addFavoriteNurse);
 router.get('/patients/:id/favorite-nurses', MarketplaceController.getFavoriteNurses);
+router.delete('/patients/:id/favorite-nurses/:nurseId', MarketplaceController.removeFavoriteNurse);
 
 // Cost preview preview
 router.post('/pricing/preview', MarketplaceController.getCostPreview);

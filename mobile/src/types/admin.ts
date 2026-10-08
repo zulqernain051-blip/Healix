@@ -91,8 +91,13 @@ export interface AdminVisit {
 export interface AdminHospital {
   id: string;
   name: string;
-  location: string;
-  capacity: number;
+  latitude: number;
+  longitude: number;
+  capacityStatus: string;
+  affordabilityTier: string;
+  isCharity: boolean;
+  location?: string;
+  capacity?: number;
 }
 
 export interface AdminAmbulance {
@@ -105,10 +110,42 @@ export interface AdminAmbulance {
 export interface AdminEmergency {
   id: string;
   patientId: string;
-  status: string;
+  patientName?: string;
+  patientPhone?: string;
+  status: string; // ACTIVE, RESOLVED, CANCELLED
+  source?: string;
+  severity?: string;
   assignedDoctorId?: string;
+  assignedDoctorName?: string;
   slaBreach: boolean;
+  slaDeadline?: string;
   createdAt: string;
+  resolvedAt?: string;
+  activeDispatch?: {
+    id: string;
+    status: string; // PENDING, DISPATCHED, EN_ROUTE, ARRIVED, COMPLETED, CANCELLED
+    etaMinutes: number;
+    dispatchedAt: string;
+    arrivedAt?: string;
+    completedAt?: string;
+    ambulance?: {
+      id: string;
+      vehicleNumber: string;
+      plateNumber: string;
+      type: string;
+      status: string;
+    } | null;
+    paramedic?: {
+      id: string;
+      name: string;
+      phone?: string;
+      certificationNumber: string;
+    } | null;
+    hospital?: {
+      id: string;
+      name: string;
+    } | null;
+  } | null;
 }
 
 export interface AdminReview {

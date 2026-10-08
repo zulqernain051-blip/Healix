@@ -20,12 +20,14 @@ export class GetDashboardSummaryUseCase {
     // TODO Phase 6: Replace with CQRS Read Model
     const [
       activeRequestsCount,
+      activeContractsCount,
       upcomingVisits,
       severeAllergiesCount,
       latestRisk,
       pendingPayments
     ] = await Promise.all([
       this.careRepository.countActiveRequests(patientId),
+      this.patientRepository.countActiveContracts(patientId),
       this.visitRepository.findUpcomingVisits(patientId),
       this.clinicalRepository.countSevereAllergies(patientId),
       this.clinicalRepository.findLatestRiskAssessment(patientId),
@@ -36,6 +38,7 @@ export class GetDashboardSummaryUseCase {
 
     return {
       activeRequestsCount,
+      activeContractsCount,
       upcomingVisits,
       severeAllergiesCount,
       latestRisk,

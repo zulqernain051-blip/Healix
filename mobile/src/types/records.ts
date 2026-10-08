@@ -1,11 +1,6 @@
 export interface VitalSign {
-  id: string;
-  type: string;
-  value: number;
-  unit: string;
-  recordedAt: string;
-  recordedBy?: string;
-  notes?: string;
+  id: string; visitId: string; systolic: number; diastolic: number; heartRate: number;
+  temperature: number; oxygenSaturation: number; bloodSugar?: number | null; recordedAt: string;
 }
 
 export interface RiskAssessment {

@@ -1,6 +1,27 @@
 import { prisma } from '../../../common/config/database';
+import { Prisma } from '@prisma/client';
 
 export class PatientRepository {
+  static countActiveContracts(patientId: string) { return prisma.contract.count({ where: { patientId, status: 'ACTIVE' } }); }
+  public static async hasCareRelationship(patientId: string, userId: string, role: string) {
+    let relation: Prisma.PatientWhereInput;
+    if (role === 'NURSE') {
+      relation = { careRequests: { some: { visits: { some: { nurse: { userId } } } } } };
+    } else if (role === 'DOCTOR') {
+      const doctor = await prisma.doctor.findUnique({ where: { userId }, select: { id: true } });
+      relation = { OR: [{ carePlans: { some: { doctor: { userId } } } }, { doctor_home_visits: { some: { doctors: { userId }, status: { in: ['SCHEDULED', 'EN_ROUTE', 'ARRIVED', 'COMPLETED'] } } } }, { emergencyEvents: { some: { assignedDoctorId: doctor?.id || '__none__', status: 'ACTIVE' } } }, { careRequests: { some: { visits: { some: { OR: [
+        { doctor: { userId } },
+        { caseAssignment: { doctor: { userId } } },
+        { caseAssignment: { secondOpinions: { some: { consultedDoctor: { userId } } } } }
+      ] } } } } }] };
+    } else if (role === 'PARAMEDIC') {
+      relation = { ambulanceDispatches: { some: { paramedic: { userId }, status: { in: ['PENDING', 'DISPATCHED', 'EN_ROUTE', 'ARRIVED'] } } } };
+    } else {
+      return false;
+    }
+    return (await prisma.patient.count({ where: { id: patientId, ...relation } })) > 0;
+  }
+
   public static async findPatientByUserId(userId: string) {
     return prisma.patient.findUnique({
       where: { userId },

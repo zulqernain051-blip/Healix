@@ -18,7 +18,7 @@ interface DoctorState {
   submitDiagnosis: (caseId: string, data: { code: string; description: string; notes?: string }) => Promise<void>;
   submitCarePlan: (caseId: string, data: { title: string; goals: string[]; interventions: string[]; durationWeeks: number }) => Promise<void>;
   submitPrescription: (caseId: string, data: { medications: { drugName: string; dosage: string; frequency: string; durationDays: number; instructions?: string }[] }) => Promise<void>;
-  submitDecision: (caseId: string, data: { recommendation: string; actionType: string; urgency: string }) => Promise<void>;
+  submitDecision: (caseId: string, data: { decision: string; justification: string; hospitalId?: string; autoDispatch?: boolean }) => Promise<void>;
   fetchHomeVisits: () => Promise<void>;
   scheduleHomeVisit: (data: { patientId: string; scheduledAt: string; purpose: string }) => Promise<void>;
   submitAiFeedback: (caseId: string, data: { agree: boolean; feedbackText?: string }) => Promise<void>;
@@ -55,11 +55,11 @@ export const useDoctorStore = create<DoctorState>((set, get) => ({
   },
 
   acceptCase: async (caseId) => {
-    await api('PUT', `/cases/${caseId}/accept`);
+    await api('PUT', `/cases/${caseId}/start-review`);
   },
 
   fetchCaseReview: async (caseId) => {
-    set({ isLoading: true });
+    set({ isLoading: true, caseReview: null });
     try {
       const caseReview = await api('GET', `/cases/${caseId}/review`);
       set({ caseReview, isLoading: false });
@@ -83,11 +83,12 @@ export const useDoctorStore = create<DoctorState>((set, get) => ({
   },
 
   submitCarePlan: async (caseId, data) => {
-    await api('POST', `/cases/${caseId}/care-plan`, data);
+    if (!data.goals.filter(Boolean).length) throw new Error('At least one care milestone is required');
+    await api('POST', `/cases/${caseId}/care-plan`, { title: data.title, description: data.interventions.filter(Boolean).join('\n'), milestones: data.goals.filter(Boolean).map(title => ({ title, targetDate: new Date(Date.now() + data.durationWeeks * 7 * 86400000).toISOString() })) });
   },
 
   submitPrescription: async (caseId, data) => {
-    await api('POST', `/cases/${caseId}/prescriptions`, data);
+    await api('POST', `/cases/${caseId}/prescriptions`, { items: data.medications.map(m => ({ medicationName: m.drugName, dosage: m.dosage, frequency: m.frequency, durationDays: m.durationDays })), instructions: data.medications.map(m => m.instructions).filter(Boolean).join('\n') });
   },
 
   submitDecision: async (caseId, data) => {
@@ -105,6 +106,6 @@ export const useDoctorStore = create<DoctorState>((set, get) => ({
   },
 
   submitAiFeedback: async (caseId, data) => {
-    await api('POST', `/cases/${caseId}/ai-feedback`, data);
+    await api('POST', `/cases/${caseId}/ai-feedback`, { targetType: 'RECOMMENDATION', comment: `${data.agree ? 'Agree' : 'Disagree'}: ${data.feedbackText || 'Doctor reviewed recommendations.'}` });
   },
 }));

@@ -27,6 +27,7 @@ export const useNurseVisits = (nurseId: string) => {
     queryKey: VISIT_KEYS.nurseList(nurseId),
     queryFn: () => visitsApi.getNurseVisits(nurseId),
     enabled: !!nurseId,
+    refetchInterval: 5000,
   });
 };
 
@@ -39,7 +40,7 @@ export const useVisitDetail = (visitId: string, options?: { pollingInterval?: nu
     refetchInterval: (query) => {
       // Stop polling once visit reaches a terminal state
       const status = query.state.data?.status as VisitStatus | undefined;
-      if (status === 'COMPLETED' || status === 'DECLINED') return false;
+      if (status === 'COMPLETED' || status === 'DECLINED' || status === 'CANCELLED') return false;
       return options?.pollingInterval ?? false;
     },
   });

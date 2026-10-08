@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+
 
 interface NurseReviewCardProps {
   patientName: string;

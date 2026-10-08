@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { AuthRepository } from './auth.repository';
-import { RegisterPayload, LoginPayload, TokenResponse, UserResponse } from './auth.types';
+import { RegisterPayload, LoginPayload, TokenResponse } from './auth.types';
 import { AppError } from '../../../common/errors/AppError';
 import { config } from '../../../common/config';
 import { logger } from '../../../common/utils/logger';
@@ -13,44 +13,33 @@ import { Role, OtpChannel, UserStatus } from '@prisma/client';
  * Coordinates repository operations and handles cryptographic functions.
  */
 import { RegisterInvitedUseCase } from './usecases/register-invited.usecase';
+import { generateOtp, OtpAttempts } from './otp';
+import { RegisterInvitedPayload } from './auth.types';
+import { prisma } from '../../../common/config/database';
+import { OtpDelivery } from './otp-delivery';
+import { verifyGoogleIdToken } from './google-id-token';
 export class AuthService {
-  static async registerInvited(dto: any) {
+  static async registerInvited(dto: RegisterInvitedPayload) {
     const { user } = await RegisterInvitedUseCase.execute(dto);
-    const accessToken = this.generateAccessToken(user);
-    const rawRefreshToken = this.generateRefreshToken();
-    const bcrypt = require('bcrypt');
-    const hashedRefresh = await bcrypt.hash(rawRefreshToken, 12);
-    
-    const { prisma } = require('../../../common/config/database');
-    await prisma.session.create({
-      data: {
-        userId: user.id,
-        refreshTokenHash: hashedRefresh,
-        deviceInfo: dto.deviceInfo || 'Unknown',
-        ipAddress: '127.0.0.1',
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      }
-    });
-    
+    const needsEmailVerification = user.role !== Role.DOCTOR && user.role !== Role.PARAMEDIC;
+    if (needsEmailVerification) {
+      OtpDelivery.assertConfigured();
+      const code = generateOtp();
+      await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, new Date(Date.now() + 600000));
+      await OtpDelivery.send(user.email, code, 'VERIFICATION');
+    }
     return {
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.fullName,
-        role: user.role,
-        status: user.status,
-      },
-      accessToken,
-      refreshToken: rawRefreshToken
+      user: { id: user.id, email: user.email, fullName: user.fullName, role: user.role, status: user.status },
+      emailVerificationRequired: needsEmailVerification
     };
   }
   private static hashRefreshToken(token: string): string {
     return crypto.createHash('sha256').update(token).digest('hex');
   }
 
-  private static generateAccessToken(user: any): string {
+  private static generateAccessToken(user: any, sessionId: string): string {
     return jwt.sign(
-      { id: user.id, role: user.role, fullName: user.fullName },
+      { id: user.id, role: user.role, fullName: user.fullName, sid: sessionId },
       config.JWT_SECRET,
       { expiresIn: config.JWT_EXPIRES_IN as any }
     );
@@ -65,6 +54,7 @@ export class AuthService {
    * initiates verification by generating a 6-digit OTP code, and saves details.
    */
   public static async register(payload: RegisterPayload) {
+    OtpDelivery.assertConfigured();
     // 1. Validate email uniqueness
     payload.email = payload.email.toLowerCase();
     const existingEmail = await AuthRepository.findUserByEmail(payload.email);
@@ -85,13 +75,12 @@ export class AuthService {
     const user = await AuthRepository.createUser(payload, passwordHash);
 
     // 5. Generate a 6-digit verification OTP code
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const code = generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // Expires in 10 minutes
 
     await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, expiresAt);
 
-    // MOCK delivery system (logs code to console so developers can easily run tests)
-    logger.info(`📧 [MOCK SMS/EMAIL] Sent OTP verification code to user ${user.email}: CODE is ${code}`);
+    await OtpDelivery.send(user.email, code, 'VERIFICATION');
 
     return {
       userId: user.id,
@@ -112,17 +101,23 @@ export class AuthService {
       throw new AppError('User not found', 404);
     }
 
+    if (user.deletedAt) throw new AppError('Account is unavailable.', 403);
+    if (user.status === UserStatus.SUSPENDED) throw new AppError('Your account has been suspended.', 403);
+    OtpAttempts.check(user.id, 'VERIFICATION');
     const otp = await AuthRepository.findActiveOtp(user.id, code);
     if (!otp) {
+      OtpAttempts.fail(user.id, 'VERIFICATION');
       throw new AppError('Invalid or expired OTP code', 400);
     }
 
     // Mark OTP code consumed to prevent replay attacks
     await AuthRepository.consumeOtp(otp.id);
+    OtpAttempts.reset(user.id, 'VERIFICATION');
+    await prisma.user.update({ where: { id: user.id }, data: { emailVerifiedAt: new Date() } });
 
     let updatedStatus = user.status;
-    if (user.role === Role.PATIENT) {
-      // Patients are activated automatically after verifying their OTP
+    if (user.role === Role.PATIENT || user.role === Role.ADMIN) {
+      // Patients and invitation-only administrators are activated automatically after verifying their OTP
       updatedStatus = UserStatus.ACTIVE;
       await AuthRepository.updateUserStatus(user.id, updatedStatus);
       logger.info(`User ${user.email} (PATIENT) successfully verified OTP and activated.`);
@@ -156,11 +151,12 @@ export class AuthService {
       throw new AppError('Too many OTP requests. Please try again in an hour.', 429);
     }
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const code = generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, expiresAt);
-    logger.info(`📧 [MOCK SMS/EMAIL] Re-issued OTP verification code to user ${user.email}: CODE is ${code}`);
+    OtpAttempts.reset(user.id, 'VERIFICATION');
+    await OtpDelivery.send(user.email, code, 'VERIFICATION');
 
     return { success: true };
   }
@@ -181,42 +177,66 @@ export class AuthService {
       throw new AppError('Invalid credentials', 401);
     }
 
+    if (user.emailVerificationRequired && !user.emailVerifiedAt) throw new AppError('Please verify your OTP code to activate your account.', 403);
     // Enforce status checks
     if (user.status === UserStatus.PENDING_VERIFICATION) {
       if (user.role === Role.PATIENT) {
         throw new AppError('Please verify your OTP code to activate your account.', 403);
       }
-      throw new AppError('Your account is pending administrator verification.', 403);
+      if (user.role !== Role.NURSE) throw new AppError('Your account is pending administrator verification.', 403);
     }
 
+    if (user.deletedAt) throw new AppError('Account is unavailable.', 403);
     if (user.status === UserStatus.SUSPENDED) {
       throw new AppError('Your account has been suspended. Please contact support.', 403);
     }
 
     if (user.mfaEnabled) {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const code = generateOtp();
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-      await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, expiresAt);
-      logger.info(`[MOCK SMS/EMAIL] Sent MFA login code to ${user.email}: ${code}`);
+      await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, expiresAt, 'MFA_LOGIN');
+      OtpAttempts.reset(user.id, 'MFA_LOGIN');
+      await OtpDelivery.send(user.email, code, 'MFA_LOGIN');
       return { mfaRequired: true, message: 'MFA verification required' };
     }
 
+    return this.createLoginSession(user, payload.deviceInfo, payload.ipAddress);
+  }
+
+  public static async loginWithGoogle(credential: string, deviceInfo?: string, ipAddress?: string): Promise<any> {
+    const { email } = await verifyGoogleIdToken(credential);
+    const user = await AuthRepository.findUserByEmail(email);
+    if (!user || user.deletedAt) throw new AppError('No Healix account uses this Google address.', 403);
+    if (user.emailVerificationRequired && !user.emailVerifiedAt) throw new AppError('Please verify your Healix email first.', 403);
+    if (user.status !== UserStatus.ACTIVE && !(user.role === Role.NURSE && user.status === UserStatus.PENDING_VERIFICATION)) {
+      throw new AppError('Your account is not active.', 403);
+    }
+    if (user.mfaEnabled) {
+      const code = generateOtp();
+      await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, new Date(Date.now() + 600000), 'MFA_LOGIN');
+      OtpAttempts.reset(user.id, 'MFA_LOGIN');
+      await OtpDelivery.send(user.email, code, 'MFA_LOGIN');
+      return { mfaRequired: true, email: user.email, message: 'MFA verification required' };
+    }
+    return this.createLoginSession(user, deviceInfo, ipAddress);
+  }
+
+  private static async createLoginSession(user: any, deviceInfo?: string, ipAddress?: string) {
     // Generate token set
-    const accessToken = this.generateAccessToken(user);
     const rawRefreshToken = this.generateRefreshToken();
     const refreshTokenHash = this.hashRefreshToken(rawRefreshToken);
 
     // Save hashed session details for token validation
-    await AuthRepository.createSession(
+    const session = await AuthRepository.createSession(
       user.id,
       refreshTokenHash,
-      payload.deviceInfo,
-      payload.ipAddress
+      deviceInfo,
+      ipAddress
     );
 
     return {
       tokens: {
-        accessToken,
+        accessToken: this.generateAccessToken(user, session.id),
         refreshToken: rawRefreshToken
       },
       user: {
@@ -229,7 +249,8 @@ export class AuthService {
         createdAt: user.createdAt,
         patientId: user.patient?.id,
         nurseId: user.nurse?.id,
-        doctorId: user.doctor?.id
+        doctorId: user.doctor?.id,
+        paramedicId: user.paramedic?.id
       }
     };
   }
@@ -241,20 +262,20 @@ export class AuthService {
     const refreshTokenHash = this.hashRefreshToken(refreshToken);
     
     const session = await AuthRepository.findSessionByTokenHash(refreshTokenHash);
-    if (!session || session.revoked || session.expiresAt < new Date()) {
+    if (!session || session.revoked || session.expiresAt <= new Date()) {
       throw new AppError('Invalid or expired refresh token', 401);
     }
 
-    // Immediately revoke old session to prevent replay attacks
-    await AuthRepository.revokeSession(session.id);
+    if (session.user.deletedAt || (session.user.emailVerificationRequired && !session.user.emailVerifiedAt)) throw new AppError('Account is unavailable or email is unverified.', 403);
+    if (session.user.status !== UserStatus.ACTIVE && !(session.user.role === Role.NURSE && session.user.status === UserStatus.PENDING_VERIFICATION)) throw new AppError('Your account is not active.', 403);
 
     // Generate new token pair
-    const accessToken = this.generateAccessToken(session.user);
     const rawRefreshToken = this.generateRefreshToken();
     const newHash = this.hashRefreshToken(rawRefreshToken);
 
     // Save new rotating session
-    await AuthRepository.createSession(
+    const rotatedSession = await AuthRepository.rotateSession(
+      session.id,
       session.userId,
       newHash,
       deviceInfo || session.deviceInfo || undefined,
@@ -262,7 +283,7 @@ export class AuthService {
     );
 
     return {
-      accessToken,
+      accessToken: this.generateAccessToken(session.user, rotatedSession.id),
       refreshToken: rawRefreshToken
     };
   }
@@ -292,16 +313,15 @@ export class AuthService {
       return { success: true, message: 'If an account exists, password reset instructions have been sent.' };
     }
 
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const code = generateOtp();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, expiresAt);
-    logger.info(`📧 [MOCK SMS/EMAIL] Sent OTP verification code to user ${user.email} for password reset: CODE is ${code}`);
+    await AuthRepository.createOtpCode(user.id, code, OtpChannel.EMAIL, expiresAt, 'PASSWORD_RESET');
+    OtpAttempts.reset(user.id, 'PASSWORD_RESET');
+    await OtpDelivery.send(user.email, code, 'PASSWORD_RESET');
 
     return { success: true };
   }
-
-  private static resetAttempts = new Map<string, number>();
 
   /**
    * Resets password using valid verification OTP.
@@ -313,24 +333,19 @@ export class AuthService {
       throw new AppError('User not found', 404);
     }
 
-    const attempts = this.resetAttempts.get(user.id) || 0;
-    if (attempts >= 5) {
-      throw new AppError('Too many failed attempts. Please request a new OTP.', 429);
-    }
-
-    const activeOtp = await AuthRepository.findActiveOtp(user.id, code);
+    OtpAttempts.check(user.id, 'PASSWORD_RESET');
+    const activeOtp = await AuthRepository.findActiveOtp(user.id, code, 'PASSWORD_RESET');
     if (!activeOtp) {
-      this.resetAttempts.set(user.id, attempts + 1);
+      OtpAttempts.fail(user.id, 'PASSWORD_RESET');
       throw new AppError('Invalid or expired password reset verification code', 400);
     }
-
-    this.resetAttempts.delete(user.id);
 
     // Hash new password securely
     const passwordHash = await bcrypt.hash(newPassword, 12);
 
     // Update password inside transaction and invalidate user sessions
     await AuthRepository.resetPasswordTransaction(user.id, passwordHash, activeOtp.id);
+    OtpAttempts.reset(user.id, 'PASSWORD_RESET');
 
     return { success: true };
   }
@@ -351,7 +366,7 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(newPassword, 12);
 
-    await AuthRepository.updatePassword(userId, passwordHash);
+    await AuthRepository.updatePasswordAndRevokeSessions(userId, passwordHash);
 
     return { success: true };
   }

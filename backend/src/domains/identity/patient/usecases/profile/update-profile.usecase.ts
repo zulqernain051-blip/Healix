@@ -15,11 +15,12 @@ export class UpdateProfileUseCase {
     if (payload.dob !== undefined) patientData.dob = payload.dob;
     if (payload.gender !== undefined) patientData.gender = payload.gender;
     if (payload.address !== undefined) patientData.address = payload.address;
+    if (payload.city !== undefined) patientData.city = payload.city;
     if (payload.photoUrl !== undefined) patientData.photoUrl = payload.photoUrl;
 
-    if (payload.address && (payload.latitude === undefined || payload.longitude === undefined)) {
-      patientData.latitude = 33.6844 + (Math.random() - 0.5) * 0.1;
-      patientData.longitude = 73.0479 + (Math.random() - 0.5) * 0.1;
+    if (payload.address && payload.address !== patient.address && payload.latitude === undefined && payload.longitude === undefined) {
+      patientData.latitude = null;
+      patientData.longitude = null;
     } else {
       if (payload.latitude !== undefined) patientData.latitude = payload.latitude;
       if (payload.longitude !== undefined) patientData.longitude = payload.longitude;

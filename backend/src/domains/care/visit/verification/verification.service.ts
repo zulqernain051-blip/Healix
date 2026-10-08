@@ -2,6 +2,9 @@ import { AppError } from '../../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../../common/constants/index';
 import { VerificationRepository } from './verification.repository';
 import { VisitRepository } from '../visit.repository';
+import { LocationHelper } from '../shared/helpers/location.helper';
+import { VerificationPolicy } from '../shared/policies/verification.policy';
+import { VisitAccessPolicy, VisitActor } from '../shared/policies/visit-access.policy';
 
 export class VerificationService {
 
@@ -11,8 +14,7 @@ export class VerificationService {
     if (!visit) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
     if (visit.nurseId !== nurseId) throw new AppError('You are not assigned to this visit', HTTP_STATUS.FORBIDDEN);
     
-    // Check-in implies starting the visit manually without verification
-    return VisitRepository.startVisit(visitId, 'MANUAL', 'Checked in manually');
+    return this.verifyManual(visitId, nurseId, 'Patient confirmed nurse arrival; nurse checked in manually.');
   }
 
   // ─── 11.1 Check-Out ────────────────────────────────────────────────────────
@@ -24,7 +26,7 @@ export class VerificationService {
       throw new AppError('Check-out is only allowed after visit is marked COMPLETED', HTTP_STATUS.BAD_REQUEST);
     }
     if (!visit.attendanceRecord) throw new AppError('No check-in record found for this visit', HTTP_STATUS.BAD_REQUEST);
-    if (visit.attendanceRecord.checkOutAt) throw new AppError('Already checked out', HTTP_STATUS.BAD_REQUEST);
+    if (visit.attendanceRecord.checkOutAt) return visit.attendanceRecord;
 
     return VerificationRepository.checkOutVisit(visitId);
   }
@@ -36,8 +38,8 @@ export class VerificationService {
     if (visit.request.patient.userId !== patientUserId) {
       throw new AppError('Only the patient for this visit can confirm arrival', HTTP_STATUS.BAD_REQUEST);
     }
-    if (visit.status !== 'IN_PROGRESS') {
-      throw new AppError('Visit must be IN_PROGRESS to confirm nurse arrival', HTTP_STATUS.BAD_REQUEST);
+    if (!['SCHEDULED', 'ACCEPTED', 'IN_PROGRESS'].includes(visit.status)) {
+      throw new AppError('Only active visits allow arrival confirmation', HTTP_STATUS.BAD_REQUEST);
     }
 
     return VerificationRepository.confirmPatientArrival(visitId);
@@ -75,15 +77,13 @@ export class VerificationService {
     if (visit.nurseId !== nurseId) throw new AppError('You are not assigned to this visit', HTTP_STATUS.FORBIDDEN);
 
     // Evidence is immutable once visit is COMPLETED
+    if (type !== 'NOTE') throw new AppError('Upload image and attachment evidence through the private file upload',400);
+    if (typeof urlOrText !== 'string' || !urlOrText.trim() || urlOrText.length > 10000) throw new AppError('Enter a note of up to 10000 characters',400);
     if (visit.status === 'COMPLETED') {
       throw new AppError('Evidence is immutable after visit completion. Add a new attachment instead.', HTTP_STATUS.BAD_REQUEST);
     }
 
     // Photos require explicit patient consent
-    if (type === 'PHOTO' && !consentGiven) {
-      throw new AppError('Patient consent is required before uploading photos containing identifiable patient faces', HTTP_STATUS.BAD_REQUEST);
-    }
-
     return VerificationRepository.createEvidence(visitId, type, urlOrText, consentGiven);
   }
 
@@ -112,7 +112,7 @@ export class VerificationService {
     const visit = await VerificationRepository.findVisitWithQr(visitId);
     if (!visit) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
     if (visit.nurseId !== nurseId) throw new AppError('You are not assigned to this visit', HTTP_STATUS.FORBIDDEN);
-    if (visit.status !== 'SCHEDULED') throw new AppError('Visit is not in a valid state for verification', HTTP_STATUS.BAD_REQUEST);
+    if (!['SCHEDULED', 'ACCEPTED'].includes(visit.status)) throw new AppError('Visit is not in a valid state for verification', HTTP_STATUS.BAD_REQUEST);
     if (!visit.qrToken) throw new AppError('No QR token found for this visit', HTTP_STATUS.BAD_REQUEST);
     
     if (visit.qrToken.token !== token) throw new AppError('Invalid QR code', HTTP_STATUS.BAD_REQUEST);
@@ -124,56 +124,50 @@ export class VerificationService {
   }
 
   static async verifyWithGps(visitId: string, nurseId: string, lat: number, lng: number) {
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      throw new AppError('Valid latitude and longitude are required', HTTP_STATUS.BAD_REQUEST);
+    }
     const visit = await VerificationRepository.findVisitWithPatient(visitId);
     if (!visit) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
     if (visit.nurseId !== nurseId) throw new AppError('You are not assigned to this visit', HTTP_STATUS.FORBIDDEN);
-    if (visit.status !== 'SCHEDULED') throw new AppError('Visit is not in a valid state for verification', HTTP_STATUS.BAD_REQUEST);
+    if (!['SCHEDULED', 'ACCEPTED'].includes(visit.status)) throw new AppError('Visit is not in a valid state for verification', HTTP_STATUS.BAD_REQUEST);
     
-    const pLat = visit.request.patient.latitude;
-    const pLng = visit.request.patient.longitude;
+    const pLat = visit.request.latitude ?? visit.request.patient.latitude;
+    const pLng = visit.request.longitude ?? visit.request.patient.longitude;
     
-    if (!pLat || !pLng) throw new AppError('Patient location not set for this visit', HTTP_STATUS.BAD_REQUEST);
+    if (pLat == null || pLng == null || !Number.isFinite(pLat) || !Number.isFinite(pLng)) throw new AppError('Patient location not set for this visit', HTTP_STATUS.BAD_REQUEST);
 
-    // Haversine formula
-    const R = 6371e3; // metres
-    const r1 = pLat * Math.PI / 180;
-    const r2 = lat * Math.PI / 180;
-    const dLat = (lat - pLat) * Math.PI / 180;
-    const dLng = (lng - pLng) * Math.PI / 180;
-
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(r1) * Math.cos(r2) *
-              Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    const d = R * c; // in metres
-
-    if (d > 150) {
+    const d = LocationHelper.calculateDistance(pLat, pLng, lat, lng);
+    if (!VerificationPolicy.isWithinRadius(d)) {
       throw new AppError('GPS verification failed: You are further than 150m from the patient location', HTTP_STATUS.BAD_REQUEST);
     }
 
     return VisitRepository.startVisit(visitId, 'GPS', `Verified via GPS distance: ${Math.round(d)}m`, lat, lng);
   }
 
-  static async verifyManual(visitId: string, nurseId: string) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new AppError('Manual testing verification is not allowed in production', HTTP_STATUS.BAD_REQUEST);
-    }
-
+  static async verifyManual(visitId: string, nurseId: string, reason?: string) {
     const visit = await VerificationRepository.findVisitById(visitId);
-    if (!visit) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
-    if (visit.nurseId !== nurseId) throw new AppError('You are not assigned to this visit', HTTP_STATUS.FORBIDDEN);
-    if (visit.status !== 'SCHEDULED') throw new AppError('Visit is not in a valid state for verification', HTTP_STATUS.BAD_REQUEST);
-
-    return VisitRepository.startVisit(visitId, 'MANUAL', 'Verified manually via dev tools');
+    if (!visit) throw new AppError('Visit not found', 404);
+    if (visit.nurseId !== nurseId) throw new AppError('You are not assigned to this visit', 403);
+    if (!['SCHEDULED', 'ACCEPTED'].includes(visit.status)) throw new AppError('Visit is not awaiting verification', 409);
+    if (!reason?.trim() || reason.trim().length < 10) throw new AppError('Record a reason of at least 10 characters for manual verification', 400);
+    if (!visit.patientConfirmed) throw new AppError('Ask the patient to confirm your arrival in their visit screen before manual verification', 409);
+    return VisitRepository.startVisit(visitId, 'MANUAL', reason.trim());
   }
 
   // ─── Get evidence list ──────────────────────────────────────────────────────
-  static async getEvidence(visitId: string) {
+  static async getEvidence(visitId: string, actor: VisitActor) {
+    const visit = await VerificationRepository.findVisitWithPatient(visitId);
+    if (!visit) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
+    VisitAccessPolicy.assertCanRead(visit, actor);
     return VerificationRepository.findEvidence(visitId);
   }
 
   // ─── Get attendance record ──────────────────────────────────────────────────
-  static async getAttendance(visitId: string) {
+  static async getAttendance(visitId: string, actor: VisitActor) {
+    const visit = await VerificationRepository.findVisitWithPatient(visitId);
+    if (!visit) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
+    VisitAccessPolicy.assertCanRead(visit, actor);
     return VerificationRepository.findAttendance(visitId);
   }
 }

@@ -47,13 +47,12 @@ export interface MedicationDTO {
 
 export interface Prescription {
   id: string;
-  medicationName: string;
-  dosage: string;
-  frequency: string;
-  duration: string;
-  prescribedBy: string;
-  datePrescribed: string;
-  status: 'active' | 'completed';
+  prescribedAt: string;
+  instructions?: string | null;
+  fileUrl: string;
+  doctor?: { user: { fullName: string } };
+  corrections?: { id: string }[];
+  items: { id: string; medicationName: string; dosage: string; frequency: string; durationDays: number }[];
 }
 
 export interface CarePlan {

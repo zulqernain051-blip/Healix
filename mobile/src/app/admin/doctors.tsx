@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar, FlatList } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar, FlatList, Platform } from 'react-native';
 import { Card, Button, Chip, Divider, Portal, Dialog, TextInput as PaperTextInput } from 'react-native-paper';
 import { useCreateDoctor, useInviteUser } from '../../hooks/useAdmin';
 import { navigate } from '../../utils/navigation';
 import { useAuthStore } from '../../store/auth';
 import { useAdminDoctors, useAdminPendingDoctors, useApproveDoctor, useRejectDoctor, useRevokeDoctor } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { COLORS, SPACING, RADIUS } from '../../theme';
 
 export default function AdminDoctors() {
   const { data: pendingDoctors = [], isLoading: isLoadingPending } = useAdminPendingDoctors();
@@ -24,8 +24,8 @@ export default function AdminDoctors() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
-  const [specialization, setSpecialization] = useState('');
   const [pmdc, setPmdc] = useState('');
+  const [cnic, setCnic] = useState('');
   const [password, setPassword] = useState('');
   
   const createDoctor = useCreateDoctor();
@@ -39,7 +39,7 @@ export default function AdminDoctors() {
         if (Platform.OS === 'web') alert('Invitation sent successfully!' + tokenMsg);
         else Alert.alert('Success', 'Invitation sent successfully!' + tokenMsg);
       } else {
-        await createDoctor.mutateAsync({ email, phone, fullName, password, specialization, professionalId: pmdc });
+        await createDoctor.mutateAsync({ email, phone, fullName, password, cnic, pmdcNumber: pmdc });
         if (Platform.OS === 'web') alert('Doctor created successfully!');
         else Alert.alert('Success', 'Doctor created successfully!');
       }
@@ -215,7 +215,7 @@ export default function AdminDoctors() {
                 <>
                   <PaperTextInput label="Full Name" value={fullName} onChangeText={setFullName} style={{ marginBottom: 10 }} />
                   <PaperTextInput label="Password" value={password} onChangeText={setPassword} secureTextEntry style={{ marginBottom: 10 }} />
-                  <PaperTextInput label="Specialization" value={specialization} onChangeText={setSpecialization} style={{ marginBottom: 10 }} />
+                  <PaperTextInput label="CNIC" value={cnic} onChangeText={setCnic} style={{ marginBottom: 10 }} />
                   <PaperTextInput label="PMDC Number" value={pmdc} onChangeText={setPmdc} style={{ marginBottom: 10 }} />
                 </>
               )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+
 
 interface VisitCardProps {
   visitId: string;
@@ -41,7 +41,7 @@ export const VisitCard: React.FC<VisitCardProps> = ({
       <View style={styles.headerRow}>
         <View style={styles.infoCol}>
           <Text style={styles.patientName}>{patientName}</Text>
-          <Text style={styles.visitType}>{visitType === 'NURSE_VISIT' ? '????? Nurse Visit' : (visitType === 'DOCTOR_VISIT' ? '????? Doctor Visit' : '?? ' + visitType)}</Text>
+          <Text style={styles.visitType}>{visitType === 'NURSE_VISIT' ? 'Nurse Visit' : (visitType === 'DOCTOR_VISIT' ? 'Doctor Visit' : visitType)}</Text>
         </View>
         <View style={[styles.statusBadge, { backgroundColor: statusBg, borderColor: statusColor }]}>
           <Text style={[styles.statusText, { color: statusColor }]}>{status}</Text>

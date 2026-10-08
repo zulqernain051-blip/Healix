@@ -16,5 +16,5 @@ export const prisma = new PrismaClient({
 
 // Pipe database query execution details to Winston logger for developer convenience
 prisma.$on('query' as any, (e: any) => {
-  logger.debug(`[Query] ${e.query} | Params: ${e.params} | Duration: ${e.duration}ms`);
+  logger.debug(`[Database] ${e.duration}ms`); // Never log SQL parameters containing identity, clinical or authentication data.
 });

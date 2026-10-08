@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, RefreshControl, StatusBar, TouchableOpacity } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
@@ -29,7 +29,7 @@ export default function PatientVisitsScreen() {
   // The visit data is embedded in the care request's contract/visit relation
   const requestsWithVisits = useMemo(() => {
     if (!requests) return [];
-    return requests.filter((r: any) => r.visit || r.status === 'ACCEPTED' || r.status === 'IN_PROGRESS' || r.status === 'COMPLETED');
+    return requests.filter((r) => !!(r.visit?.id || r.visits?.length));
   }, [requests]);
 
   return (
@@ -66,9 +66,9 @@ export default function PatientVisitsScreen() {
         )}
 
         {requestsWithVisits.map((req: any) => {
-          const visitId = req.visit?.id || req.id;
+          const visit = req.visit || req.visits?.[0];
           const scheduledAt = req.scheduledAt ? new Date(req.scheduledAt).toLocaleString() : 'Pending';
-          const status = req.visit?.status || req.status;
+          const status = visit?.status || req.status;
 
           return (
             <TouchableOpacity
@@ -76,19 +76,20 @@ export default function PatientVisitsScreen() {
               style={styles.card}
               activeOpacity={0.85}
               onPress={() => {
-                if (req.visit?.id) {
-                  navigate(`/(patient)/visits/${req.visit.id}`);
+                if (visit?.id) {
+                  navigate(`/(patient)/visits/${visit.id}`);
                 }
               }}
             >
               <View style={styles.cardHeader}>
                 <View style={styles.cardInfo}>
-                  <Text style={styles.cardType}>{req.requirements || (req.type === 'NURSE_VISIT' ? '????? Nurse Visit' : '?? Care Visit')}</Text>
+                  <Text style={styles.cardType}>{req.requirements || (req.type === 'NURSE_VISIT' ? 'Nurse Visit' : 'Care Visit')}</Text>
                   <Text style={styles.cardDate}>🕐 {scheduledAt}</Text>
                 </View>
                 {status && <VisitStatusBadge status={status} />}
               </View>
               {req.notes && <Text style={styles.cardNotes} numberOfLines={2}>{req.notes}</Text>}
+              {!!visit?.id && ['SCHEDULED', 'ACCEPTED'].includes(visit.status) && <Text style={styles.cardNotes}>Open to show your QR code to the nurse</Text>}
             </TouchableOpacity>
           );
         })}

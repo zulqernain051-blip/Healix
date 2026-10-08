@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { AdminService } from './admin.service';
 import {
   updateUserStatusSchema, deleteUserSchema,
@@ -10,6 +11,7 @@ const ok = (res: Response, data: any, message = 'Success') =>
   res.json({ success: true, message, data });
 
 const fail = (res: Response, err: any) => {
+  if (err instanceof ZodError) { res.status(400).json({ success: false, message: err.issues[0]?.message ?? 'Invalid input' }); return; }
   const status = err.statusCode ?? 500;
   res.status(status).json({ success: false, message: err.message ?? 'Internal error' });
 };
@@ -229,6 +231,31 @@ export const assignEmergencyDoctor = async (req: Request, res: Response) => {
     const { doctorId } = req.body;
     if (!doctorId) return fail(res, { statusCode: 400, message: 'doctorId required' });
     ok(res, await AdminService.assignEmergencyDoctor(req.params.id, doctorId, (req as any).user.id));
+  } catch (e) { fail(res, e); }
+};
+export const assignEmergencyParamedic = async (req: Request, res: Response) => {
+  try {
+    const { paramedicId } = req.body;
+    if (!paramedicId) return fail(res, { statusCode: 400, message: 'paramedicId required' });
+    ok(res, await AdminService.assignEmergencyParamedic(req.params.id, paramedicId, (req as any).user.id));
+  } catch (e) { fail(res, e); }
+};
+export const assignEmergencyAmbulance = async (req: Request, res: Response) => {
+  try {
+    const { ambulanceId } = req.body;
+    if (!ambulanceId) return fail(res, { statusCode: 400, message: 'ambulanceId required' });
+    ok(res, await AdminService.assignEmergencyAmbulance(req.params.id, ambulanceId, (req as any).user.id));
+  } catch (e) { fail(res, e); }
+};
+export const resolveEmergency = async (req: Request, res: Response) => {
+  try {
+    const { notes } = req.body;
+    ok(res, await AdminService.resolveEmergency(req.params.id, notes, (req as any).user.id));
+  } catch (e) { fail(res, e); }
+};
+export const escalateEmergency = async (req: Request, res: Response) => {
+  try {
+    ok(res, await AdminService.escalateEmergency(req.params.id, (req as any).user.id));
   } catch (e) { fail(res, e); }
 };
 

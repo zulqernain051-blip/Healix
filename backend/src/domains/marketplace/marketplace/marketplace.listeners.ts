@@ -10,6 +10,7 @@ export function registerMarketplaceListeners() {
       console.log(`[Marketplace] Successfully published care request ${payload.careRequestId} to marketplace.`);
     } catch (err: any) {
       console.error(`[Marketplace] Failed to publish care request ${payload.careRequestId}:`, err.message);
+      throw err;
     }
   });
 
@@ -24,6 +25,7 @@ export function registerMarketplaceListeners() {
       console.log(`[Marketplace] Processed CARE_REQUEST_CANCELLED for request ${payload.careRequestId}.`);
     } catch (err: any) {
       console.error(`[Marketplace] Failed to process CARE_REQUEST_CANCELLED:`, err.message);
+      throw err;
     }
   });
 
@@ -39,9 +41,11 @@ export function registerMarketplaceListeners() {
       }
     } catch (err: any) {
       console.error(`[Marketplace] Failed to process contract rejection/expiration:`, err.message);
+      throw err;
     }
   };
 
   AppEventBus.on(EVENTS.CONTRACT_REJECTED, handleContractRejectedOrExpired);
+  AppEventBus.on(EVENTS.CONTRACT_CANCELLED, handleContractRejectedOrExpired);
   AppEventBus.on(EVENTS.CONTRACT_EXPIRED, handleContractRejectedOrExpired);
 }

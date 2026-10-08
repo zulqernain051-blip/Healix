@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface AddAllergyModalProps {
   visible: boolean;
@@ -19,19 +19,22 @@ export const AddAllergyModal: React.FC<AddAllergyModalProps> = ({
   const [allergen, setAllergen] = useState('');
   const [severity, setSeverity] = useState<'MILD' | 'MODERATE' | 'SEVERE'>('MILD');
 
+  const [formError, setFormError] = useState('');
   const handleSubmit = async () => {
     if (!allergen.trim()) return;
-    await onSubmit(allergen, severity);
+    setFormError('');
+    try { await onSubmit(allergen, severity);
     setAllergen('');
     setSeverity('MILD');
     onClose();
+    } catch(e: any) { setFormError(e.message || 'Could not save. Please try again.'); }
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.title}>Add Allergy</Text>
+          {!!formError && <Text accessibilityRole="alert" style={{color:COLORS.red}}>{formError}</Text>}<Text style={styles.title}>Add Allergy</Text>
           <Text style={styles.sub}>Enter allergen name and select severity level:</Text>
 
           <TextInput

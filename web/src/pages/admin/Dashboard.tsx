@@ -126,7 +126,9 @@ export default function Dashboard() {
             <div className="vital-label">Doctors Registered</div>
           </div>
         </div>
-        <div className="card" style={{ marginTop: '24px' }}>
+      </div>
+
+      <div className="card" style={{ marginTop: '24px' }}>
           <h3 className="card-title">🚨 Emergency Escalations Action Required</h3>
           {loadingCases ? <p>Loading cases...</p> : escalatedCases.length === 0 ? <p style={{margin: '16px'}}>No emergency cases require admin intervention.</p> : (
             <table className="data-table" style={{width: '100%', marginTop: '16px'}}>

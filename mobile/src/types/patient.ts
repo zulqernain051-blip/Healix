@@ -5,13 +5,17 @@ export interface PatientProfile {
   userId: string;
   user?: User;
   dob?: string;
+  dateOfBirth?: string;
   gender?: string;
   bloodGroup?: string;
   address?: string;
-  latitude?: number;
-  longitude?: number;
+  city?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   photoUrl?: string;
   emergencyContacts?: EmergencyContact[];
+  allergies?: any[];
+  medicalConditions?: any[];
 }
 
 export interface EmergencyContact {
@@ -26,8 +30,9 @@ export interface UpdateProfileDTO {
   dob?: string | Date;
   gender?: string;
   address?: string;
-  latitude?: number;
-  longitude?: number;
+  city?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   photoUrl?: string;
 }
 

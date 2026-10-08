@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/auth';
+import GoogleSignInButton from '../components/GoogleSignInButton';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [code, setCode] = useState('');
   const [roleTab, setRoleTab] = useState<'ADMIN' | 'DOCTOR'>('ADMIN');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, token, user } = useAuthStore();
+  const { login, loginWithGoogle, verifyMfa, token, user } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,7 +26,8 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      if (mfaRequired) await verifyMfa(email, code);
+      else { const challenge = await login(email, password); setMfaRequired(challenge); if (challenge) setPassword(''); }
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check credentials.');
     } finally {
@@ -73,21 +77,31 @@ export default function Login() {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label">{mfaRequired ? 'Email verification code' : 'Password'}</label>
             <input
-              type="password"
+              type={mfaRequired ? 'text' : 'password'}
               className="form-input"
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={mfaRequired ? code : password}
+              onChange={(e) => mfaRequired ? setCode(e.target.value.replace(/\D/g, '').slice(0,6)) : setPassword(e.target.value)}
+              autoComplete={mfaRequired ? 'one-time-code' : 'current-password'}
               required
             />
           </div>
 
           <button type="submit" className="btn-login" disabled={loading}>
-            {loading ? 'Verifying Credentials...' : 'Sign In'}
+            {loading ? 'Verifying...' : mfaRequired ? 'Verify and sign in' : 'Sign In'}
           </button>
         </form>
+        <GoogleSignInButton disabled={loading} onError={setError} onCredential={async credential => {
+          setError(''); setLoading(true);
+          try {
+            const result = await loginWithGoogle(credential);
+            if (result.mfaRequired) { setEmail(result.email || ''); setMfaRequired(true); setPassword(''); }
+          } catch (err: any) { setError(err.message || 'Google sign-in failed'); }
+          finally { setLoading(false); }
+        }} />
+        {mfaRequired && <button type="button" className="btn" onClick={() => { setMfaRequired(false); setCode(''); }}>Back to sign in</button>}
       </div>
     </div>
   );

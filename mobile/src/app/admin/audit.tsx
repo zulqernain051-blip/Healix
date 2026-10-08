@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaVi
 import { Card } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
 import { useAdminAuditLogs } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminAuditLogs() {
   const { data: auditLogs = [], isLoading } = useAdminAuditLogs();

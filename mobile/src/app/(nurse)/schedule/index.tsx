@@ -1,90 +1,44 @@
-// f:/class Data/FYP Project/Proposal/Project/Healix/mobile/src/app/(nurse)/schedule/index.tsx
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Simple tab component for Day/Week/Calendar views
-const TabButton = ({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) => (
-  <TouchableOpacity onPress={onPress} style={[styles.tabButton, active && styles.tabButtonActive]}>
-    <Text style={[styles.tabButtonText, active && styles.tabButtonTextActive]}>{label}</Text>
-  </TouchableOpacity>
-);
-
+import { useAuthStore } from '../../../store/auth';
+import { useNurseVisits } from '../../../hooks/useVisits';
+import { VisitSummaryCard } from '../../../components/visits/VisitSummaryCard';
+import { navigate } from '../../../utils/navigation';
+import { scheduleRange, shiftScheduleDate, ScheduleView } from '../../../utils/schedule';
+import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 export default function NurseScheduleScreen() {
-  const [selectedTab, setSelectedTab] = useState<'DAY' | 'WEEK' | 'CALENDAR'>('DAY');
-
-  const renderContent = () => {
-    switch (selectedTab) {
-      case 'DAY':
-        return <Text style={styles.placeholder}>Day view – list of visits for the selected day.</Text>;
-      case 'WEEK':
-        return <Text style={styles.placeholder}>Week view – weekly overview of scheduled visits.</Text>;
-      case 'CALENDAR':
-        return <Text style={styles.placeholder}>Calendar view – month grid with visit markers.</Text>;
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Schedule</Text>
-      </View>
-      <View style={styles.tabBar}>
-        <TabButton label="Day" active={selectedTab === 'DAY'} onPress={() => setSelectedTab('DAY')} />
-        <TabButton label="Week" active={selectedTab === 'WEEK'} onPress={() => setSelectedTab('WEEK')} />
-        <TabButton label="Calendar" active={selectedTab === 'CALENDAR'} onPress={() => setSelectedTab('CALENDAR')} />
-      </View>
-      <ScrollView style={styles.content}>{renderContent()}</ScrollView>
-    </SafeAreaView>
-  );
+  const nurseId = useAuthStore(state => state.user?.nurseId);
+  const { data = [], isLoading, isRefetching, error, refetch } = useNurseVisits(nurseId || '');
+  const [view, setView] = useState<ScheduleView>('DAY');
+  const [date, setDate] = useState(new Date());
+  const { start, end } = scheduleRange(date, view);
+  const visits = data.filter(visit => {
+    const time = new Date(visit.request?.scheduledAt || '').getTime();
+    return time >= start.getTime() && time < end.getTime();
+  }).sort((a, b) => new Date(a.request!.scheduledAt!).getTime() - new Date(b.request!.scheduledAt!).getTime());
+  const lastDay = new Date(end); lastDay.setDate(lastDay.getDate() - 1);
+  const label = view === 'DAY' ? start.toLocaleDateString() : start.toLocaleDateString() + ' ? ' + lastDay.toLocaleDateString();
+  return <SafeAreaView style={styles.container}>
+    <Text style={styles.title}>Schedule</Text>
+    <View style={styles.row}>{(['DAY', 'WEEK', 'MONTH'] as const).map(item => <TouchableOpacity key={item} accessibilityRole="button" accessibilityState={{ selected: view === item }} activeOpacity={0.8} style={[styles.button, view === item && styles.active]} onPress={() => setView(item)}><Text style={styles.text}>{item === 'DAY' ? 'Day' : item === 'WEEK' ? 'Week' : 'Month'}</Text></TouchableOpacity>)}</View>
+    <View style={styles.row}>
+      <TouchableOpacity accessibilityLabel="Previous period" activeOpacity={0.8} style={styles.button} onPress={() => setDate(shiftScheduleDate(date, view, -1))}><Text style={styles.text}>Previous</Text></TouchableOpacity>
+      <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={() => setDate(new Date())}><Text style={styles.text}>Today</Text></TouchableOpacity>
+      <TouchableOpacity accessibilityLabel="Next period" activeOpacity={0.8} style={styles.button} onPress={() => setDate(shiftScheduleDate(date, view, 1))}><Text style={styles.text}>Next</Text></TouchableOpacity>
+    </View>
+    <Text style={styles.caption}>{label}</Text>
+    <ScrollView refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={() => { void refetch(); }} />}>
+      {isLoading ? <Text style={styles.text}>Loading visits...</Text> : error ? <TouchableOpacity activeOpacity={0.8} onPress={() => { void refetch(); }}><Text style={styles.error}>Unable to load schedule. Tap to retry.</Text></TouchableOpacity> : !nurseId ? <Text style={styles.text}>Your nurse profile is unavailable.</Text> : visits.length === 0 ? <Text style={styles.text}>No visits scheduled for this period.</Text> : visits.map(visit => <VisitSummaryCard key={visit.id} visit={visit} onPress={() => navigate('/(nurse)/visits/' + visit.id)} />)}
+    </ScrollView>
+  </SafeAreaView>;
 }
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#061C19',
-  },
-  header: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#0A2D28',
-  },
-  title: {
-    color: '#00E676',
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#0A2D28',
-    paddingVertical: 8,
-  },
-  tabButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-  },
-  tabButtonActive: {
-    backgroundColor: '#00E676',
-  },
-  tabButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  tabButtonTextActive: {
-    color: '#061C19',
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-  },
-  placeholder: {
-    color: '#00E676',
-    fontSize: 16,
-    textAlign: 'center',
-    marginTop: 32,
-  },
+  container: { flex: 1, padding: SPACING.lg, gap: SPACING.md, backgroundColor: COLORS.surface },
+  title: { color: COLORS.navy, fontSize: TYPOGRAPHY.sizes.xxl, fontWeight: TYPOGRAPHY.weights.bold },
+  row: { flexDirection: 'row', gap: SPACING.sm },
+  button: { flex: 1, minHeight: SPACING.lg * 3, padding: SPACING.sm, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.md, backgroundColor: COLORS.surfaceMuted },
+  active: { backgroundColor: COLORS.quickBlue, borderWidth: 1, borderColor: COLORS.accentBlue },
+  text: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.md },
+  caption: { color: COLORS.textBody, fontSize: TYPOGRAPHY.sizes.sm }, error: { color: COLORS.red, padding: SPACING.lg },
 });

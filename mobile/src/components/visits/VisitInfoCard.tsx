@@ -24,7 +24,7 @@ export const VisitInfoCard: React.FC<VisitInfoCardProps> = ({ visit }) => {
     <Card style={styles.card}>
       <Card.Content>
         <View style={styles.headerRow}>
-          <Text style={styles.sectionHeader}>👤 Patient Information</Text>
+          <Text style={styles.sectionHeader}>Patient Information</Text>
           <VisitStatusBadge status={visit.status} />
         </View>
         <Divider style={styles.divider} />
@@ -38,7 +38,7 @@ export const VisitInfoCard: React.FC<VisitInfoCardProps> = ({ visit }) => {
         />
         
         <Divider style={styles.divider} />
-        <Text style={styles.sectionHeader}>📋 Request Details</Text>
+        <Text style={styles.sectionHeader}>Request Details</Text>
         <DetailRow label="Visit Type" value={visit.request?.requirements || (visit.request?.type === 'DOCTOR_VISIT' ? 'Doctor Visit' : 'Nurse Visit')} />
         <DetailRow label="Schedule" value={visit.request?.scheduleType === 'RECURRING' ? 'Recurring' : 'One-Time'} />
         {visit.request?.preferredTimeWindow && (
@@ -51,7 +51,7 @@ export const VisitInfoCard: React.FC<VisitInfoCardProps> = ({ visit }) => {
         {nurse && (
           <>
             <Divider style={styles.divider} />
-            <Text style={styles.sectionHeader}>🩺 Assigned Nurse</Text>
+            <Text style={styles.sectionHeader}>Assigned Nurse</Text>
             <DetailRow label="Name" value={nurse.user?.fullName || 'Not assigned'} />
           </>
         )}

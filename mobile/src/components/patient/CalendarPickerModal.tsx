@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Modal,
-  ScrollView,
-} from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal } from 'react-native';
 import { Text, Button } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING } from '../../theme';
 
 interface CalendarPickerModalProps {
   visible: boolean;

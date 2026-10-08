@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { appAlert } from '../../../components/common/AppDialogs';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -42,10 +43,10 @@ export default function MedicalHistoryScreen() {
     if (!patientId) return;
     try {
       await addAllergy({ patientId, data: { allergen, severity, reaction: '' } });
-      Alert.alert('Success', 'Allergy added to medical record.');
+      appAlert('Success', 'Allergy added to medical record.');
       setShowAllergyModal(false);
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to add allergy.');
+      throw err;
     }
   };
 
@@ -53,10 +54,10 @@ export default function MedicalHistoryScreen() {
     if (!patientId) return;
     try {
       await addCondition({ patientId, data: { name, diagnosedDate, notes } });
-      Alert.alert('Success', 'Condition added to medical record.');
+      appAlert('Success', 'Condition added to medical record.');
       setShowConditionModal(false);
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to add condition.');
+      throw err;
     }
   };
 
@@ -64,10 +65,10 @@ export default function MedicalHistoryScreen() {
     if (!patientId) return;
     try {
       await addMedication({ patientId, data: { name, dosage, frequency, active: true } });
-      Alert.alert('Success', 'Medication added to medical record.');
+      appAlert('Success', 'Medication added to medical record.');
       setShowMedicationModal(false);
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to add medication.');
+      throw err;
     }
   };
 

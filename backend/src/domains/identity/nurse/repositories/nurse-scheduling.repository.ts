@@ -1,3 +1,4 @@
+import { AppError } from '../../../../common/errors/AppError';
 import { prisma } from '../../../../common/config/database';
 
 export class NurseSchedulingRepository {
@@ -6,6 +7,7 @@ export class NurseSchedulingRepository {
     dayOfWeek: number;
     startTime: string;
     endTime: string;
+    shiftType?: string;
   }) {
     return prisma.availabilitySlot.create({
       data: { nurseId, ...data }
@@ -32,15 +34,23 @@ export class NurseSchedulingRepository {
     });
   }
 
-  // TODO: Restore orphaned Vacation methods required by care/visit/scheduling
-  public static async createVacation(_nurseId: string, _startDate: Date, _endDate: Date, _reason?: string): Promise<any> {
-    throw new Error('Not implemented. Vacation model missing from schema.');
+  public static async createVacation(nurseId: string, startDate: Date, endDate: Date, reason?: string) {
+    return prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT "id" FROM "nurses" WHERE "id" = ${nurseId} FOR UPDATE`;
+      const [overlap, visit] = await Promise.all([
+        tx.nurseVacation.findFirst({ where: { nurseId, startDate: { lte: endDate }, endDate: { gte: startDate } } }),
+        tx.visit.findFirst({ where: { nurseId, status: { in: ['SCHEDULED', 'ACCEPTED', 'IN_PROGRESS'] }, request: { scheduledAt: { gte: startDate, lte: endDate } } } })
+      ]);
+      if (overlap) throw new AppError('This date range overlaps existing time off', 409);
+      if (visit) throw new AppError('An assigned visit falls within this time off. Resolve the booking before adding vacation.', 409);
+      return tx.nurseVacation.create({ data: { nurseId, startDate, endDate, reason } });
+    });
   }
-  public static async deleteVacation(_vacationId: string, _nurseId: string): Promise<any> {
-    throw new Error('Not implemented. Vacation model missing from schema.');
+  public static async deleteVacation(vacationId: string, nurseId: string) {
+    return prisma.nurseVacation.deleteMany({ where: { id: vacationId, nurseId } });
   }
-  public static async findVacationsByNurseId(_nurseId: string): Promise<any[]> {
-    return [];
+  public static async findVacationsByNurseId(nurseId: string) {
+    return prisma.nurseVacation.findMany({ where: { nurseId }, orderBy: { startDate: 'asc' } });
   }
 }
 

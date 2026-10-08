@@ -8,6 +8,7 @@ export class LogMedicationDoseUseCase {
   async execute(medicationId: string, patientId: string) {
     const med = await this.clinicalRepository.findMedicationById(medicationId);
     if (!med) throw new AppError('Medication not found', HTTP_STATUS.NOT_FOUND);
+    if (med.patientId !== patientId) throw new AppError('Medication does not belong to this patient', HTTP_STATUS.FORBIDDEN);
 
     return this.clinicalRepository.createMedicationLog(medicationId, patientId);
   }

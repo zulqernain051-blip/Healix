@@ -16,7 +16,8 @@ export function usePerformRiskAssessment() {
       clinicalApi.performRiskAssessment(data),
     onSuccess: (_, variables) => {
       if (variables.visitId) {
-        queryClient.invalidateQueries({ queryKey: ['visit', variables.visitId] });
+        queryClient.invalidateQueries({ queryKey: ['clinical', 'visitAiSummary', variables.visitId] });
+        queryClient.invalidateQueries({ queryKey: ['visits', variables.visitId] });
       }
     },
   });

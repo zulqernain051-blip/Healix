@@ -62,7 +62,7 @@ export class DoctorController {
       const queue = await getQueueUseCase.execute(doctorId);
       res.json({ success: true, data: queue });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      res.status(err.statusCode || 500).json({ success: false, message: err.message });
     }
   }
 
@@ -77,7 +77,7 @@ export class DoctorController {
       const result = await acceptEmergencyCaseUseCase.execute(caseId, doctorId);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -92,7 +92,7 @@ export class DoctorController {
       const queue = await getHighRiskQueueUseCase.execute(doctorId);
       res.json({ success: true, data: queue });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      res.status(err.statusCode || 500).json({ success: false, message: err.message });
     }
   }
 
@@ -108,7 +108,7 @@ export class DoctorController {
       const result = await startCaseReviewUseCase.execute(caseId, doctorId);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -124,7 +124,7 @@ export class DoctorController {
       const payload = await getCaseReviewUseCase.execute(caseId, doctorId);
       res.json({ success: true, data: payload });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      res.status(err.statusCode || 500).json({ success: false, message: err.message });
     }
   }
 
@@ -139,7 +139,7 @@ export class DoctorController {
       const list = await getDoctorsUseCase.execute(doctorId);
       res.json({ success: true, data: list });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      res.status(err.statusCode || 500).json({ success: false, message: err.message });
     }
   }
 
@@ -156,7 +156,7 @@ export class DoctorController {
       const result = await requestSecondOpinionUseCase.execute(caseId, requestingDoctorId, validated.consultedDoctorId);
       res.status(201).json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -173,7 +173,7 @@ export class DoctorController {
       const result = await submitDiagnosisUseCase.execute(caseId, doctorId, validated);
       res.status(201).json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -183,7 +183,7 @@ export class DoctorController {
       const result = await getDiagnosisHistoryUseCase.execute(caseId);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(500).json({ success: false, message: err.message });
+      res.status(err.statusCode || 500).json({ success: false, message: err.message });
     }
   }
 
@@ -200,7 +200,7 @@ export class DoctorController {
       const result = await submitCarePlanUseCase.execute(caseId, doctorId, validated);
       res.status(201).json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -221,7 +221,7 @@ export class DoctorController {
         res.status(409).json({ success: false, message: err.message, data: err.data });
         return;
       }
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -242,7 +242,7 @@ export class DoctorController {
         res.status(409).json({ success: false, message: err.message, data: err.data });
         return;
       }
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -259,7 +259,7 @@ export class DoctorController {
       const result = await submitClinicalDecisionUseCase.execute(caseId, doctorId, validated);
       res.status(201).json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -276,7 +276,7 @@ export class DoctorController {
       const result = await submitAiFeedbackUseCase.execute(caseId, doctorId, validated.targetType, validated.comment);
       res.status(201).json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -295,7 +295,7 @@ export class DoctorController {
       const result = await resolveCaseUseCase.execute(caseId, doctorId, summary);
       res.json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 
@@ -316,7 +316,7 @@ export class DoctorController {
       const result = await scheduleFollowUpUseCase.execute(caseId, doctorId, data);
       res.status(201).json({ success: true, data: result });
     } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
     }
   }
 

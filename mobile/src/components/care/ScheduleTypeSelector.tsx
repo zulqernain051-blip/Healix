@@ -39,10 +39,10 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   label: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.text,
-    marginBottom: SPACING.xs,
+    fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '600',
+    color: COLORS.textDark,
+    marginBottom: SPACING.xs,
   },
   row: {
     flexDirection: 'row',
@@ -51,22 +51,22 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     paddingVertical: SPACING.md,
-    backgroundColor: '#000000',
+    backgroundColor: 'rgba(255, 255, 255, 0.40)',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
-    borderRadius: RADIUS.md,
+    borderColor: 'rgba(255, 255, 255, 0.60)',
+    borderRadius: RADIUS.round,
     alignItems: 'center',
   },
   buttonActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.primary + '20',
+    borderColor: COLORS.accentBlue,
+    backgroundColor: 'rgba(41, 169, 245, 0.18)',
   },
   text: {
-    ...TYPOGRAPHY.bodyMedium,
-    color: COLORS.textSecondary,
+    fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '600',
+    color: COLORS.textBody,
   },
   textActive: {
-    color: COLORS.primary,
+    color: COLORS.navy,
   },
 });

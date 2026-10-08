@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useAddQualification } from '../../hooks/useNurse';

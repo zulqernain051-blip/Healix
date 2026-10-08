@@ -13,12 +13,16 @@ export function registerContractListeners() {
       }
     } catch (err: any) {
       console.error(`[Contract Domain] Failed to cancel contracts for CareRequest ${payload.careRequestId}:`, err.message);
+      throw err;
     }
   });
 
   AppEventBus.on(EVENTS.VISIT_CANCELLED, async (payload: { visitId: string, careRequestId?: string }) => {
     try {
       if (!payload.careRequestId) return;
+      const { prisma } = require('../../../common/config/database');
+      const sourceVisit = await prisma.visit.findUnique({where:{id:payload.visitId}});
+      if (sourceVisit?.sourceContractId) { const owner=await ContractRepository.findContractById(sourceVisit.sourceContractId); if (!owner?.careRequestId || owner.status !== 'ACTIVE') return; }
       const contracts = await ContractRepository.findContractIdsForRequest(payload.careRequestId, ['PENDING_APPROVAL', 'ACTIVE']);
       for (const contract of contracts) {
         await ContractRepository.cancelContract(contract.id, 'Visit was cancelled', 'SYSTEM', 'SYSTEM');
@@ -29,6 +33,7 @@ export function registerContractListeners() {
       }
     } catch (err: any) {
       console.error(`[Contract Domain] Failed to cancel contracts for Visit ${payload.visitId}:`, err.message);
+      throw err;
     }
   });
 
@@ -44,6 +49,7 @@ export function registerContractListeners() {
         console.log(`[Contract Domain] Contract already exists for offer ${payload.offerId}. Treating as success.`);
       } else {
         console.error(`[Contract Domain] Failed to process OFFER_SELECTED:`, err.message);
+      throw err;
       }
     }
   });

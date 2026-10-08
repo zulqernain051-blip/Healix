@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface UpcomingVisitCardProps {
   staffName?: string;
@@ -20,128 +21,157 @@ export const UpcomingVisitCard: React.FC<UpcomingVisitCardProps> = ({
 }) => {
   const hasVisit = Boolean(staffName && staffName !== 'Assigned Staff' && scheduledAt && scheduledAt !== 'No upcoming visit');
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.sectionHeaderRow}>
-        <Text style={styles.sectionTitle}>Upcoming Visit</Text>
-        <TouchableOpacity onPress={onSeeAllPress}>
-          <Text style={styles.seeAllText}>››</Text>
-        </TouchableOpacity>
-      </View>
+  const staffInitials = staffName
+    ? staffName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+    : 'DR';
 
-      {hasVisit ? (
-        <TouchableOpacity
-          style={styles.upcomingCard}
-          onPress={onPress}
-          activeOpacity={0.85}
-        >
-          <View style={styles.nurseInfoRow}>
-            <Avatar.Icon size={44} icon="account-heart" style={styles.nurseAvatarBg} color="#00E676" />
-            <View style={styles.nurseTextWrap}>
-              <Text style={styles.nurseName}>{staffName}</Text>
-              <Text style={styles.nurseTime}>{scheduledAt}</Text>
-            </View>
-            <View style={styles.confirmedBadge}>
-              <Text style={styles.confirmedText}>{status}</Text>
-            </View>
+  return (
+    <View style={styles.wrapper}>
+      <View style={styles.card}>
+        {/* Header row */}
+        <View style={styles.headerRow}>
+          <View style={styles.titleRow}>
+            <Ionicons name="calendar" size={16} color={COLORS.accentBlue} />
+            <Text style={styles.sparkle}>{' '}✨</Text>
+            <Text style={styles.title}> Your Next Care Visit</Text>
           </View>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={styles.emptyCard}
-          onPress={onSeeAllPress}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.emptyIcon}>📅</Text>
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.emptyTitle}>No Upcoming Visits</Text>
-            <Text style={styles.emptySub}>You have no scheduled care visits right now.</Text>
+        </View>
+
+        {hasVisit ? (
+          <View style={styles.visitContent}>
+            <View style={styles.visitInfoRow}>
+              <View style={styles.iconCircle}>
+                <Ionicons name="calendar-outline" size={20} color={COLORS.accentBlue} />
+              </View>
+              <View style={styles.visitTextWrap}>
+                <Text style={styles.visitTime}>{scheduledAt}</Text>
+                <Text style={styles.visitStaff}>{staffName}</Text>
+              </View>
+              <Avatar.Text
+                size={48}
+                label={staffInitials}
+                style={styles.staffAvatar}
+                labelStyle={styles.staffAvatarLabel}
+                color="#FFFFFF"
+              />
+            </View>
+            <TouchableOpacity style={styles.viewDetailsBtn} onPress={onPress} activeOpacity={0.85}>
+              <Text style={styles.viewDetailsText}>View Details</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      )}
+        ) : (
+          <TouchableOpacity style={styles.emptyContent} onPress={onSeeAllPress} activeOpacity={0.85}>
+            <Ionicons name="calendar-outline" size={24} color="rgba(255,255,255,0.5)" />
+            <View style={styles.emptyTextWrap}>
+              <Text style={styles.emptyTitle}>No Upcoming Visits</Text>
+              <Text style={styles.emptySub}>You have no scheduled care visits right now.</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginBottom: SPACING.md,
+  wrapper: {
+    marginTop: -30,
+    marginBottom: SPACING.lg,
+    paddingHorizontal: 0,
+    zIndex: 10,
   },
-  sectionHeaderRow: {
+  card: {
+    backgroundColor: COLORS.navy,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.lg,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.md,
   },
-  sectionTitle: {
-    color: '#FFFFFF',
-    fontSize: TYPOGRAPHY.sizes.md,
-    fontWeight: '700',
-  },
-  seeAllText: {
-    color: '#00E676',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  upcomingCard: {
-    backgroundColor: '#0A2D28',
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
-  },
-  nurseInfoRow: {
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  nurseAvatarBg: {
-    backgroundColor: '#051815',
+  sparkle: {
+    fontSize: 12,
   },
-  nurseTextWrap: {
-    marginLeft: SPACING.md,
-    flex: 1,
-  },
-  nurseName: {
+  title: {
     color: '#FFFFFF',
     fontSize: TYPOGRAPHY.sizes.sm,
-    fontWeight: '700',
+    fontWeight: TYPOGRAPHY.weights.semibold,
   },
-  nurseTime: {
-    color: '#94A3B8',
+  visitContent: {},
+  visitInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  iconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(41, 169, 245, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  visitTextWrap: {
+    flex: 1,
+    marginLeft: SPACING.md,
+  },
+  visitTime: {
+    color: '#FFFFFF',
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  visitStaff: {
+    color: 'rgba(255, 255, 255, 0.7)',
     fontSize: TYPOGRAPHY.sizes.xs,
     marginTop: 2,
   },
-  confirmedBadge: {
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  staffAvatar: {
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  },
+  staffAvatarLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  viewDetailsBtn: {
+    backgroundColor: COLORS.navyDark,
     borderRadius: RADIUS.round,
-  },
-  confirmedText: {
-    color: '#00E676',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  emptyCard: {
-    backgroundColor: '#0A2D28',
-    borderRadius: RADIUS.lg,
-    padding: SPACING.md,
-    flexDirection: 'row',
+    paddingVertical: SPACING.sm + 2,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  emptyIcon: {
-    fontSize: 24,
+  viewDetailsText: {
+    color: '#FFFFFF',
+    fontSize: TYPOGRAPHY.sizes.sm,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  emptyContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  emptyTextWrap: {
+    flex: 1,
   },
   emptyTitle: {
     color: '#FFFFFF',
     fontSize: TYPOGRAPHY.sizes.sm,
-    fontWeight: '700',
+    fontWeight: TYPOGRAPHY.weights.semibold,
   },
   emptySub: {
-    color: '#94A3B8',
-    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: TYPOGRAPHY.sizes.xs,
     marginTop: 2,
   },
 });

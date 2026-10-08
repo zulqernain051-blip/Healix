@@ -1,7 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../../common/config/database';
 import { ChatService } from './chat.service';
 
-const prisma = new PrismaClient();
 
 export class ChatAutoCreator {
   /**
@@ -24,9 +23,9 @@ export class ChatAutoCreator {
   /**
    * Automatically creates a chat thread between a Patient and a Doctor when a case is assigned.
    */
-  static async onDoctorAssigned(caseAssignmentId: string, doctorUserId: string) {
+  static async onDoctorAssigned(caseAssignmentId: string, doctorUserId: string, tx?: any) {
     try {
-      const caseRec = await prisma.caseAssignment.findUnique({
+      const caseRec = await (tx || prisma).caseAssignment.findUnique({
         where: { id: caseAssignmentId },
         include: {
           visit: {
@@ -41,10 +40,29 @@ export class ChatAutoCreator {
       
       const patientUserId = caseRec?.visit?.request?.patient?.userId;
       if (patientUserId && doctorUserId) {
-        await ChatService.getOrCreateThread(patientUserId, doctorUserId);
+        if (tx) {
+          const [participantAId, participantBId] = [patientUserId, doctorUserId].sort();
+          await tx.chatThread.upsert({ where: { participantAId_participantBId: { participantAId, participantBId } }, create: { type: 'PATIENT_DOCTOR', participantAId, participantBId, caseAssignmentId }, update: { caseAssignmentId, readOnly: false } });
+        } else await ChatService.getOrCreateThread(patientUserId, doctorUserId);
       }
     } catch (err: any) {
       console.error('[ChatAutoCreator] Failed to auto-create Patient-Doctor thread:', err.message);
+    }
+  }
+
+  /**
+   * Automatically creates chat threads between Patient <-> Paramedic and Nurse <-> Paramedic when a paramedic is assigned.
+   */
+  static async onParamedicAssigned(paramedicUserId: string, patientUserId: string, nurseUserId?: string) {
+    try {
+      if (paramedicUserId && patientUserId) {
+        await ChatService.getOrCreateThread(patientUserId, paramedicUserId);
+      }
+      if (paramedicUserId && nurseUserId) {
+        await ChatService.getOrCreateThread(nurseUserId, paramedicUserId);
+      }
+    } catch (err: any) {
+      console.error('[ChatAutoCreator] Failed to auto-create Paramedic chat threads:', err.message);
     }
   }
 }

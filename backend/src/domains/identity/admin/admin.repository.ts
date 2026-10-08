@@ -1,4 +1,8 @@
 import { prisma } from '../../../common/config/database';
+import { EscalationService } from '../../care/emergency/escalation/escalation.service';
+import { ResourceAssignmentService } from '../../care/emergency/resource-assignment.service';
+import { hospitalSchema } from '../../care/emergency/emergency.validation';
+import { AppError } from '../../../common/errors/AppError';
 
 export class AdminRepository {
   // ─── STATS ───────────────────────────────────────────────────────────────────
@@ -57,6 +61,7 @@ export class AdminRepository {
           nurse: { select: { id: true, cnic: true, pncNumber: true, verificationStatus: true } },
           doctor: { select: { id: true, cnic: true, pmdcNumber: true, verificationStatus: true } },
           admin: { select: { id: true } },
+          paramedic: { select: { id: true, verificationStatus: true } },
         },
       }),
       prisma.user.count({ where }),
@@ -73,6 +78,7 @@ export class AdminRepository {
         nurse: { include: { qualifications: true, specializations: true, score: true, badges: true } },
         doctor: { include: { diagnoses: { take: 5 }, caseAssignments: { take: 5 } } },
         admin: true,
+        paramedic: true,
         sessions: { where: { revoked: false, expiresAt: { gt: new Date() } } },
         documents: true,
       },
@@ -325,35 +331,173 @@ export class AdminRepository {
 
   // ─── Emergency Center ─────────────────────────────────────────────────────────
   static async getEmergencies(slaStatus?: string) {
-      const events = await prisma.emergencyEvent.findMany({
-        orderBy: { createdAt: 'desc' },
-        include: { 
-          patient: { include: { user: { select: { fullName: true } } } },
-          visit: { include: { caseAssignment: true } }
+    const where: any = {};
+    if (slaStatus === 'active') {
+      where.status = 'ACTIVE';
+    } else if (slaStatus === 'resolved') {
+      where.status = 'RESOLVED';
+    }
+
+    const events = await prisma.emergencyEvent.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        patient: {
+          include: {
+            user: { select: { id: true, fullName: true, phone: true, email: true } },
+          },
+        },
+        visit: {
+          include: {
+            caseAssignment: {
+              include: {
+                doctor: {
+                  include: {
+                    user: { select: { id: true, fullName: true, phone: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
+        dispatches: {
+          orderBy: { dispatchedAt: 'desc' },
+          include: {
+            ambulance: true,
+            paramedic: {
+              include: {
+                user: { select: { id: true, fullName: true, phone: true } },
+              },
+            },
+            hospital: true,
+          },
+        },
+      },
+    });
+
+    const assignedDoctorIds = [...new Set(events.map(e => e.assignedDoctorId).filter((id): id is string => !!id))];
+    const assignedDoctors = await prisma.doctor.findMany({ where: { id: { in: assignedDoctorIds } }, select: { id: true, user: { select: { fullName: true } } } });
+    const doctorNames = new Map(assignedDoctors.map(d => [d.id, d.user.fullName]));
+    let mapped = events.map((e) => {
+      const activeDispatch = e.dispatches?.find(d => ['PENDING', 'DISPATCHED', 'EN_ROUTE', 'ARRIVED'].includes(d.status)) || null;
+      const status = e.status || (e.visit as any)?.caseAssignment?.status || 'PENDING';
+      const deadline = e.slaDeadline || (e.visit as any)?.caseAssignment?.slaDeadline || null;
+      const isBreached = deadline ? new Date() > new Date(deadline) && status !== 'RESOLVED' : false;
+
+      return {
+        id: e.id,
+        patientId: e.patientId,
+        patientName: e.patient?.user?.fullName || 'Unknown Patient',
+        patientPhone: e.patient?.user?.phone || null,
+        visitId: e.visitId,
+        source: e.source,
+        severity: e.severity,
+        status,
+        slaDeadline: deadline,
+        slaBreach: isBreached,
+        assignedDoctorId: e.assignedDoctorId || (e.visit as any)?.caseAssignment?.doctorId || null,
+        assignedDoctorName: (e.assignedDoctorId && doctorNames.get(e.assignedDoctorId)) || (e.visit as any)?.caseAssignment?.doctor?.user?.fullName || null,
+        createdAt: e.createdAt,
+        resolvedAt: e.resolvedAt,
+        dispatches: e.dispatches,
+        activeDispatch: activeDispatch
+          ? {
+              id: activeDispatch.id,
+              status: activeDispatch.status,
+              etaMinutes: activeDispatch.etaMinutes,
+              dispatchedAt: activeDispatch.dispatchedAt,
+              arrivedAt: activeDispatch.arrivedAt,
+              completedAt: activeDispatch.completedAt,
+              ambulance: activeDispatch.ambulance
+                ? {
+                    id: activeDispatch.ambulance.id,
+                    vehicleNumber: activeDispatch.ambulance.vehicleNumber,
+                    plateNumber: activeDispatch.ambulance.plateNumber,
+                    type: activeDispatch.ambulance.type,
+                    status: activeDispatch.ambulance.status,
+                  }
+                : null,
+              paramedic: activeDispatch.paramedic
+                ? {
+                    id: activeDispatch.paramedic.id,
+                    name: activeDispatch.paramedic.user?.fullName || 'Paramedic',
+                    phone: activeDispatch.paramedic.user?.phone || null,
+                    certificationNumber: activeDispatch.paramedic.certificationNumber,
+                  }
+                : null,
+              hospital: activeDispatch.hospital
+                ? {
+                    id: activeDispatch.hospital.id,
+                    name: activeDispatch.hospital.name,
+                  }
+                : null,
+            }
+          : null,
+      };
+    });
+
+    if (slaStatus === 'active') {
+      mapped = mapped.filter((e) => e.status !== 'RESOLVED');
+    } else if (slaStatus === 'resolved') {
+      mapped = mapped.filter((e) => e.status === 'RESOLVED');
+    }
+
+    return mapped;
+  }
+
+  static async assignEmergencyDoctor(emergencyId: string, doctorId: string) {
+    return EscalationService.assignDoctor(emergencyId, doctorId);
+  }
+
+  static async assignEmergencyParamedic(dispatchId: string, paramedicId: string) {
+    return ResourceAssignmentService.assignParamedic(dispatchId, paramedicId);
+  }
+
+  static async assignEmergencyAmbulance(dispatchId: string, ambulanceId: string) {
+    return ResourceAssignmentService.assignVehicle(dispatchId, ambulanceId);
+  }
+
+  static async resolveEmergency(emergencyId: string, resolutionNotes?: string) {
+    return prisma.$transaction(async (tx) => {
+      // Lock dispatches first, matching the status-update lock order.
+      await tx.$queryRaw`SELECT "id" FROM "ambulance_dispatches" WHERE "emergencyEventId" = ${emergencyId} ORDER BY "id" FOR UPDATE`;
+      const event = await tx.emergencyEvent.findUnique({ where: { id: emergencyId }, include: { dispatches: { where: { status: { in: ['PENDING', 'DISPATCHED', 'EN_ROUTE', 'ARRIVED'] } } } } });
+      if (!event) throw new AppError('Emergency event not found', 404);
+      const resolvedEvent = await tx.emergencyEvent.update({
+        where: { id: emergencyId },
+        data: {
+          status: 'RESOLVED',
+          resolvedAt: new Date(),
         }
       });
-      
-      let mapped = events.map(e => ({
-        ...e,
-        status: e.visit?.caseAssignment?.status || 'PENDING',
-        assignedDoctorId: e.visit?.caseAssignment?.doctorId || null,
-        slaBreach: e.visit?.caseAssignment?.slaDeadline ? new Date() > new Date(e.visit.caseAssignment.slaDeadline) : false
-      }));
-      
-      if (slaStatus === 'active') {
-        mapped = mapped.filter(e => e.status !== 'RESOLVED');
+
+      for (const dispatch of event.dispatches) {
+        await tx.ambulanceDispatch.update({
+          where: { id: dispatch.id },
+          data: {
+            status: 'COMPLETED',
+            completedAt: new Date(),
+            notes: resolutionNotes || dispatch.notes
+          }
+        });
+
+        if (dispatch.ambulanceId) {
+          await tx.ambulance.update({
+            where: { id: dispatch.ambulanceId },
+            data: { status: 'AVAILABLE' }
+          });
+        }
       }
-      return mapped;
-    }
-    static async assignEmergencyDoctor(emergencyId: string, doctorId: string) {
-    const event = await prisma.emergencyEvent.findUnique({ where: { id: emergencyId } });
-    if (event?.visitId) {
-       await prisma.caseAssignment.updateMany({
-         where: { visitId: event.visitId },
-         data: { doctorId, status: 'ACCEPTED' }
-       });
-    }
-    return event;
+
+      return resolvedEvent;
+    });
+  }
+
+  static async escalateEmergency(emergencyId: string) {
+    return prisma.emergencyEvent.update({
+      where: { id: emergencyId },
+      data: { severity: 'CRITICAL' }
+    });
   }
 
   // ─── Healthcare Network ───────────────────────────────────────────────────────
@@ -361,12 +505,17 @@ export class AdminRepository {
     return prisma.hospital.findMany({ orderBy: { name: 'asc' } });
   }
   static async createHospital(data: any) {
-    return prisma.hospital.create({ data });
+    const parsed = hospitalSchema.safeParse(data);
+    if (!parsed.success) throw new AppError(parsed.error.issues.map(i => i.message).join('; '), 400);
+    return prisma.hospital.create({ data: parsed.data });
   }
   static async updateHospital(id: string, data: any) {
-    return prisma.hospital.update({ where: { id }, data });
+    const parsed = hospitalSchema.partial().safeParse(data);
+    if (!parsed.success) throw new AppError(parsed.error.issues.map(i => i.message).join('; '), 400);
+    return prisma.hospital.update({ where: { id }, data: { ...parsed.data, ...(parsed.data.capacityStatus ? { capacityUpdatedAt: new Date() } : {}) } });
   }
   static async deleteHospital(id: string) {
+    if (await prisma.ambulanceDispatch.count({ where: { hospitalId: id } })) throw new AppError('Hospital has dispatch history and cannot be deleted', 409);
     return prisma.hospital.delete({ where: { id } });
   }
 

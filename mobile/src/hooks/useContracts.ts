@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { contractsApi } from '../api/contracts.api';
 import { CreateContractDto, RejectContractDto, CancelContractDto } from '../types/contract';
+import { CARE_REQUESTS_KEY } from './useCareRequests';
+import { MARKETPLACE_KEYS } from './useMarketplace';
 
 export const CONTRACT_KEYS = {
   all: ['contracts'] as const,
@@ -42,6 +44,7 @@ export const useCreateContract = () => {
     mutationFn: (data: CreateContractDto) => contractsApi.createContract(data),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: CARE_REQUESTS_KEY });
     },
   });
 };
@@ -53,6 +56,7 @@ export const useApproveContract = () => {
     onSuccess: (data, id) => {
       queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.detail(id) });
       queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: CARE_REQUESTS_KEY });
     },
   });
 };
@@ -64,6 +68,8 @@ export const useRejectContract = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: CARE_REQUESTS_KEY });
+      queryClient.invalidateQueries({ queryKey: MARKETPLACE_KEYS.all });
     },
   });
 };
@@ -75,6 +81,8 @@ export const useCancelContract = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: CONTRACT_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: CARE_REQUESTS_KEY });
+      queryClient.invalidateQueries({ queryKey: MARKETPLACE_KEYS.all });
     },
   });
 };

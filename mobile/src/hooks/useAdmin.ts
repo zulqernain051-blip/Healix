@@ -224,6 +224,32 @@ export function useAssignEmergencyDoctor() {
   });
 }
 
+export function useResolveEmergency() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, notes }: { id: string; notes?: string }) => adminApi.resolveEmergency(id, notes),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'emergencies'] }),
+  });
+}
+
+export function useAssignEmergencyParamedic() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ dispatchId, paramedicId }: { dispatchId: string; paramedicId: string }) =>
+      adminApi.assignEmergencyParamedic(dispatchId, paramedicId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'emergencies'] }),
+  });
+}
+
+export function useAssignEmergencyAmbulance() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ dispatchId, ambulanceId }: { dispatchId: string; ambulanceId: string }) =>
+      adminApi.assignEmergencyAmbulance(dispatchId, ambulanceId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'emergencies'] }),
+  });
+}
+
 // Network (Hospitals)
 export function useAdminHospitals() {
   return useQuery({ queryKey: ['admin', 'hospitals'], queryFn: () => adminApi.getHospitals() });

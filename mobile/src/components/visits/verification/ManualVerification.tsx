@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Alert, Platform } from 'react-native';
+import { StyleSheet, TextInput, Alert, Platform } from 'react-native';
 import { Text, Button, Card } from 'react-native-paper';
 import { useVerifyManual } from '../../../hooks/useVisits';
 import { verifyManualSchema } from '../../../types/visit';
@@ -15,8 +15,6 @@ export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId,
   const [error, setError] = useState('');
   const verifyManual = useVerifyManual();
 
-  // Only available in development
-  if (!__DEV__) return null;
 
   const handleSubmit = async () => {
     const result = verifyManualSchema.safeParse({ reason });
@@ -29,10 +27,10 @@ export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId,
     try {
       await verifyManual.mutateAsync({ visitId, data: { reason } });
       if (Platform.OS === 'web') {
-        alert('Manual verification applied (dev mode).');
+        alert('Manual verification recorded.');
         onSuccess();
       } else {
-        Alert.alert('Verified', 'Manual verification applied (dev mode).', [
+        Alert.alert('Verified', 'Manual verification recorded.', [
           { text: 'Continue', onPress: onSuccess },
         ]);
       }
@@ -48,11 +46,11 @@ export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId,
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Text style={styles.title}>??? Manual Verification (Dev Only)</Text>
-        <Text style={styles.description}>Bypass verification for testing. Requires a reason (min 10 characters).</Text>
+        <Text style={styles.title}>Patient-confirmed manual verification</Text>
+        <Text style={styles.description}>The patient must confirm your arrival in their app. Record why QR/GPS verification could not be used (at least 10 characters).</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter verification bypass reason..."
+          placeholder="Reason QR/GPS could not be used..."
           placeholderTextColor="#6B8E8A"
           value={reason}
           onChangeText={setReason}
@@ -70,7 +68,7 @@ export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId,
           style={styles.btn}
           labelStyle={{ fontWeight: '700' }}
         >
-          Force Bypass
+          Verify after patient confirmation
         </Button>
       </Card.Content>
     </Card>

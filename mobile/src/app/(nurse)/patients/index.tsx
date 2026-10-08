@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+
 import { SafeAreaView, StyleSheet, View, Text, FlatList, TouchableOpacity, StatusBar } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
@@ -6,7 +6,7 @@ import { useAuthStore } from '../../../store/auth';
 import { useNurseVisits } from '../../../hooks/useVisits';
 import { EmptyState } from '../../../components/common/EmptyState';
 import { LoadingState } from '../../../components/common/LoadingState';
-import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+
 
 export default function PatientsListScreen() {
   const { user, accessToken } = useAuthStore();

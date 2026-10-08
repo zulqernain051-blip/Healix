@@ -11,8 +11,6 @@ export default function DiagnosisStack() {
       }}
     >
       <Stack.Screen name="[id]" />
-      <Stack.Screen name="careplan" />
-      <Stack.Screen name="prescription" />
     </Stack>
   );
 }

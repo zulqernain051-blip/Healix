@@ -1,12 +1,14 @@
-import React from 'react';
+import { VisitCompletionPanel } from '../../../components/visits/VisitCompletionPanel';
+import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
-import { Text, Button, ActivityIndicator } from 'react-native-paper';
+import { Text, Button, ActivityIndicator, TextInput, Switch } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
 import { goBack } from '../../../utils/navigation';
 import { useVisitDetail, useQrToken, useConfirmArrival } from '../../../hooks/useVisits';
 import { VisitInfoCard } from '../../../components/visits/VisitInfoCard';
 import { VisitStatusBadge } from '../../../components/visits/VisitStatusBadge';
+import { visitsApi } from '../../../api/visits.api';
 import { SPACING, RADIUS } from '../../../theme';
 
 export default function PatientVisitDetailScreen() {
@@ -16,6 +18,8 @@ export default function PatientVisitDetailScreen() {
   const { data: visit, isLoading, error, refetch } = useVisitDetail(visitId, { pollingInterval: 15000 });
   const { data: qrData, isLoading: qrLoading, refetch: refetchQr } = useQrToken(visitId);
   const confirmArrival = useConfirmArrival();
+  const [actionError, setActionError] = useState(''); const [stars, setStars] = useState('5'); const [reviewText, setReview] = useState(''); const [recommend, setRecommend] = useState(true); const [reviewing, setReviewing] = useState(false);
+  const review = async () => { if (!Number.isInteger(Number(stars)) || Number(stars) < 1 || Number(stars) > 5) { setActionError('Enter a whole star rating from 1 to 5.'); return; } setReviewing(true); setActionError(''); try { await visitsApi.submitReview(visitId, { stars: Number(stars), reviewText: reviewText.trim() || undefined, recommend }); await refetch(); } catch(e: any) { setActionError(e.message); } finally { setReviewing(false); } };
 
   if (isLoading && !visit) {
     return (
@@ -41,7 +45,7 @@ export default function PatientVisitDetailScreen() {
     );
   }
 
-  const isActive = visit.status === 'SCHEDULED' || visit.status === 'ACCEPTED' || visit.status === 'IN_PROGRESS';
+  const isActive = visit.status === 'SCHEDULED' || visit.status === 'ACCEPTED';
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -57,6 +61,11 @@ export default function PatientVisitDetailScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <VisitInfoCard visit={visit} />
+        <VisitCompletionPanel visit={visit} onChanged={refetch} />
+        {!!actionError && <Text style={{ color: '#EF4444' }}>{actionError}</Text>}
+        {isActive && !visit.patientConfirmed && <><Text style={styles.qrSubtitle}>Confirm only after your assigned nurse arrives. This enables manual verification if QR or GPS cannot be used.</Text><Button mode="contained" loading={confirmArrival.isPending} disabled={confirmArrival.isPending} onPress={async () => { setActionError(''); try { await confirmArrival.mutateAsync(visitId); } catch(e: any) { setActionError(e.message); } }}>Confirm nurse has arrived</Button></>}
+        {visit.patientConfirmed && <Text style={styles.summaryItem}>Arrival confirmed</Text>}
+        {visit.status === 'COMPLETED' && visit.nurseId && <View style={styles.completedCard}>{visit.review ? <><Text style={styles.completedTitle}>Your feedback: {visit.review.stars}/5</Text><Text style={styles.qrSubtitle}>{visit.review.reviewText}</Text></> : <><Text style={styles.completedTitle}>Rate your nurse</Text><TextInput label="Stars (1–5)" value={stars} onChangeText={setStars} keyboardType="number-pad" /><TextInput label="Review (optional)" value={reviewText} onChangeText={setReview} multiline /><Text style={styles.qrSubtitle}>Would you recommend this nurse?</Text><Switch value={recommend} onValueChange={setRecommend} /><Button mode="contained" loading={reviewing} disabled={reviewing} onPress={() => void review()}>Submit feedback</Button></>}</View>}
 
         {/* QR Code for nurse verification */}
         {isActive && (

@@ -1,3 +1,4 @@
+import { appAlert } from '../../../components/common/AppDialogs';
 import React from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -7,11 +8,12 @@ import {
   useMarketplaceListing,
   useSubmitOffer,
   useWithdrawOffer,
+  useListingOffers, useUpdateOffer,
 } from '../../../hooks/useMarketplace';
 import { ListingCard } from '../../../components/marketplace/ListingCard';
 import { OfferForm } from '../../../components/marketplace/OfferForm';
 import { OfferCard } from '../../../components/marketplace/OfferCard';
-import { SubmitOfferDto, NurseOffer } from '../../../types/marketplace';
+import { SubmitOfferDto } from '../../../types/marketplace';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../../theme';
 
 export default function NurseListingDetailScreen() {
@@ -24,11 +26,13 @@ export default function NurseListingDetailScreen() {
   const { listing, isLoading, isError } = useMarketplaceListing(listingId);
   const submitOffer = useSubmitOffer();
   const withdrawOffer = useWithdrawOffer();
+  const ownOffers = useListingOffers(listingId, { pollingInterval: 15000 });
+  const updateOffer = useUpdateOffer();
 
   if (isLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={COLORS.primary} size="large" />
+        <ActivityIndicator color={COLORS.navy} size="large" />
       </View>
     );
   }
@@ -42,37 +46,25 @@ export default function NurseListingDetailScreen() {
   }
 
   // Find if nurse has already submitted an offer on this listing
-  const existingOfferSummary = listing.offers?.find((o) => o.nurseId === nurseId);
-
-  // Reconstruct a full NurseOffer from summary to use OfferCard
-  const mockExistingOffer: NurseOffer | null = existingOfferSummary
-    ? {
-        ...existingOfferSummary,
-        listingId,
-        proposedStart: listing.careRequest.scheduledAt, // Fallback since summary doesn't have proposedStart
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date().toISOString(),
-        bestMatchScore: 0,
-        nurse: { user: { fullName: user?.fullName || '' } },
-      } as NurseOffer
-    : null;
+  const existingOffer = ownOffers.data?.find(o => o.nurseId === nurseId && o.status === 'PENDING');
 
   const handleSubmit = async (data: SubmitOfferDto) => {
     try {
-      await submitOffer.mutateAsync({ listingId, data });
-      Alert.alert('Success', 'Offer submitted successfully!');
+      if (existingOffer) await updateOffer.mutateAsync({ offerId: existingOffer.id, data });
+      else await submitOffer.mutateAsync({ listingId, data });
+      appAlert('Success', 'Offer submitted successfully!');
       router.back();
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to submit offer');
+      appAlert('Error', err.message || 'Failed to submit offer');
     }
   };
 
   const handleWithdraw = async (offerId: string) => {
     try {
       await withdrawOffer.mutateAsync(offerId);
-      Alert.alert('Success', 'Offer withdrawn.');
+      appAlert('Success', 'Offer withdrawn.');
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to withdraw offer');
+      appAlert('Error', err.message || 'Failed to withdraw offer');
     }
   };
 
@@ -83,23 +75,26 @@ export default function NurseListingDetailScreen() {
       <ListingCard listing={listing} />
 
       <View style={styles.section}>
-        {mockExistingOffer ? (
+        {ownOffers.isError && <Text style={styles.errorText}>Could not load your offers. Try again.</Text>}
+        {ownOffers.data?.filter(o => o.status !== 'PENDING').map(o => <OfferCard key={o.id} offer={o} />)}
+        {existingOffer ? (
           <>
             <Text style={styles.sectionTitle}>Your Offer</Text>
             <OfferCard
-              offer={mockExistingOffer}
+              offer={existingOffer}
               isPatientView={false}
               onWithdraw={handleWithdraw}
               isWithdrawing={withdrawOffer.isPending}
             />
+            <OfferForm key={existingOffer.id} initialOffer={existingOffer} onSubmit={handleSubmit} isSubmitting={updateOffer.isPending} defaultProposedStart={existingOffer.proposedStart} />
           </>
-        ) : (
+        ) : !ownOffers.isLoading && !ownOffers.isError ? (
           <OfferForm
             onSubmit={handleSubmit}
             isSubmitting={submitOffer.isPending}
-            defaultProposedStart={listing.careRequest.scheduledAt}
+            defaultProposedStart={listing.careRequest.scheduledAt || listing.careRequest.preferredDate || new Date().toISOString()}
           />
-        )}
+        ) : null}
       </View>
     </ScrollView>
   );
@@ -108,7 +103,7 @@ export default function NurseListingDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.bg,
+    backgroundColor: COLORS.surface,
   },
   content: {
     padding: SPACING.lg,
@@ -117,11 +112,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.bg,
+    backgroundColor: COLORS.surface,
   },
   title: {
     ...TYPOGRAPHY.h1,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
     marginBottom: SPACING.md,
   },
   section: {
@@ -129,7 +124,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     ...TYPOGRAPHY.h2,
-    color: COLORS.textPrimary,
+    color: COLORS.textDark,
     marginBottom: SPACING.md,
   },
   errorText: {

@@ -1,4 +1,6 @@
 import { prisma } from '../../../common/config/database';
+import { OutboxRepository } from '../../../common/events/outbox.repository';
+import { EVENTS } from '../../../common/events/app-event-bus';
 
 export class ClinicalRepository {
   static async findLatestVitalsForVisit(visitId: string) {
@@ -21,6 +23,10 @@ export class ClinicalRepository {
     });
   }
 
+  static async findPendingCaseIds(cursor?: string) {
+    return prisma.caseAssignment.findMany({ where: { status: { in: ['PENDING', 'UNASSIGNED'] } }, select: { id: true }, orderBy: [{ createdAt: 'asc' }, { id: 'asc' }], take: 20, ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}) });
+  }
+
   static async createRiskAssessmentAndCase(assessmentData: any, shouldCreateCase: boolean, visitId?: string) {
     return prisma.$transaction(async (tx) => {
       const assessment = await tx.riskAssessment.create({
@@ -33,16 +39,18 @@ export class ClinicalRepository {
         });
 
         if (!existingCase) {
-          const slaDeadline = new Date();
-          slaDeadline.setHours(slaDeadline.getHours() + 2); // 2 hours SLA deadline
+          const slaDeadline = new Date(Date.now() + 5 * 60 * 1000);
 
-          await tx.caseAssignment.create({
+          const newCase = await tx.caseAssignment.create({
             data: {
               visitId,
               riskTier: 'HIGH',
               slaDeadline,
               status: 'PENDING'
             }
+          });
+          await OutboxRepository.createEvent(tx, {
+            eventType: EVENTS.CASE_CREATED, aggregateType: 'CASE', aggregateId: newCase.id, payload: { caseId: newCase.id }
           });
         }
       }
@@ -59,7 +67,8 @@ export class ClinicalRepository {
     return prisma.visit.findUnique({
       where: { id: visitId },
       include: {
-        request: { include: { patient: { include: { user: true } } } },
+        request: { include: { patient: { include: { user: { select: { id: true, fullName: true } } } } } },
+        caseAssignment: { select: { doctorId: true, secondOpinions: { select: { consultedDoctorId: true } } } },
         vitals: true,
         symptoms: true,
         clinicalRemark: true
@@ -144,6 +153,8 @@ export class ClinicalRepository {
 
         let caseId = null;
         if (riskTier === 'MEDIUM' || riskTier === 'HIGH' || riskTier === 'CRITICAL') {
+          const existing = await tx.caseAssignment.findUnique({ where: { visitId } });
+          if (existing) return { risk, caseId: existing.id };
           const isUrgent = riskTier === 'HIGH' || riskTier === 'CRITICAL';
           const slaMinutes = isUrgent ? 5 : 20;
 
@@ -156,6 +167,9 @@ export class ClinicalRepository {
             }
           });
           caseId = newCase.id;
+          await OutboxRepository.createEvent(tx, {
+            eventType: EVENTS.CASE_CREATED, aggregateType: 'CASE', aggregateId: newCase.id, payload: { caseId: newCase.id }
+          });
         }
 
         return { risk, caseId };
@@ -259,6 +273,8 @@ export class ClinicalRepository {
       where: { patientId },
       orderBy: { prescribedAt: 'desc' },
       include: {
+        items: true,
+        corrections: { select: { id: true } },
         doctor: {
           select: {
             user: {

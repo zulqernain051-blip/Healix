@@ -17,7 +17,7 @@ export class CreateDoctorUseCase {
     return prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
-          email, phone, fullName, passwordHash, role: 'DOCTOR', status: 'ACTIVE',
+          email, phone, fullName, passwordHash, role: 'DOCTOR', status: 'ACTIVE', emailVerificationRequired: false,
           doctor: {
             create: {
               cnic,

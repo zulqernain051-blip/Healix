@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useVoiceRecorder } from '../../../hooks/useVoiceRecorder';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { RADIUS, SPACING } from '../../../theme';
 import { MediaPreview } from './types';
-const Audio = { Sound: { createAsync: async () => ({ sound: null }) } } as any;
 
 interface ChatInputProps {
   inputText: string;
@@ -23,55 +23,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onAttachPress,
   onSendAudio,
 }) => {
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [recordingDuration, setRecordingDuration] = useState(0);
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isRecording) {
-      timer = setInterval(() => setRecordingDuration(prev => prev + 1000), 1000);
-    }
-    return () => clearInterval(timer);
-  }, [isRecording]);
-
-  const startRecording = async () => {
-    try {
-      const permission = await Audio.requestPermissionsAsync();
-      if (permission.status === 'granted') {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-        const { recording: newRecording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY
-        );
-        setRecording(newRecording);
-        setIsRecording(true);
-        setRecordingDuration(0);
-      } else {
-        alert('Microphone permission is required to record a voice message.');
-      }
-    } catch (err) {
-      console.error('Failed to start recording', err);
-    }
-  };
-
-  const stopRecording = async (cancel: boolean = false) => {
-    if (!recording) return;
-    setIsRecording(false);
-    try {
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
-      if (!cancel && uri && onSendAudio) {
-        onSendAudio(uri, recordingDuration);
-      }
-    } catch (err) {
-      console.error('Failed to stop recording', err);
-    }
-    setRecording(null);
-    setRecordingDuration(0);
-  };
+  const { isRecording, recordingDuration, busy, startRecording, stopRecording } = useVoiceRecorder(async (uri, durationMs) => { await onSendAudio?.(uri, durationMs); });
 
   const formatDuration = (ms: number) => {
     const secs = Math.floor(ms / 1000);
@@ -129,6 +81,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
           <TouchableOpacity
             style={[styles.sendBtn, (!inputText.trim() && !mediaPreview) && styles.sendBtnDisabled]}
+            disabled={busy || (!inputText.trim() && !mediaPreview && !onSendAudio)}
             onPress={inputText.trim() || mediaPreview ? onSend : startRecording}
           >
             <Text style={styles.sendIcon}>{(inputText.trim() || mediaPreview) ? '➤' : '🎤'}</Text>

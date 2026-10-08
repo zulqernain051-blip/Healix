@@ -1,5 +1,6 @@
 import { prisma } from '../../../common/config/database';
 import { OutboxRepository } from '../../../common/events/outbox.repository';
+import { AppError } from '../../../common/errors/AppError';
 
 export class CareRepository {
   public static async findNormalizedRequests() {
@@ -47,38 +48,6 @@ export class CareRepository {
     });
   }
 
-  public static async findExistingRequestInWindow(patientId: string, since: Date) {
-    return prisma.careRequest.findFirst({
-      where: {
-        patientId,
-        createdAt: { gt: since },
-        status: { in: ['PENDING', 'ASSIGNED'] }
-      }
-    });
-  }
-
-  public static async mergeNotes(requestId: string, newNotes: string) {
-    const request = await prisma.careRequest.findUnique({ where: { id: requestId } });
-    const mergedNotes = request?.notes ? `${request.notes} | ${newNotes}` : newNotes;
-    return prisma.careRequest.update({
-      where: { id: requestId },
-      data: { notes: mergedNotes }
-    });
-  }
-
-
-
-  public static async createRecurringPattern(patientId: string, frequency: string, endDate: Date, occurrencesRemaining: number) {
-    return prisma.recurringPattern.create({
-      data: {
-        patientId,
-        frequency,
-        endDate,
-        occurrencesRemaining
-      }
-    });
-  }
-
   public static async findOverdueMilestones() {
     return prisma.carePlanMilestone.findMany({
       where: {
@@ -98,49 +67,6 @@ export class CareRepository {
     });
   }
 
-
-
-
-
-
-
-
-
-
-
-  public static async createRequest(data: any) {
-    return prisma.careRequest.create({ data });
-  }
-
-  public static async createRecurringRequestsAndVisits(patientId: string, patternId: string, scheduledDates: Date[]) {
-    return prisma.$transaction(async (tx) => {
-      const generatedVisits = [];
-      let i = 1;
-      for (const scheduledAt of scheduledDates) {
-        const request = await tx.careRequest.create({
-          data: {
-            patientId,
-            type: 'NURSE_VISIT',
-            status: 'ASSIGNED',
-            scheduledAt,
-            notes: `[Recurring Visit #${i} of pattern ${patternId}]`
-          }
-        });
-
-        const visit = await tx.visit.create({
-          data: {
-            requestId: request.id,
-            status: 'SCHEDULED'
-          }
-        });
-
-        generatedVisits.push(visit);
-        i++;
-      }
-      return generatedVisits;
-    });
-  }
-
   public static async findVisitById(visitId: string) {
     return prisma.visit.findUnique({ where: { id: visitId } });
   }
@@ -149,39 +75,6 @@ export class CareRepository {
     return prisma.careRequest.update({
       where: { id: requestId },
       data: { scheduledAt }
-    });
-  }
-
-
-
-
-
-
-
-  public static async updateCareRequestNotes(requestId: string, notes: string) {
-    return prisma.careRequest.update({
-      where: { id: requestId },
-      data: { notes }
-    });
-  }
-
-  public static async findAvailableNurses() {
-    return prisma.nurse.findMany({
-      where: {
-        available: true,
-        user: { status: 'ACTIVE' }
-      },
-      include: {
-        specializations: true,
-        score: true
-      }
-    });
-  }
-
-  public static async findUserWithClinicalRoles(userId: string) {
-    return prisma.user.findUnique({
-      where: { id: userId },
-      include: { nurse: true, doctor: true }
     });
   }
 
@@ -202,6 +95,25 @@ export class CareRepository {
       include: {
         visits: {
           include: {
+            vitals: {
+              orderBy: { recordedAt: 'desc' }
+            },
+            assessments: {
+              orderBy: { assessedAt: 'desc' }
+            },
+            caseAssignment: {
+              include: {
+                doctor: {
+                  include: {
+                    user: {
+                      select: {
+                        fullName: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
             nurse: {
               select: {
                 experience: true,
@@ -226,7 +138,31 @@ export class CareRepository {
             }
           }
         },
-        payment: true
+        payment: true,
+        contract: {
+          include: {
+            nurse: {
+              include: {
+                user: {
+                  select: {
+                    fullName: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        marketplaceListing: {
+          include: {
+            _count: {
+              select: {
+                offers: {
+                  where: { status: 'PENDING' }
+                }
+              }
+            }
+          }
+        }
       }
     });
     
@@ -239,6 +175,18 @@ export class CareRepository {
 
   public static async updateCareRequestStatus(id: string, status: string) {
     return prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT id FROM care_requests WHERE id = ${id} FOR UPDATE`;
+      const current = await tx.careRequest.findUnique({ where: { id }, include: { contract: true } });
+      if (!current) throw new AppError('Care request not found', 404);
+      if (status === 'CANCELLED') {
+        if (current.status === 'CANCELLED') return current;
+        if (['IN_PROGRESS', 'COMPLETED'].includes(current.status) || await tx.visit.count({ where: { requestId: id, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } })) {
+          throw new AppError('Care already started and cannot be cancelled.', 409);
+        }
+        if (current.contract && ['PENDING_APPROVAL', 'ACTIVE'].includes(current.contract.status)) throw new AppError('Cancel the associated contract before cancelling this request.', 409);
+        await tx.visit.updateMany({ where: { requestId: id, status: { in: ['SCHEDULED', 'ACCEPTED'] } }, data: { status: 'CANCELLED' } });
+        await tx.marketplaceListing.updateMany({ where: { careRequestId: id }, data: { status: 'CLOSED' } });
+      }
       const updated = await tx.careRequest.update({
         where: { id },
         data: { status }
@@ -258,9 +206,16 @@ export class CareRepository {
   }
 
   public static async rescheduleCareRequest(id: string, scheduledAt: Date) {
-    return prisma.careRequest.update({
-      where: { id },
-      data: { scheduledAt }
+    return prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM care_requests WHERE id = ${id} FOR UPDATE`;
+      const current = await tx.careRequest.findUnique({ where: { id }, include: { contract: true } });
+      if (!current) throw new AppError('Care request not found', 404);
+      if (!['OPEN', 'PENDING'].includes(current.status)) throw new AppError('Only an open, unassigned request can be rescheduled.', 409);
+      if (current.contract && ['PENDING_APPROVAL', 'ACTIVE'].includes(current.contract.status)) throw new AppError('Cancel the existing agreement before changing its schedule.', 409);
+      if (!Number.isFinite(scheduledAt.getTime()) || scheduledAt.getTime() <= Date.now()) throw new AppError('Select a future appointment time.', 400);
+      const previousTime = current.scheduledAt ?? current.preferredDate;
+      if (!previousTime || previousTime.getTime() - Date.now() < 2 * 60 * 60 * 1000) throw new AppError('Rescheduling requires at least two hours before the current appointment.', 400);
+      return tx.careRequest.update({ where: { id }, data: { scheduledAt, preferredDate: scheduledAt } });
     });
   }
 
@@ -271,6 +226,25 @@ export class CareRepository {
       include: {
         visits: {
           include: {
+            vitals: {
+              orderBy: { recordedAt: 'desc' }
+            },
+            assessments: {
+              orderBy: { assessedAt: 'desc' }
+            },
+            caseAssignment: {
+              include: {
+                doctor: {
+                  include: {
+                    user: {
+                      select: {
+                        fullName: true
+                      }
+                    }
+                  }
+                }
+              }
+            },
             nurse: {
               select: {
                 user: {
@@ -292,7 +266,30 @@ export class CareRepository {
           }
         },
         payment: true,
-        marketplaceListing: true
+        contract: {
+          include: {
+            nurse: {
+              include: {
+                user: {
+                  select: {
+                    fullName: true
+                  }
+                }
+              }
+            }
+          }
+        },
+        marketplaceListing: {
+          include: {
+            _count: {
+              select: {
+                offers: {
+                  where: { status: 'PENDING' }
+                }
+              }
+            }
+          }
+        }
       }
     });
     
@@ -305,6 +302,7 @@ export class CareRepository {
   public static async findPatientCarePlans(patientId: string) {
     return prisma.carePlan.findMany({
       where: { patientId },
+      include: { milestones: { orderBy: [{ targetDate: 'asc' }, { createdAt: 'asc' }] } },
       orderBy: { startDate: 'desc' }
     });
   }

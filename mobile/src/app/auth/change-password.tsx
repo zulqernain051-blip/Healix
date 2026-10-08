@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { TextInput, Button, Card } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -44,12 +44,12 @@ export default function ChangePasswordScreen() {
         onSuccess: () => {
           Alert.alert(
             'Password Changed Successfully',
-            'Your profile password has been successfully updated.',
+            'Your password has been updated. Please sign in again.',
             [
               {
                 text: 'OK',
                 onPress: () => {
-                  router.back();
+                  router.replace('/auth/login');
                 }
               }
             ]

@@ -48,6 +48,7 @@ export interface UpcomingVisit {
 
 export interface DashboardSummaryResponse {
   activeRequestsCount: number;
+  activeContractsCount: number;
   upcomingVisits: UpcomingVisit[];
   severeAllergiesCount: number;
   latestRisk: RiskAssessment | null;

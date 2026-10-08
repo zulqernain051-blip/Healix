@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, TouchableWithoutFeedback, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native-paper';
@@ -20,15 +20,15 @@ export default function NurseTabsLayout() {
         screenOptions={{
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: '#071E1C',
+            backgroundColor: COLORS.surfaceCard,
             borderTopWidth: 1,
-            borderTopColor: 'rgba(0, 230, 118, 0.15)',
+            borderTopColor: COLORS.inputBorder,
             height: 65,
             paddingBottom: 8,
             paddingTop: 6,
           },
-          tabBarActiveTintColor: '#00E676',
-          tabBarInactiveTintColor: '#6B8E8A',
+          tabBarActiveTintColor: COLORS.navy,
+          tabBarInactiveTintColor: COLORS.textMuted,
           tabBarLabelStyle: {
             fontSize: 10,
             fontWeight: '600',

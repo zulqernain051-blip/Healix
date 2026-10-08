@@ -1,5 +1,5 @@
-﻿import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { useState } from 'react';
+import { Text, StyleSheet, ScrollView } from 'react-native';
 import { TextInput, Button, Card, HelperText } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import { useMutation } from '@tanstack/react-query';

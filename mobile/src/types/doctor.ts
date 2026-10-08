@@ -2,10 +2,10 @@ export interface CaseAssignment {
   id: string;
   visitId: string;
   doctorId: string | null;
-  riskTier: 'MEDIUM' | 'HIGH';
+  riskTier: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   slaDeadline: string;
   acceptedAt: string | null;
-  status: 'PENDING' | 'ACCEPTED' | 'RESOLVED';
+  status: 'PENDING' | 'ASSIGNED' | 'IN_REVIEW' | 'PROFESSIONAL_BROADCAST' | 'GENERAL_BROADCAST' | 'ADMIN_ESCALATED' | 'RESOLVED';
   createdAt: string;
   remainingMins?: number;
   visit: {
@@ -40,7 +40,7 @@ export interface CaseReviewPayload {
     id: string;
     visitId: string;
     doctorId: string | null;
-    riskTier: 'MEDIUM' | 'HIGH';
+    riskTier: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
     slaDeadline: string;
     status: string;
     visit: {

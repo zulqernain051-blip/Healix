@@ -1,3 +1,4 @@
+import { prisma } from '../../../../../common/config/database';
 import { DoctorRepository } from '../../doctor.repository';
 import { AppError } from '../../../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../../../common/constants/index';
@@ -15,6 +16,12 @@ export class GetCaseReviewUseCase {
     // If doctorId is null, it means it's in the broadcast pool and any doctor can view it to accept it.
     if (caseAssignment.doctorId && caseAssignment.doctorId !== doctorId) {
       throw new AppError('Unauthorized: This case is assigned to another doctor', HTTP_STATUS.FORBIDDEN);
+    }
+
+    if (!caseAssignment.doctorId) {
+      if (!['PROFESSIONAL_BROADCAST', 'GENERAL_BROADCAST', 'ADMIN_ESCALATED'].includes(caseAssignment.status)) throw new AppError('This case is not available for review', 403);
+      const viewer = await prisma.doctor.findUnique({ where: { id: doctorId }, include: { user: true } });
+      if (!viewer || viewer.verificationStatus !== 'VERIFIED' || viewer.user.status !== 'ACTIVE' || (caseAssignment.status === 'PROFESSIONAL_BROADCAST' && !viewer.isProfessional)) throw new AppError('You are not eligible to view this broadcast', 403);
     }
 
     // Consolidated single API payload

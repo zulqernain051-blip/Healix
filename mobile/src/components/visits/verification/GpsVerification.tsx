@@ -50,7 +50,7 @@ export const GpsVerification: React.FC<GpsVerificationProps> = ({ visitId, onSuc
   return (
     <Card style={styles.card}>
       <Card.Content>
-        <Text style={styles.title}>📍 GPS Proximity Verification</Text>
+        <Text style={styles.title}>GPS Proximity Verification</Text>
         <Text style={styles.description}>
           Verify you are within proximity of the patient's registered location.
         </Text>

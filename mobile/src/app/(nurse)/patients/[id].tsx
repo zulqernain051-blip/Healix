@@ -46,7 +46,7 @@ export default function PatientDetailScreen() {
 
   const formattedPatient = {
     patientName: patientProfile.user?.fullName || 'Unknown',
-    dob: patientProfile.dateOfBirth ? new Date(patientProfile.dateOfBirth).toISOString().split('T')[0] : 'N/A',
+    dob: (patientProfile.dob || patientProfile.dateOfBirth) ? new Date(patientProfile.dob || patientProfile.dateOfBirth!).toISOString().split('T')[0] : 'N/A',
     gender: patientProfile.gender || 'N/A',
     allergies: patientProfile.allergies || [],
     chronicConditions: patientProfile.medicalConditions?.map((c: any) => ({ name: c })) || [],

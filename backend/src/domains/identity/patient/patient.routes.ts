@@ -36,10 +36,12 @@ import {
 } from './patient.validation';
 import { createCareRequestSchema } from '../../care/requests/schemas/care-request.schema';
 
+import patientWorkflows from './patient-workflows.routes';
 const router = Router();
 
 // Secure all patient module routes under authentication
 router.use(protect as any);
+router.use(patientWorkflows);
 
 // User Lookup operation by phone
 router.get('/users/search-phone', searchUserByPhoneController);

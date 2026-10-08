@@ -1,3 +1,4 @@
+import { COLORS, SPACING, TYPOGRAPHY } from '../../../theme';
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,17 +9,17 @@ export default function DoctorTabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#071E1C',
+          backgroundColor: COLORS.surfaceCard,
           borderTopWidth: 1,
-          borderTopColor: 'rgba(0, 230, 118, 0.15)',
+          borderTopColor: COLORS.inputBorder,
           height: 65,
-          paddingBottom: 8,
-          paddingTop: 6,
+          paddingBottom: SPACING.sm,
+          paddingTop: SPACING.sm,
         },
-        tabBarActiveTintColor: '#00E676',
-        tabBarInactiveTintColor: '#6B8E8A',
+        tabBarActiveTintColor: COLORS.navy,
+        tabBarInactiveTintColor: COLORS.textMuted,
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: TYPOGRAPHY.sizes.xs,
           fontWeight: '600',
         },
       }}

@@ -18,10 +18,11 @@ export const registerSchema = z.object({
   phone: z.string().trim().regex(phoneRegex, 'Invalid Pakistan phone number format (e.g. 03001234567)'),
   fullName: z.string().trim().min(3, 'Full name must be at least 3 characters long'),
   password: z.string().regex(passwordRegex, 'Password must be 8+ characters with at least one number and one special character'),
-  role: z.nativeEnum(Role).refine(r => r === Role.PATIENT || r === Role.NURSE || r === Role.DOCTOR || r === Role.PARAMEDIC, 'Invalid role for public registration'),
+  role: z.nativeEnum(Role).refine(r => r === Role.PATIENT || r === Role.NURSE, 'Only patients and nurses can sign up directly'),
   cnic: z.string().trim().optional(),
   pncNumber: z.string().trim().optional(),
   pmdcNumber: z.string().trim().optional(),
+  certificationNumber: z.string().trim().optional(),
 }).refine((data) => {
   if (data.role !== Role.ADMIN) {
     if (!data.cnic) return false;
@@ -47,11 +48,27 @@ export const registerSchema = z.object({
 }, {
   message: 'PMDC registration number is required for doctors',
   path: ['pmdcNumber'],
+}).refine(data => data.role !== Role.PARAMEDIC || !!data.certificationNumber, {
+  message: 'Certification number is required for paramedics',
+  path: ['certificationNumber'],
 });
+
+export const registerInvitedSchema = z.object({
+  invitationToken: z.string().min(1),
+  email: z.string().trim().email().transform(value => value.toLowerCase()),
+  phone: z.string().trim().regex(phoneRegex),
+  fullName: z.string().trim().min(3),
+  password: z.string().regex(passwordRegex),
+  cnic: z.string().trim().regex(cnicRegex),
+  professionalId: z.string().trim().min(1).optional(),
+  specialization: z.string().trim().min(1).optional()
+});
+
+export const mfaCodeSchema = z.object({ code: z.string().regex(/^\d{6}$/) });
 
 export const verifyOtpSchema = z.object({
   emailOrPhone: z.string().min(1, 'Email or phone number is required'),
-  code: z.string().length(6, 'OTP code must be exactly 6 characters')
+  code: z.string().regex(/^\d{6}$/, 'OTP code must be exactly 6 digits')
 });
 
 export const resendOtpSchema = z.object({
@@ -62,6 +79,8 @@ export const loginSchema = z.object({
   emailOrPhone: z.string().min(1, 'Email or phone number is required'),
   password: z.string().min(1, 'Password is required')
 });
+
+export const googleLoginSchema = z.object({ credential: z.string().min(100, 'Google credential is required') });
 
 export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required')

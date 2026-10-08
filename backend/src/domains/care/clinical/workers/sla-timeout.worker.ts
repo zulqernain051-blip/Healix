@@ -73,57 +73,7 @@ export class SlaTimeoutWorker {
         console.error(`[SLA TIMEOUT] Failed to escalate to general broadcast for ${caseData.id}:`, err.message);
       }
     }
-
-    // 2. Check for 10-minute timeout (GENERAL_BROADCAST -> ADMIN_ESCALATED)
-    // 10 minutes = slaDeadline + 5 minutes
-    const tenMinThreshold = new Date(now.getTime() - 5 * 60 * 1000);
-    const tenMinBreaches = await prisma.caseAssignment.findMany({
-      where: {
-        status: 'GENERAL_BROADCAST',
-        riskTier: { in: ['HIGH', 'CRITICAL'] },
-        slaDeadline: { lt: tenMinThreshold }
-      }
-    });
-
-    for (const caseData of tenMinBreaches) {
-      try {
-        await prisma.$transaction(async (tx) => {
-          const lockedCases = await tx.$queryRaw<any[]>`SELECT * FROM "case_assignments" WHERE "id" = ${caseData.id} FOR UPDATE`;
-          if (!lockedCases || lockedCases.length === 0) return;
-          if (lockedCases[0].status !== 'GENERAL_BROADCAST') return;
-
-          // Transition to ADMIN_ESCALATED
-          await tx.caseAssignment.update({
-            where: { id: caseData.id },
-            data: { status: 'ADMIN_ESCALATED' }
-          });
-
-          await tx.assignmentLog.create({
-            data: {
-              visitId: caseData.visitId,
-              method: 'AUTO',
-              assignedTo: 'SYSTEM',
-              reason: 'SLA_TIMEOUT: Case escalated to ADMIN_ESCALATED (10min limit reached)'
-            }
-          });
-
-          // Alert admin that they must assign
-          const admins = await tx.administrator.findMany({ include: { user: true } });
-          
-          const io = getIo();
-          
-          if (io) {
-            admins.forEach((admin: any) => {
-              io.to(`user:${admin.userId}`).emit('admin_emergency_alert', {
-                caseId: caseData.id,
-                message: `🚨 ADMIN ACTION REQUIRED: Emergency case has remained unassigned for 10 minutes.`
-              });
-            });
-          }
-        });
-      } catch (err: any) {
-        console.error(`[SLA TIMEOUT] Failed to escalate to admin for ${caseData.id}:`, err.message);
-      }
-    }
+    // Note: Once a case transitions to GENERAL_BROADCAST, it remains available in GENERAL_BROADCAST
+    // until a doctor explicitly accepts it or Admin manually assigns it. There is no automated timeout to ADMIN_ESCALATED.
   }
 }

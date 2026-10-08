@@ -148,17 +148,13 @@ export class ChatRepository {
     });
   }
 
-  static async markMessageDelivered(messageId: string, userId: string) {
-    const msg = await prisma.chatMessage.findUnique({ where: { id: messageId } });
-    if (!msg || msg.senderId === userId || msg.status !== 'SENT') {
-      return false; // Cannot mark own message, or already read/delivered
-    }
-    
-    await prisma.chatMessage.update({
-      where: { id: messageId },
+  static async markMessageDelivered(messageId: string, userId: string, threadId: string) {
+    const result = await prisma.chatMessage.updateMany({
+      where: { id: messageId, threadId, senderId: { not: userId }, status: 'SENT',
+        thread: { OR: [{ participantAId: userId }, { participantBId: userId }] } },
       data: { status: 'DELIVERED' }
     });
-    return true;
+    return result.count > 0;
   }
 
   static async updateThreadFollowUp(threadId: string, doctorFollowUp: boolean) {
@@ -229,7 +225,7 @@ export class ChatRepository {
     // Check if there is an active case assignment for a visit involving the patient and doctor
     return prisma.caseAssignment.findFirst({
       where: {
-        status: 'ACCEPTED',
+        status: { in: ['ASSIGNED', 'IN_REVIEW'] },
         doctor: { userId: doctorUserId },
         visit: { request: { patient: { userId: patientUserId } } },
       },
@@ -323,7 +319,7 @@ export class ChatRepository {
   static async findActiveNurseDoctorCase(nurseId: string, doctorId: string) {
     return prisma.caseAssignment.findFirst({
       where: {
-        status: 'ACCEPTED',
+        status: { in: ['ASSIGNED', 'IN_REVIEW'] },
         doctor: { id: doctorId },
         visit: { nurseId },
       },

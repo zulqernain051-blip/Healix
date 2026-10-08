@@ -15,6 +15,7 @@ export class UpdateNurseProfileUseCase {
       throw new AppError('Nurse profile not found', HTTP_STATUS.NOT_FOUND);
     }
 
+    if (data.available === true && nurse.user.status !== 'ACTIVE') throw new AppError('Administrator verification is required before going available', 403);
     if (data.available === true) {
       const nurseToEvaluate = {
         ...nurse,

@@ -1,10 +1,14 @@
 {
   "name": "qa-tests",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "playwright test",
+    "test:list": "playwright test --list",
+    "test:report": "playwright show-report",
+    "reports:generate": "node generate_reports.js"
   },
   "keywords": [],
   "author": "",

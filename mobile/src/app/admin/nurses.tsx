@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { Card, Button, Chip, Divider } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
 import { useAdminNurses, useAdminPendingNurses, useApproveNurse, useRejectNurse, useRevokeNurse } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminNurses() {
-  const { data: pendingNurses_raw, isLoading: isLoadingPending  } = useAdminPendingNurses(); const pendingNurses = pendingNurses_raw?.users || [];
-  const { data: nurses_raw, isLoading: isLoadingNurses  } = useAdminNurses(); const nurses = nurses_raw?.users || [];
+  const { data: pendingNurses_raw, isLoading: isLoadingPending } = useAdminPendingNurses();
+  const pendingNurses: any[] = Array.isArray(pendingNurses_raw) ? pendingNurses_raw : (pendingNurses_raw as any)?.users || [];
+  const { data: nurses_raw, isLoading: isLoadingNurses } = useAdminNurses();
+  const nurses: any[] = Array.isArray(nurses_raw) ? nurses_raw : (nurses_raw as any)?.users || [];
 
   const { mutateAsync: approveNurse } = useApproveNurse();
   const { mutateAsync: rejectNurse } = useRejectNurse();
@@ -71,6 +73,7 @@ export default function AdminNurses() {
         </View>
 
         <Divider style={styles.divider} />
+        <Button onPress={() => navigate(`/admin/nurse-review/${nurse.id}` as any)}>Review documents & specialty certificates</Button>
 
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>PNC Registration No:</Text>

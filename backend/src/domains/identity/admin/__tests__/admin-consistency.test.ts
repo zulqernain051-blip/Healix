@@ -3,6 +3,7 @@ import { AdminService } from '../admin.service';
 // We'll mock the Prisma client
 jest.mock('../../../../common/config/database', () => ({
   prisma: {
+    doctor: { findMany: jest.fn().mockResolvedValue([]) },
     caseAssignment: {
       findMany: jest.fn()
     },
@@ -98,4 +99,11 @@ describe('Admin Consistency & Operations', () => {
       );
     });
   });
+});
+
+test('standalone emergency displays the assigned doctor name and excludes closed trips from active dispatch', async () => {
+  prisma.doctor.findMany.mockResolvedValue([{ id: 'doctor', user: { fullName: 'Assigned Doctor' } }]);
+  prisma.emergencyEvent.findMany.mockResolvedValue([{ id: 'event', status: 'ACTIVE', assignedDoctorId: 'doctor', visit: null, dispatches: [{ id: 'old', status: 'COMPLETED' }] }]);
+  const events = await AdminService.getEmergencies('active');
+  expect(events[0]).toMatchObject({ assignedDoctorName: 'Assigned Doctor', activeDispatch: null });
 });

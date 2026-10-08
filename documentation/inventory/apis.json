@@ -1,0 +1,1353 @@
+[
+  {
+    "id": "API-POST-CLINICAL-RISK-ASSESS",
+    "method": "POST",
+    "path": "/clinical/risk-assess",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/clinical/clinical.routes.ts"
+  },
+  {
+    "id": "API-POST-CLINICAL-KNOWLEDGE-QUERY",
+    "method": "POST",
+    "path": "/clinical/knowledge-query",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/clinical/clinical.routes.ts"
+  },
+  {
+    "id": "API-GET-VISITS-:ID-AI-SUMMARY",
+    "method": "GET",
+    "path": "/visits/:id/ai-summary",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/clinical/clinical.routes.ts"
+  },
+  {
+    "id": "API-GET-PATIENTS-:PATIENTID-COMPLIANCE",
+    "method": "GET",
+    "path": "/patients/:patientId/compliance",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/clinical/clinical.routes.ts"
+  },
+  {
+    "id": "API-PUT-ADMISSIONS-:ID-STATUS",
+    "method": "PUT",
+    "path": "/admissions/:id/status",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/admission/admission.routes.ts"
+  },
+  {
+    "id": "API-GET-HOSPITALS-RECOMMEND",
+    "method": "GET",
+    "path": "/hospitals/recommend",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/dispatch/dispatch.routes.ts"
+  },
+  {
+    "id": "API-POST-DISPATCH",
+    "method": "POST",
+    "path": "/dispatch",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/dispatch/dispatch.routes.ts"
+  },
+  {
+    "id": "API-GET-DISPATCH-:ID-TRACKING",
+    "method": "GET",
+    "path": "/dispatch/:id/tracking",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/dispatch/dispatch.routes.ts"
+  },
+  {
+    "id": "API-PUT-DISPATCH-:ID-STATUS",
+    "method": "PUT",
+    "path": "/dispatch/:id/status",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/dispatch/dispatch.routes.ts"
+  },
+  {
+    "id": "API-POST-EMERGENCY-EXTERNAL-REQUEST",
+    "method": "POST",
+    "path": "/emergency/external-request",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/dispatch/dispatch.routes.ts"
+  },
+  {
+    "id": "API-POST-ESCALATION-:EVENTID-ASSIGN",
+    "method": "POST",
+    "path": "/escalation/:eventId/assign",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/escalation/escalation.routes.ts"
+  },
+  {
+    "id": "API-POST-ESCALATION-:EVENTID-BROADCAST",
+    "method": "POST",
+    "path": "/escalation/:eventId/broadcast",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/emergency/escalation/escalation.routes.ts"
+  },
+  {
+    "id": "API-GET-CARE-REQUESTS",
+    "method": "GET",
+    "path": "/care-requests",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-CARE-REQUESTS-:ID-PRIORITY",
+    "method": "PUT",
+    "path": "/care-requests/:id/priority",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-POST-SCHEDULING-VISITS",
+    "method": "POST",
+    "path": "/scheduling/visits",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-PUT-SCHEDULING-VISITS-:ID",
+    "method": "PUT",
+    "path": "/scheduling/visits/:id",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-DELETE-SCHEDULING-VISITS-:ID",
+    "method": "DELETE",
+    "path": "/scheduling/visits/:id",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-GET-CARE-PLANS-OVERDUE",
+    "method": "GET",
+    "path": "/care-plans/overdue",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-PUT-CARE-PLANS-MILESTONES-:ID-COMPLETE",
+    "method": "PUT",
+    "path": "/care-plans/milestones/:id/complete",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-GET-PATIENTS-:ID-COMPLIANCE",
+    "method": "GET",
+    "path": "/patients/:id/compliance",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-POST-PATIENTS-:ID-MEDICATION-LOGS",
+    "method": "POST",
+    "path": "/patients/:id/medication-logs",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-GET-PATIENTS-:ID-MEDICATION-LOGS",
+    "method": "GET",
+    "path": "/patients/:id/medication-logs",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/requests/care.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES-:NURSEID-VISITS",
+    "method": "GET",
+    "path": "/nurses/:nurseId/visits",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-GET-VISITS-:VISITID",
+    "method": "GET",
+    "path": "/visits/:visitId",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:VISITID-COMPLETE",
+    "method": "POST",
+    "path": "/visits/:visitId/complete",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-PUT-VISITS-:VISITID-NOTES",
+    "method": "PUT",
+    "path": "/visits/:visitId/notes",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:VISITID-VITALS",
+    "method": "POST",
+    "path": "/visits/:visitId/vitals",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:VISITID-SYMPTOMS",
+    "method": "POST",
+    "path": "/visits/:visitId/symptoms",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:VISITID-CLINICAL-REMARKS",
+    "method": "POST",
+    "path": "/visits/:visitId/clinical-remarks",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:VISITID-RATING",
+    "method": "POST",
+    "path": "/visits/:visitId/rating",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES-:NURSEID-REVIEWS",
+    "method": "GET",
+    "path": "/nurses/:nurseId/reviews",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES-:NURSEID-SCORE",
+    "method": "GET",
+    "path": "/nurses/:nurseId/score",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES-:NURSEID-BADGES",
+    "method": "GET",
+    "path": "/nurses/:nurseId/badges",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-POST-NURSES-:NURSEID-VACATIONS",
+    "method": "POST",
+    "path": "/nurses/:nurseId/vacations",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES-:NURSEID-VACATIONS",
+    "method": "GET",
+    "path": "/nurses/:nurseId/vacations",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-DELETE-NURSES-:NURSEID-VACATIONS-:VACATIONID",
+    "method": "DELETE",
+    "path": "/nurses/:nurseId/vacations/:vacationId",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/visit.routes.ts"
+  },
+  {
+    "id": "API-PUT-VISITS-:ID-CHECK-IN",
+    "method": "PUT",
+    "path": "/visits/:id/check-in",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-PUT-VISITS-:ID-CHECK-OUT",
+    "method": "PUT",
+    "path": "/visits/:id/check-out",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-GET-VISITS-:ID-ATTENDANCE",
+    "method": "GET",
+    "path": "/visits/:id/attendance",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-PUT-VISITS-:ID-CONFIRM-ARRIVAL",
+    "method": "PUT",
+    "path": "/visits/:id/confirm-arrival",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-GET-VISITS-:ID-QR-CODE",
+    "method": "GET",
+    "path": "/visits/:id/qr-code",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:ID-VERIFY-QR",
+    "method": "POST",
+    "path": "/visits/:id/verify-qr",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:ID-VERIFY-GPS",
+    "method": "POST",
+    "path": "/visits/:id/verify-gps",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:ID-VERIFY-MANUAL",
+    "method": "POST",
+    "path": "/visits/:id/verify-manual",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-PUT-VISITS-:ID-COMPLETE",
+    "method": "PUT",
+    "path": "/visits/:id/complete",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-POST-VISITS-:ID-EVIDENCE",
+    "method": "POST",
+    "path": "/visits/:id/evidence",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-GET-VISITS-:ID-EVIDENCE",
+    "method": "GET",
+    "path": "/visits/:id/evidence",
+    "module": "Care",
+    "sourceFile": "backend/src/domains/care/visit/verification/verification.routes.ts"
+  },
+  {
+    "id": "API-POST-CHAT-AI-:PATIENTID-MESSAGES",
+    "method": "POST",
+    "path": "/chat/ai/:patientId/messages",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-GET-CHAT-AI-:PATIENTID-MESSAGES",
+    "method": "GET",
+    "path": "/chat/ai/:patientId/messages",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-GET-CHAT-THREADS",
+    "method": "GET",
+    "path": "/chat/threads",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-POST-CHAT-THREADS",
+    "method": "POST",
+    "path": "/chat/threads",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-POST-CHAT-THREADS-:THREADID-MESSAGES",
+    "method": "POST",
+    "path": "/chat/threads/:threadId/messages",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-POST-CHAT-THREADS-:THREADID-MESSAGES-MEDIA",
+    "method": "POST",
+    "path": "/chat/threads/:threadId/messages/media",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-GET-CHAT-THREADS-:THREADID-MESSAGES",
+    "method": "GET",
+    "path": "/chat/threads/:threadId/messages",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-PUT-CHAT-THREADS-:THREADID-MESSAGES-READ",
+    "method": "PUT",
+    "path": "/chat/threads/:threadId/messages/read",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-PUT-CHAT-THREADS-:THREADID-FOLLOW-UP",
+    "method": "PUT",
+    "path": "/chat/threads/:threadId/follow-up",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-GET-PATIENTS-:ID-COMMUNICATION-HISTORY",
+    "method": "GET",
+    "path": "/patients/:id/communication-history",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/chat/chat.routes.ts"
+  },
+  {
+    "id": "API-GET-NOTIFICATIONS",
+    "method": "GET",
+    "path": "/notifications",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/notification/notification.routes.ts"
+  },
+  {
+    "id": "API-PUT-NOTIFICATIONS-:ID-READ",
+    "method": "PUT",
+    "path": "/notifications/:id/read",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/notification/notification.routes.ts"
+  },
+  {
+    "id": "API-PUT-NOTIFICATIONS-PREFERENCES",
+    "method": "PUT",
+    "path": "/notifications/preferences",
+    "module": "Communication",
+    "sourceFile": "backend/src/domains/communication/notification/notification.routes.ts"
+  },
+  {
+    "id": "API-GET-STATS",
+    "method": "GET",
+    "path": "/stats",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-USERS-DOCTOR",
+    "method": "POST",
+    "path": "/users/doctor",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-USERS-PARAMEDIC",
+    "method": "POST",
+    "path": "/users/paramedic",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-USERS-INVITE",
+    "method": "POST",
+    "path": "/users/invite",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-USERS",
+    "method": "GET",
+    "path": "/users",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-USERS-:ID",
+    "method": "GET",
+    "path": "/users/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-USERS-:ID-STATUS",
+    "method": "PUT",
+    "path": "/users/:id/status",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-DELETE-USERS-:ID",
+    "method": "DELETE",
+    "path": "/users/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES",
+    "method": "GET",
+    "path": "/nurses",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES-PENDING",
+    "method": "GET",
+    "path": "/nurses/pending",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-NURSES-:ID-APPROVE",
+    "method": "PUT",
+    "path": "/nurses/:id/approve",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-NURSES-:ID-REJECT",
+    "method": "PUT",
+    "path": "/nurses/:id/reject",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-NURSES-:ID-REVOKE",
+    "method": "PUT",
+    "path": "/nurses/:id/revoke",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-DOCTORS",
+    "method": "GET",
+    "path": "/doctors",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-DOCTORS-PENDING",
+    "method": "GET",
+    "path": "/doctors/pending",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-DOCTORS-:ID-APPROVE",
+    "method": "PUT",
+    "path": "/doctors/:id/approve",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-DOCTORS-:ID-REJECT",
+    "method": "PUT",
+    "path": "/doctors/:id/reject",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-DOCTORS-:ID-REVOKE",
+    "method": "PUT",
+    "path": "/doctors/:id/revoke",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-MARKETPLACE-OFFERS",
+    "method": "GET",
+    "path": "/marketplace/offers",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-MARKETPLACE-OFFERS-:ID-REMOVE",
+    "method": "PUT",
+    "path": "/marketplace/offers/:id/remove",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-CONFIG",
+    "method": "GET",
+    "path": "/config",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-CONFIG-FEATURE-FLAGS",
+    "method": "GET",
+    "path": "/config/feature-flags",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-CONFIG-:KEY",
+    "method": "PUT",
+    "path": "/config/:key",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-AUDIT-LOGS",
+    "method": "GET",
+    "path": "/audit-logs",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-AUDIT-LOGS-EXPORT",
+    "method": "POST",
+    "path": "/audit-logs/export",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-CASES-OVERRIDE-ASSIGNMENT",
+    "method": "PUT",
+    "path": "/cases/override-assignment",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-CASES",
+    "method": "GET",
+    "path": "/cases",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-CONTRACTS",
+    "method": "GET",
+    "path": "/contracts",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-VISITS",
+    "method": "GET",
+    "path": "/visits",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-CASES-UNASSIGNED",
+    "method": "GET",
+    "path": "/cases/unassigned",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-CASES-ASSIGNED",
+    "method": "GET",
+    "path": "/cases/assigned",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-CASES-HIGH-RISK",
+    "method": "GET",
+    "path": "/cases/high-risk",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-EMERGENCIES",
+    "method": "GET",
+    "path": "/emergencies",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-EMERGENCIES-:ID-ASSIGN-DOCTOR",
+    "method": "POST",
+    "path": "/emergencies/:id/assign-doctor",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-EMERGENCIES-:ID-ASSIGN-PARAMEDIC",
+    "method": "POST",
+    "path": "/emergencies/:id/assign-paramedic",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-EMERGENCIES-:ID-ASSIGN-AMBULANCE",
+    "method": "POST",
+    "path": "/emergencies/:id/assign-ambulance",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-EMERGENCIES-:ID-RESOLVE",
+    "method": "PUT",
+    "path": "/emergencies/:id/resolve",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-EMERGENCIES-:ID-ESCALATE",
+    "method": "PUT",
+    "path": "/emergencies/:id/escalate",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-HOSPITALS",
+    "method": "GET",
+    "path": "/hospitals",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-HOSPITALS",
+    "method": "POST",
+    "path": "/hospitals",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-HOSPITALS-:ID",
+    "method": "PUT",
+    "path": "/hospitals/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-DELETE-HOSPITALS-:ID",
+    "method": "DELETE",
+    "path": "/hospitals/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-AMBULANCES",
+    "method": "GET",
+    "path": "/ambulances",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-AMBULANCES",
+    "method": "POST",
+    "path": "/ambulances",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-AMBULANCES-:ID",
+    "method": "GET",
+    "path": "/ambulances/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-AMBULANCES-:ID",
+    "method": "PUT",
+    "path": "/ambulances/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-DELETE-AMBULANCES-:ID",
+    "method": "DELETE",
+    "path": "/ambulances/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-GET-REVIEWS",
+    "method": "GET",
+    "path": "/reviews",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-PUT-REVIEWS-:ID-MODERATE",
+    "method": "PUT",
+    "path": "/reviews/:id/moderate",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-DELETE-REVIEWS-:ID",
+    "method": "DELETE",
+    "path": "/reviews/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/admin/admin.routes.ts"
+  },
+  {
+    "id": "API-POST-REGISTER",
+    "method": "POST",
+    "path": "/register",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-REGISTER-INVITED",
+    "method": "POST",
+    "path": "/register-invited",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-VERIFY-OTP",
+    "method": "POST",
+    "path": "/verify-otp",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-RESEND-OTP",
+    "method": "POST",
+    "path": "/resend-otp",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-LOGIN",
+    "method": "POST",
+    "path": "/login",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-REFRESH",
+    "method": "POST",
+    "path": "/refresh",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-LOGOUT",
+    "method": "POST",
+    "path": "/logout",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-FORGOT-PASSWORD",
+    "method": "POST",
+    "path": "/forgot-password",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-RESET-PASSWORD",
+    "method": "POST",
+    "path": "/reset-password",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-VERIFY-MFA-LOGIN",
+    "method": "POST",
+    "path": "/verify-mfa-login",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-GET-ME",
+    "method": "GET",
+    "path": "/me",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-CHANGE-PASSWORD",
+    "method": "POST",
+    "path": "/change-password",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-MFA-ENABLE",
+    "method": "POST",
+    "path": "/mfa/enable",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-MFA-VERIFY-ENABLE",
+    "method": "POST",
+    "path": "/mfa/verify-enable",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-MFA-REQUEST-DISABLE",
+    "method": "POST",
+    "path": "/mfa/request-disable",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-POST-MFA-DISABLE",
+    "method": "POST",
+    "path": "/mfa/disable",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/auth/auth.routes.ts"
+  },
+  {
+    "id": "API-GET-DOCTORS-QUEUE",
+    "method": "GET",
+    "path": "/doctors/queue",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-GET-DOCTORS-QUEUE-HIGH-RISK",
+    "method": "GET",
+    "path": "/doctors/queue/high-risk",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-PUT-CASES-:CASEID-ACCEPT-EMERGENCY",
+    "method": "PUT",
+    "path": "/cases/:caseId/accept-emergency",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-PUT-CASES-:CASEID-START-REVIEW",
+    "method": "PUT",
+    "path": "/cases/:caseId/start-review",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-PUT-CASES-:CASEID-RESOLVE",
+    "method": "PUT",
+    "path": "/cases/:caseId/resolve",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-GET-CASES-:CASEID-REVIEW",
+    "method": "GET",
+    "path": "/cases/:caseId/review",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-GET-DOCTORS-LIST",
+    "method": "GET",
+    "path": "/doctors/list",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-CASES-:CASEID-SECOND-OPINION",
+    "method": "POST",
+    "path": "/cases/:caseId/second-opinion",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-CASES-:CASEID-DIAGNOSIS",
+    "method": "POST",
+    "path": "/cases/:caseId/diagnosis",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-GET-CASES-:CASEID-DIAGNOSIS",
+    "method": "GET",
+    "path": "/cases/:caseId/diagnosis",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-CASES-:CASEID-CARE-PLAN",
+    "method": "POST",
+    "path": "/cases/:caseId/care-plan",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-CASES-:CASEID-PRESCRIPTIONS",
+    "method": "POST",
+    "path": "/cases/:caseId/prescriptions",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-PRESCRIPTIONS-:ID-SUPERSEDE",
+    "method": "POST",
+    "path": "/prescriptions/:id/supersede",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-CASES-:CASEID-DECISION",
+    "method": "POST",
+    "path": "/cases/:caseId/decision",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-CASES-:CASEID-FOLLOW-UP",
+    "method": "POST",
+    "path": "/cases/:caseId/follow-up",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-POST-CASES-:CASEID-AI-FEEDBACK",
+    "method": "POST",
+    "path": "/cases/:caseId/ai-feedback",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/doctor/doctor.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-PROFILE",
+    "method": "GET",
+    "path": "/:id/profile",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-PUT-:ID-PROFILE",
+    "method": "PUT",
+    "path": "/:id/profile",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-QUALIFICATIONS",
+    "method": "POST",
+    "path": "/:id/qualifications",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-DELETE-:ID-QUALIFICATIONS-:QUALID",
+    "method": "DELETE",
+    "path": "/:id/qualifications/:qualId",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-SPECIALIZATIONS",
+    "method": "POST",
+    "path": "/:id/specializations",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-VERIFICATION",
+    "method": "GET",
+    "path": "/:id/verification",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-VERIFICATION-UPLOAD",
+    "method": "POST",
+    "path": "/:id/verification/upload",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-PUT-VERIFICATION-REVIEW",
+    "method": "PUT",
+    "path": "/verification/review",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-AVAILABILITY",
+    "method": "GET",
+    "path": "/:id/availability",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-AVAILABILITY",
+    "method": "POST",
+    "path": "/:id/availability",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-DELETE-:ID-AVAILABILITY-:SLOTID",
+    "method": "DELETE",
+    "path": "/:id/availability/:slotId",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-EARNINGS",
+    "method": "GET",
+    "path": "/:id/earnings",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/nurse/nurse.routes.ts"
+  },
+  {
+    "id": "API-GET-USERS-SEARCH-PHONE",
+    "method": "GET",
+    "path": "/users/search-phone",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-EMERGENCY-ACTIVE",
+    "method": "GET",
+    "path": "/:id/emergency/active",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-EMERGENCY-CONTACTS",
+    "method": "POST",
+    "path": "/:id/emergency-contacts",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-DELETE-:ID-EMERGENCY-CONTACTS-:CONTACTID",
+    "method": "DELETE",
+    "path": "/:id/emergency-contacts/:contactId",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-MEDICAL-HISTORY",
+    "method": "GET",
+    "path": "/:id/medical-history",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-CLINICAL-OUTCOMES",
+    "method": "GET",
+    "path": "/:id/clinical-outcomes",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-CONDITIONS",
+    "method": "POST",
+    "path": "/:id/conditions",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-ALLERGIES",
+    "method": "POST",
+    "path": "/:id/allergies",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-POST-:ID-MEDICATIONS",
+    "method": "POST",
+    "path": "/:id/medications",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-POST-REQUESTS",
+    "method": "POST",
+    "path": "/requests",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-REQUESTS",
+    "method": "GET",
+    "path": "/requests",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-REQUESTS-:ID",
+    "method": "GET",
+    "path": "/requests/:id",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-PUT-REQUESTS-:ID-CANCEL",
+    "method": "PUT",
+    "path": "/requests/:id/cancel",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-PUT-REQUESTS-:ID-RESCHEDULE",
+    "method": "PUT",
+    "path": "/requests/:id/reschedule",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-VISITS",
+    "method": "GET",
+    "path": "/:id/visits",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-VITALS-HISTORY",
+    "method": "GET",
+    "path": "/:id/vitals-history",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-RISK-HISTORY",
+    "method": "GET",
+    "path": "/:id/risk-history",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-PRESCRIPTIONS",
+    "method": "GET",
+    "path": "/:id/prescriptions",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-DASHBOARD",
+    "method": "GET",
+    "path": "/:id/dashboard",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-CARE-PLANS",
+    "method": "GET",
+    "path": "/:id/care-plans",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-GET-:ID-CAREGIVERS",
+    "method": "GET",
+    "path": "/:id/caregivers",
+    "module": "Identity",
+    "sourceFile": "backend/src/domains/identity/patient/patient.routes.ts"
+  },
+  {
+    "id": "API-POST-CONTRACTS",
+    "method": "POST",
+    "path": "/contracts",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-GET-CONTRACTS-:ID",
+    "method": "GET",
+    "path": "/contracts/:id",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-PUT-CONTRACTS-:ID-APPROVE",
+    "method": "PUT",
+    "path": "/contracts/:id/approve",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-PUT-CONTRACTS-:ID-REJECT",
+    "method": "PUT",
+    "path": "/contracts/:id/reject",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-PUT-CONTRACTS-:ID-CANCEL",
+    "method": "PUT",
+    "path": "/contracts/:id/cancel",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-GET-CONTRACTS-:ID-AUDIT-TRAIL",
+    "method": "GET",
+    "path": "/contracts/:id/audit-trail",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-GET-PATIENTS-:PATIENTID-CONTRACTS",
+    "method": "GET",
+    "path": "/patients/:patientId/contracts",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-GET-NURSES-:NURSEID-CONTRACTS",
+    "method": "GET",
+    "path": "/nurses/:nurseId/contracts",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/contracts/contract.routes.ts"
+  },
+  {
+    "id": "API-GET-MARKETPLACE-REQUESTS",
+    "method": "GET",
+    "path": "/marketplace/requests",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-POST-MARKETPLACE-LISTINGS-:ID-OFFERS",
+    "method": "POST",
+    "path": "/marketplace/listings/:id/offers",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-PUT-OFFERS-:ID",
+    "method": "PUT",
+    "path": "/offers/:id",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-DELETE-OFFERS-:ID",
+    "method": "DELETE",
+    "path": "/offers/:id",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-GET-MARKETPLACE-LISTINGS-:ID-OFFERS",
+    "method": "GET",
+    "path": "/marketplace/listings/:id/offers",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-POST-MARKETPLACE-LISTINGS-:ID-SELECT",
+    "method": "POST",
+    "path": "/marketplace/listings/:id/select",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-POST-PATIENTS-:ID-FAVORITE-NURSES",
+    "method": "POST",
+    "path": "/patients/:id/favorite-nurses",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-GET-PATIENTS-:ID-FAVORITE-NURSES",
+    "method": "GET",
+    "path": "/patients/:id/favorite-nurses",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-POST-PRICING-PREVIEW",
+    "method": "POST",
+    "path": "/pricing/preview",
+    "module": "Marketplace",
+    "sourceFile": "backend/src/domains/marketplace/marketplace/marketplace.routes.ts"
+  },
+  {
+    "id": "API-GET-",
+    "method": "GET",
+    "path": "/",
+    "module": "Platform",
+    "sourceFile": "backend/src/domains/platform/health/health.routes.ts"
+  }
+]

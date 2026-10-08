@@ -27,6 +27,7 @@ export class VerificationPolicy {
     for (const doc of documents) {
       if (this.REQUIRED_DOCUMENTS.includes(doc.documentType)) {
         checksMap[doc.documentType] = {
+          id: doc.id,
           status: doc.status,
           fileUrl: doc.fileUrl,
           rejectionReason: doc.rejectionReason,

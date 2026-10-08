@@ -1,6 +1,7 @@
 import { AppError } from '../../../common/errors/AppError';
 import { HTTP_STATUS } from '../../../common/constants/index';
 import { ClinicalRepository } from './clinical.repository';
+import { VisitAccessPolicy, VisitActor } from '../visit/shared/policies/visit-access.policy';
 
 export class ClinicalService {
   public static async performRiskAssessment(
@@ -118,7 +119,7 @@ export class ClinicalService {
     );
 
     if (shouldCreateCase) {
-      console.log(`[ALERT] High risk visit ${data.visitId} auto-assigned to clinical case queue with 2-hour SLA.`);
+      console.log(`[ALERT] High risk visit ${data.visitId} queued for doctor assignment with 5-minute SLA.`);
     }
 
     return assessment;
@@ -152,10 +153,11 @@ export class ClinicalService {
       .map(item => item.entry);
   }
 
-  public static async getVisitAiSummary(visitId: string) {
+  public static async getVisitAiSummary(visitId: string, actor: VisitActor) {
     const visit = await ClinicalRepository.findVisitForAiSummary(visitId);
 
-    if (!visit) throw new AppError('', HTTP_STATUS.NOT_FOUND);
+    if (!visit) throw new AppError('Visit not found', HTTP_STATUS.NOT_FOUND);
+    VisitAccessPolicy.assertCanRead(visit, actor);
 
     const patientName = visit.request.patient.user.fullName;
     const latestVitals = visit.vitals.sort((a, b) => b.recordedAt.getTime() - a.recordedAt.getTime())[0];

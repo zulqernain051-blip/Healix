@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { COLORS } from '../../theme';
+import { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import { navigate } from '../../utils/navigation';
-import { useVerifyOtp } from '../../hooks/useAuth';
+import { useVerifyOtp, useResendOtp } from '../../hooks/useAuth';
 import { ApiError } from '../../types/api';
 
 /**
@@ -15,18 +16,19 @@ export default function VerifyOtpScreen() {
   const emailOrPhone = (params.emailOrPhone as string) || '';
 
   const [code, setCode] = useState('');
+  const resend = useResendOtp();
   const verifyOtpMutation = useVerifyOtp();
   const isLoading = verifyOtpMutation.isPending;
   const error = verifyOtpMutation.error as ApiError | null;
   
 
   const handleVerify = () => {
-    if (code.length !== 6) return;
+    if (!/^\d{6}$/.test(code) || !emailOrPhone) return;
     verifyOtpMutation.mutate(
       { emailOrPhone, code },
       {
-        onSuccess: () => {
-          navigate('/auth/login', { message: 'OTP verified successfully. You can now log in.' });
+        onSuccess: (result) => {
+          navigate('/auth/login', { message: result.status === 'ACTIVE' ? 'Email verified. You can now sign in.' : result.role === 'NURSE' ? 'Email verified. Sign in to submit your professional verification documents.' : 'Email verified. Your account awaits administrator approval.' });
         },
       }
     );
@@ -63,13 +65,16 @@ export default function VerifyOtpScreen() {
           mode="contained"
           onPress={handleVerify}
           loading={isLoading}
-          disabled={isLoading || code.length !== 6}
+          disabled={isLoading || !/^\d{6}$/.test(code) || !emailOrPhone}
           style={styles.button}
           contentStyle={styles.buttonContent}
           buttonColor="#0D9488">
           Verify Code
         </Button>
 
+        <Button mode="text" textColor={COLORS.navy} loading={resend.isPending} disabled={resend.isPending || !emailOrPhone} onPress={() => resend.mutate({ emailOrPhone })}>Resend code</Button>
+        {resend.isSuccess && <Text>New verification code sent.</Text>}
+        {resend.error && <HelperText type="error">{resend.error.message}</HelperText>}
         <Button
           mode="text"
           onPress={() => navigate('/auth/login')}

@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TextInput, Alert, ActivityIndicator, Platform } from 'react-native';
+import { COLORS } from '../../theme';
+import { useState } from 'react';
+import { View, StyleSheet, TextInput, Alert, Platform } from 'react-native';
 import { Button, Text, Card } from 'react-native-paper';
 import { useSubmitDiagnosis } from '../../hooks/useDoctor';
 
-const COLORS = {
-  bg: '#0A1628', card: '#111D35', border: '#1E2D4A', teal: '#0D9488',
-  textPrimary: '#F1F5F9', textSecondary: '#94A3B8', textMuted: '#475569'
-};
 
 export function DiagnosisForm({ caseId, onComplete, onCancel }: { caseId: string, onComplete: () => void, onCancel: () => void }) {
   const { mutateAsync: submitDiagnosis, isPending } = useSubmitDiagnosis();
@@ -15,12 +12,12 @@ export function DiagnosisForm({ caseId, onComplete, onCancel }: { caseId: string
   const [notes, setNotes] = useState('');
 
   const handleSubmit = async () => {
-    if (!code || !description) {
+    if (!code.trim() || !description.trim()) {
       if (Platform.OS === 'web') alert('ICD Code and Description are required.'); else Alert.alert('Validation Error', 'ICD Code and Description are required.');
       return;
     }
     try {
-      await submitDiagnosis({ caseId, data: { code, description, notes } });
+      await submitDiagnosis({ caseId, data: { code: code.trim(), description: description.trim(), notes: notes.trim() } });
       if (Platform.OS === 'web') alert('Diagnosis added successfully.'); else Alert.alert('Success', 'Diagnosis added successfully.');
       onComplete();
     } catch (err: any) {
@@ -42,8 +39,8 @@ export function DiagnosisForm({ caseId, onComplete, onCancel }: { caseId: string
         <TextInput style={[styles.input, { height: 80, textAlignVertical: 'top' }]} placeholder="Additional remarks..." placeholderTextColor={COLORS.textMuted} multiline value={notes} onChangeText={setNotes} />
 
         <View style={styles.actions}>
-          <Button mode="text" onPress={onCancel} textColor={COLORS.textSecondary} disabled={isPending}>Cancel</Button>
-          <Button mode="contained" onPress={handleSubmit} buttonColor={COLORS.teal} loading={isPending} disabled={isPending}>Save Diagnosis</Button>
+          <Button mode="text" onPress={onCancel} textColor={COLORS.textBody} disabled={isPending}>Cancel</Button>
+          <Button mode="contained" onPress={handleSubmit} buttonColor={COLORS.navy} loading={isPending} disabled={isPending}>Save Diagnosis</Button>
         </View>
       </Card.Content>
     </Card>
@@ -51,9 +48,9 @@ export function DiagnosisForm({ caseId, onComplete, onCancel }: { caseId: string
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: COLORS.card, borderColor: COLORS.border, borderWidth: 1, marginBottom: 16 },
-  title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
-  label: { color: COLORS.textSecondary, marginBottom: 6, fontSize: 14 },
-  input: { backgroundColor: COLORS.bg, color: COLORS.textPrimary, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.border, marginBottom: 16 },
+  card: { backgroundColor: COLORS.surfaceCard, borderColor: COLORS.inputBorder, borderWidth: 1, marginBottom: 16 },
+  title: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
+  label: { color: COLORS.textBody, marginBottom: 6, fontSize: 14 },
+  input: { backgroundColor: COLORS.surface, color: COLORS.textDark, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.inputBorder, marginBottom: 16 },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }
 });

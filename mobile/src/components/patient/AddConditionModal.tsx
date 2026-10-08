@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface AddConditionModalProps {
   visible: boolean;
@@ -20,20 +20,23 @@ export const AddConditionModal: React.FC<AddConditionModalProps> = ({
   const [diagnosedDate, setDiagnosedDate] = useState('');
   const [notes, setNotes] = useState('');
 
+  const [formError, setFormError] = useState('');
   const handleSubmit = async () => {
     if (!name.trim()) return;
-    await onSubmit(name, diagnosedDate || undefined, notes || undefined);
+    setFormError('');
+    try { await onSubmit(name, diagnosedDate || undefined, notes || undefined);
     setName('');
     setDiagnosedDate('');
     setNotes('');
     onClose();
+    } catch(e: any) { setFormError(e.message || 'Could not save. Please try again.'); }
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.title}>Add Chronic Condition</Text>
+          {!!formError && <Text accessibilityRole="alert" style={{color:COLORS.red}}>{formError}</Text>}<Text style={styles.title}>Add Chronic Condition</Text>
           <Text style={styles.sub}>Enter condition details:</Text>
 
           <TextInput

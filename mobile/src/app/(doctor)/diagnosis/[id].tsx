@@ -1,29 +1,17 @@
-import React, { useState } from 'react';
+import { COLORS } from '../../../theme';
+import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Card, TextInput, Button, Divider, List } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCaseReview, useSubmitDiagnosis } from '../../../hooks/useDoctor';
 
-const COLORS = {
-  bg: '#0A1628',
-  card: '#111D35',
-  border: '#1E2D4A',
-  teal: '#0D9488',
-  emerald: '#10B981',
-  amber: '#F59E0B',
-  blue: '#3B82F6',
-  red: '#EF4444',
-  textPrimary: '#F1F5F9',
-  textSecondary: '#94A3B8',
-  textMuted: '#475569'
-};
 
 export default function DiagnosisScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams(); // Case ID
   const caseId = id as string;
 
-  const { data: selectedCaseReview } = useCaseReview(caseId);
+  const { data: selectedCaseReview, isLoading, error, refetch } = useCaseReview(caseId);
   const { mutateAsync: submitDiagnosis } = useSubmitDiagnosis();
 
   const [code, setCode] = useState('');
@@ -32,6 +20,7 @@ export default function DiagnosisScreen() {
   const [parentId, setParentId] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
 
+  const canEdit = !!selectedCaseReview?.case.doctorId && ['ASSIGNED', 'IN_REVIEW'].includes(selectedCaseReview.case.status);
   const diagnosesHistory = selectedCaseReview?.case?.visit?.request?.patient?.diagnoses || [];
 
   const handleSelectCorrection = (diag: any) => {
@@ -50,7 +39,7 @@ export default function DiagnosisScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!caseId) return;
+    if (!caseId || !canEdit) return;
     if (code.trim().length === 0 || description.trim().length === 0) {
       Alert.alert('Validation Error', 'ICD Code and Description are required.');
       return;
@@ -83,6 +72,9 @@ export default function DiagnosisScreen() {
         <Text style={styles.subtitle}>Log ICD-10 diagnoses or issue versioned audit corrections</Text>
       </View>
 
+      {isLoading && <Text style={styles.subtitle}>Loading case...</Text>}
+      {error && <View><Text style={styles.subtitle}>{(error as Error).message}</Text><Button onPress={() => void refetch()}>Retry</Button></View>}
+      {!isLoading && !canEdit && <Text style={styles.subtitle}>Diagnosis requires an active case assigned to you.</Text>}
       {/* Entry Form Card */}
       <Card style={styles.card}>
         <Card.Content>
@@ -108,7 +100,7 @@ export default function DiagnosisScreen() {
             onChangeText={setCode}
             placeholder="e.g. I10 (Essential Hypertension)"
             mode="outlined"
-            activeOutlineColor={COLORS.teal}
+            activeOutlineColor={COLORS.navy}
             style={styles.input}
           />
 
@@ -117,7 +109,7 @@ export default function DiagnosisScreen() {
             value={description}
             onChangeText={setDescription}
             mode="outlined"
-            activeOutlineColor={COLORS.teal}
+            activeOutlineColor={COLORS.navy}
             style={styles.input}
           />
 
@@ -126,7 +118,7 @@ export default function DiagnosisScreen() {
             value={notes}
             onChangeText={setNotes}
             mode="outlined"
-            activeOutlineColor={COLORS.teal}
+            activeOutlineColor={COLORS.navy}
             style={styles.input}
             multiline
             numberOfLines={3}
@@ -137,7 +129,7 @@ export default function DiagnosisScreen() {
             buttonColor={COLORS.emerald}
             onPress={handleSubmit}
             loading={submitting}
-            disabled={submitting || code.trim().length === 0 || description.trim().length === 0}
+            disabled={!canEdit || submitting || code.trim().length === 0 || description.trim().length === 0}
             style={{ marginTop: 12 }}
           >
             {parentId ? 'Issue Versioned Correction' : 'Append Diagnosis'}
@@ -158,15 +150,15 @@ export default function DiagnosisScreen() {
               <List.Item
                 key={diag.id}
                 title={`${diag.code} - ${diag.description}`}
-                titleStyle={{ color: COLORS.textPrimary, fontSize: 14, fontWeight: '700' }}
+                titleStyle={{ color: COLORS.textDark, fontSize: 14, fontWeight: '700' }}
                 description={`Version: ${diag.version} | Notes: ${diag.notes || 'None'}\nLogged: ${new Date(diag.diagnosedAt).toLocaleDateString()}`}
-                descriptionStyle={{ color: COLORS.textSecondary, fontSize: 12, lineHeight: 18 }}
+                descriptionStyle={{ color: COLORS.textBody, fontSize: 12, lineHeight: 18 }}
                 right={(props) => (
                   <Button
                     compact
                     mode="outlined"
-                    textColor={COLORS.teal}
-                    style={{ alignSelf: 'center', borderColor: COLORS.border }}
+                    textColor={COLORS.navy}
+                    style={{ alignSelf: 'center', borderColor: COLORS.inputBorder }}
                     onPress={() => handleSelectCorrection(diag)}
                   >
                     Correct
@@ -183,16 +175,16 @@ export default function DiagnosisScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
+  container: { flex: 1, backgroundColor: COLORS.surface },
   content: { padding: 20, paddingBottom: 40 },
   header: { marginBottom: 20 },
-  title: { color: COLORS.textPrimary, fontSize: 22, fontWeight: '700' },
-  subtitle: { color: COLORS.textSecondary, fontSize: 13, marginTop: 4 },
-  card: { backgroundColor: COLORS.card, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, marginBottom: 20 },
-  cardTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '700' },
-  divider: { backgroundColor: COLORS.border, marginVertical: 10 },
-  input: { backgroundColor: COLORS.card, color: COLORS.textPrimary, marginBottom: 12 },
+  title: { color: COLORS.textDark, fontSize: 22, fontWeight: '700' },
+  subtitle: { color: COLORS.textBody, fontSize: 13, marginTop: 4 },
+  card: { backgroundColor: COLORS.surfaceCard, borderRadius: 16, borderWidth: 1, borderColor: COLORS.inputBorder, marginBottom: 20 },
+  cardTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  divider: { backgroundColor: COLORS.inputBorder, marginVertical: 10 },
+  input: { backgroundColor: COLORS.surfaceCard, color: COLORS.textDark, marginBottom: 12 },
   correctionBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F59E0B1A', padding: 8, borderRadius: 6, marginBottom: 12 },
   emptyText: { color: COLORS.textMuted, fontSize: 13, textAlign: 'center', marginVertical: 12 },
-  historyRow: { borderBottomWidth: 1, borderBottomColor: COLORS.border, paddingVertical: 8 }
+  historyRow: { borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder, paddingVertical: 8 }
 });

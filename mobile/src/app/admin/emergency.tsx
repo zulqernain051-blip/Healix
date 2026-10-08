@@ -1,116 +1,557 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
-import { Text, Card, Chip, Appbar, Button, Portal, Dialog, TextInput } from 'react-native-paper';
+import { useState } from 'react';
+import { navigate } from '../../utils/navigation';
+import { View, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { Text, Card, Chip, Appbar, Button, Portal, Dialog, TextInput, Divider } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-import { useAdminEmergencies, useEscalateEmergency, useAssignEmergencyDoctor } from '../../hooks/useAdmin';
+import {
+  useAdminEmergencies,
+  useEscalateEmergency,
+  useAssignEmergencyDoctor,
+  useResolveEmergency,
+  useAssignEmergencyParamedic,
+  useAdminDoctors
+} from '../../hooks/useAdmin';
 import { COLORS, SPACING, RADIUS } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { AdminEmergency } from '../../types/admin';
 
 export default function AdminEmergencyCenter() {
   const router = useRouter();
 
-  // Active emergencies automatically refetch every 5000ms as per hook definition
-  const { data: emergencies, isLoading, isError } = useAdminEmergencies();
-  
-  const escalateMutation = useEscalateEmergency();
-  const assignMutation = useAssignEmergencyDoctor();
+  // Active emergencies automatically refetch every 5000ms
+  const { data: emergencies, isLoading, isError, refetch } = useAdminEmergencies();
+  const { data: registeredDoctors = [], isLoading: isLoadingDoctors } = useAdminDoctors();
 
+  const escalateMutation = useEscalateEmergency();
+  const assignDoctorMutation = useAssignEmergencyDoctor();
+  const assignParamedicMutation = useAssignEmergencyParamedic();
+  const resolveMutation = useResolveEmergency();
+
+  // Dialog states
   const [selectedEmergencyId, setSelectedEmergencyId] = useState<string | null>(null);
   const [doctorId, setDoctorId] = useState('');
+  const [doctorDropdownOpen, setDoctorDropdownOpen] = useState(false);
+  const [selectedDoctorDisplay, setSelectedDoctorDisplay] = useState('');
 
-  const handleAssign = () => {
-    if (!selectedEmergencyId || !doctorId) return;
-    assignMutation.mutate({ id: selectedEmergencyId, doctorId }, {
+  const [selectedDispatchId, setSelectedDispatchId] = useState<string | null>(null);
+  const [paramedicId, setParamedicId] = useState('');
+
+  const [resolvingEmergencyId, setResolvingEmergencyId] = useState<string | null>(null);
+  const [resolutionNotes, setResolutionNotes] = useState('');
+
+  const handleAssignDoctor = () => {
+    if (!selectedEmergencyId || !doctorId.trim()) return;
+    assignDoctorMutation.mutate({ id: selectedEmergencyId, doctorId: doctorId.trim() }, {
       onSuccess: () => {
         setSelectedEmergencyId(null);
         setDoctorId('');
+        setDoctorDropdownOpen(false);
+        setSelectedDoctorDisplay('');
       }
     });
   };
 
-  const renderContent = () => {
-    if (isLoading && !emergencies) return <ActivityIndicator color="#EF4444" style={{ marginTop: 20 }} />;
-    if (isError) return <Text style={{ color: '#EF4444', textAlign: 'center', marginTop: 20 }}>Error loading emergencies.</Text>;
-    if (!emergencies?.length) return <Text style={styles.emptyText}>No active emergencies</Text>;
-    
-    return emergencies.map(em => (
-      <Card key={em.id} style={[styles.card, em.status === 'ADMIN_ESCALATED' && styles.escalatedCard]}>
-        <Card.Content>
-          <View style={styles.row}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <MaterialCommunityIcons name="alert-decagram" size={20} color={em.status === 'ADMIN_ESCALATED' ? '#EF4444' : '#F59E0B'} />
-              <Text style={styles.cardTitle}>Emergency: {em.id.slice(0, 8)}</Text>
-            </View>
-            <Chip textStyle={{ fontSize: 10, color: '#FFF' }} style={{ backgroundColor: em.status === 'ADMIN_ESCALATED' ? '#EF4444' : '#F59E0B' }}>
-              {em.status}
-            </Chip>
+  const handleAssignParamedic = () => {
+    if (!selectedDispatchId || !paramedicId.trim()) return;
+    assignParamedicMutation.mutate({ dispatchId: selectedDispatchId, paramedicId: paramedicId.trim() }, {
+      onSuccess: () => {
+        setSelectedDispatchId(null);
+        setParamedicId('');
+      }
+    });
+  };
+
+  const handleResolve = () => {
+    if (!resolvingEmergencyId) return;
+    resolveMutation.mutate({ id: resolvingEmergencyId, notes: resolutionNotes.trim() }, {
+      onSuccess: () => {
+        setResolvingEmergencyId(null);
+        setResolutionNotes('');
+      }
+    });
+  };
+
+  const renderDispatchCard = (dispatch: NonNullable<AdminEmergency['activeDispatch']>) => {
+    return (
+      <View style={styles.dispatchSection}>
+        <View style={styles.dispatchHeader}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <MaterialCommunityIcons name="ambulance" size={18} color={COLORS.navy} />
+            <Text style={styles.dispatchTitle}>Ambulance Dispatch</Text>
           </View>
-          <Text style={styles.cardSub}>Patient ID: {em.patientId?.slice(0, 8)}</Text>
-          <Text style={styles.cardSub}>SLA Breach: {em.slaBreach ? 'YES' : 'NO'}</Text>
-          
-          {em.assignedDoctorId && (
-            <Text style={styles.cardSub}>Assigned Dr: {em.assignedDoctorId.slice(0, 8)}</Text>
+          <Chip
+            textStyle={{ fontSize: 11, fontWeight: '700', color: '#FFF' }}
+            style={{
+              backgroundColor:
+                dispatch.status === 'COMPLETED'
+                  ? COLORS.careEmerald
+                  : dispatch.status === 'ARRIVED'
+                  ? COLORS.blue
+                  : COLORS.amber
+            }}
+          >
+            {dispatch.status}
+          </Chip>
+        </View>
+
+        <View style={styles.dispatchDetailsGrid}>
+          {dispatch.ambulance ? (
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="car-emergency" size={16} color={COLORS.textBody} />
+              <Text style={styles.detailText}>
+                <Text style={{ fontWeight: '700' }}>Ambulance: </Text>
+                {dispatch.ambulance.vehicleNumber} ({dispatch.ambulance.plateNumber}) • {dispatch.ambulance.type}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="car-off" size={16} color={COLORS.amber} />
+              <Text style={[styles.detailText, { color: COLORS.amber }]}>No vehicle assigned</Text>
+            </View>
           )}
 
-          <View style={styles.actionRow}>
-            {em.status !== 'ADMIN_ESCALATED' && (
-              <Button 
-                mode="text" 
-                textColor="#F59E0B"
-                onPress={() => escalateMutation.mutate(em.id)}
-                loading={escalateMutation.isPending}
-              >
-                Escalate
-              </Button>
-            )}
-            {em.status === 'ADMIN_ESCALATED' && !em.assignedDoctorId && (
-              <Button 
-                mode="contained" 
-                style={{ backgroundColor: '#EF4444', marginTop: 10 }}
-                onPress={() => setSelectedEmergencyId(em.id)}
-              >
-                Assign Doctor Manually
-              </Button>
-            )}
+          {dispatch.paramedic ? (
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="account-tie" size={16} color={COLORS.textBody} />
+              <Text style={styles.detailText}>
+                <Text style={{ fontWeight: '700' }}>Paramedic: </Text>
+                {dispatch.paramedic.name} ({dispatch.paramedic.phone || dispatch.paramedic.certificationNumber})
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="account-alert" size={16} color={COLORS.amber} />
+              <Text style={[styles.detailText, { color: COLORS.amber }]}>Paramedic unassigned</Text>
+            </View>
+          )}
+
+          {dispatch.hospital && (
+            <View style={styles.detailRow}>
+              <MaterialCommunityIcons name="hospital-building" size={16} color={COLORS.textBody} />
+              <Text style={styles.detailText}>
+                <Text style={{ fontWeight: '700' }}>Hospital: </Text>
+                {dispatch.hospital.name}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.detailRow}>
+            <MaterialCommunityIcons name="timer-outline" size={16} color={COLORS.textBody} />
+            <Text style={styles.detailText}>
+              <Text style={{ fontWeight: '700' }}>ETA: </Text>
+              {dispatch.etaMinutes} mins
+            </Text>
           </View>
-        </Card.Content>
-      </Card>
-    ));
+        </View>
+      </View>
+    );
+  };
+
+  const renderContent = () => {
+    if (isLoading && !emergencies) {
+      return (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator color={COLORS.red} size="large" />
+          <Text style={styles.loadingText}>Monitoring emergency queue...</Text>
+        </View>
+      );
+    }
+    if (isError) {
+      return (
+        <View style={styles.centerContainer}>
+          <MaterialCommunityIcons name="alert-circle-outline" size={48} color={COLORS.red} />
+          <Text style={styles.errorText}>Error loading emergencies. Check connection.</Text>
+          <Button mode="outlined" textColor={COLORS.navy} onPress={() => refetch()} style={{ marginTop: 12 }}>
+            Retry
+          </Button>
+        </View>
+      );
+    }
+    if (!emergencies?.length) {
+      return (
+        <View style={styles.centerContainer}>
+          <MaterialCommunityIcons name="check-circle-outline" size={56} color={COLORS.careEmerald} />
+          <Text style={styles.allClearTitle}>All Clear</Text>
+          <Text style={styles.allClearSubtitle}>No active emergencies or SLA breaches at this moment.</Text>
+        </View>
+      );
+    }
+
+    return emergencies.map((em) => {
+      const isCritical = em.severity === 'CRITICAL' || em.status === 'CRITICAL';
+      const isBreached = em.slaBreach;
+
+      return (
+        <Card
+          key={em.id}
+          style={[
+            styles.card,
+            isBreached && styles.breachedCard,
+            isCritical && styles.criticalCard
+          ]}
+        >
+          <Card.Content>
+            {/* Card Header */}
+            <View style={styles.cardHeader}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+                <MaterialCommunityIcons
+                  name={isBreached ? 'alert-octagon' : 'alert-decagram'}
+                  size={22}
+                  color={isBreached || isCritical ? COLORS.red : COLORS.amber}
+                />
+                <View>
+                  <Text style={styles.cardTitle}>Emergency #{em.id.slice(0, 8)}</Text>
+                  <Text style={styles.cardSourceText}>Source: {em.source || 'CLINICAL'}</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', gap: 6 }}>
+                <Chip
+                  textStyle={{ fontSize: 10, fontWeight: '700', color: '#FFF' }}
+                  style={{ backgroundColor: isCritical ? COLORS.red : COLORS.amber }}
+                >
+                  {em.severity || 'CRITICAL'}
+                </Chip>
+                <Chip
+                  textStyle={{ fontSize: 10, fontWeight: '700', color: '#FFF' }}
+                  style={{ backgroundColor: em.status === 'RESOLVED' ? COLORS.careEmerald : COLORS.navy }}
+                >
+                  {em.status}
+                </Chip>
+              </View>
+            </View>
+
+            {/* SLA Breach Alert Banner */}
+            {isBreached && (
+              <View style={styles.breachBanner}>
+                <MaterialCommunityIcons name="alarm-light" size={16} color={COLORS.red} />
+                <Text style={styles.breachBannerText}>SLA TIMEOUT BREACHED — IMMEDIATE CLINICAL ACTION REQUIRED</Text>
+              </View>
+            )}
+
+            {/* Patient & Doctor Clinical Info */}
+            <View style={styles.infoBlock}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Patient:</Text>
+                <Text style={styles.infoValue}>
+                  {em.patientName || 'Unknown Patient'} {em.patientPhone ? `(${em.patientPhone})` : ''}
+                </Text>
+              </View>
+
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Assigned Doctor:</Text>
+                {(() => {
+                  const matchedDoc = registeredDoctors.find((d: any) => d.id === em.assignedDoctorId);
+                  const docDisplayName = em.assignedDoctorName
+                    ? em.assignedDoctorName
+                    : matchedDoc?.user?.fullName
+                    ? (matchedDoc.user.fullName.startsWith('Dr') ? matchedDoc.user.fullName : `Dr. ${matchedDoc.user.fullName}`)
+                    : em.assignedDoctorId
+                    ? `Doctor (${em.assignedDoctorId.slice(0, 8)})`
+                    : 'Unassigned (Awaiting Review)';
+
+                  return (
+                    <Text style={[styles.infoValue, !em.assignedDoctorId && { color: COLORS.red, fontWeight: '700' }]}>
+                      {docDisplayName}
+                    </Text>
+                  );
+                })()}
+              </View>
+            </View>
+
+            {/* Ambulance Dispatch Section */}
+            {em.activeDispatch && renderDispatchCard(em.activeDispatch)}
+
+            <Divider style={{ marginVertical: 12 }} />
+
+            {/* Action Buttons */}
+            <View style={styles.actionRow}>
+              {!em.assignedDoctorId && (
+                <Button
+                  mode="contained"
+                  buttonColor={COLORS.navy}
+                  textColor="#FFF"
+                  icon="doctor"
+                  onPress={() => setSelectedEmergencyId(em.id)}
+                  style={styles.actionBtn}
+                  compact
+                >
+                  Assign Doctor
+                </Button>
+              )}
+
+              {em.activeDispatch && !em.activeDispatch.paramedic && (
+                <Button
+                  mode="contained"
+                  buttonColor={COLORS.blue}
+                  textColor="#FFF"
+                  icon="account-plus"
+                  onPress={() => setSelectedDispatchId(em.activeDispatch?.id || null)}
+                  style={styles.actionBtn}
+                  compact
+                >
+                  Assign Paramedic
+                </Button>
+              )}
+
+              {em.status !== 'RESOLVED' && (
+                <Button
+                  mode="outlined"
+                  textColor={COLORS.careEmerald}
+                  icon="check-circle"
+                  onPress={() => setResolvingEmergencyId(em.id)}
+                  style={[styles.actionBtn, { borderColor: COLORS.careEmerald }]}
+                  compact
+                >
+                  Resolve
+                </Button>
+              )}
+
+              {em.severity !== 'CRITICAL' && (
+                <Button
+                  mode="text"
+                  textColor={COLORS.red}
+                  icon="alert"
+                  onPress={() => escalateMutation.mutate(em.id)}
+                  loading={escalateMutation.isPending}
+                  compact
+                >
+                  Escalate
+                </Button>
+              )}
+            </View>
+          </Card.Content>
+        </Card>
+      );
+    });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Appbar.Header style={{ backgroundColor: '#1A0505' }}>
-        <Appbar.BackAction onPress={() => router.back()} color="#EF4444" />
-        <Appbar.Content title="Emergency Center" titleStyle={{ color: '#EF4444', fontWeight: 'bold' }} />
-        <Appbar.Action icon="refresh" color="#EF4444" />
+      <Appbar.Header style={{ backgroundColor: COLORS.navyDark }}>
+        <Appbar.BackAction onPress={() => router.back()} color="#FFF" />
+        <Appbar.Action icon="ambulance" color={COLORS.headerText} onPress={() => navigate('/admin/ambulances')} />
+        <Appbar.Content title="Emergency Center" titleStyle={{ color: '#FFF', fontWeight: 'bold' }} />
+        <Appbar.Action icon="refresh" color="#FFF" onPress={() => refetch()} />
       </Appbar.Header>
-      
+
       <View style={styles.liveIndicator}>
         <View style={styles.dot} />
-        <Text style={styles.liveText}>LIVE MONITORING (Updates every 5s)</Text>
+        <Text style={styles.liveText}>LIVE MONITORING (Active Queue • 5s Pulse)</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         {renderContent()}
       </ScrollView>
 
+      {/* Assign Doctor Dialog */}
       <Portal>
-        <Dialog visible={!!selectedEmergencyId} onDismiss={() => setSelectedEmergencyId(null)} style={{ backgroundColor: '#2A0808' }}>
-          <Dialog.Title style={{ color: '#FFF' }}>Assign Emergency Doctor</Dialog.Title>
+        <Dialog
+          visible={!!selectedEmergencyId}
+          onDismiss={() => {
+            setSelectedEmergencyId(null);
+            setDoctorDropdownOpen(false);
+            setDoctorId('');
+            setSelectedDoctorDisplay('');
+          }}
+          style={{ backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.md }}
+        >
+          <Dialog.Title style={{ color: COLORS.textDark, fontWeight: '700' }}>Assign Emergency Doctor</Dialog.Title>
           <Dialog.Content>
+            <Text style={{ color: COLORS.textBody, marginBottom: 12, fontSize: 13 }}>
+              Select a doctor from the registry or enter a Doctor ID to immediately transfer clinical supervision:
+            </Text>
+
+            {/* Doctor Selection Dropdown Button */}
+            <Text style={{ color: COLORS.textDark, fontWeight: '700', fontSize: 13, marginBottom: 6 }}>
+              Select Registered Doctor:
+            </Text>
+            <TouchableOpacity
+              style={styles.dropdownButton}
+              activeOpacity={0.8}
+              onPress={() => setDoctorDropdownOpen(prev => !prev)}
+            >
+              <MaterialCommunityIcons name="doctor" size={20} color={COLORS.navy} style={{ marginRight: 8 }} />
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={[
+                    styles.dropdownSelectedText,
+                    !selectedDoctorDisplay && { color: COLORS.textSecondary }
+                  ]}
+                  numberOfLines={1}
+                >
+                  {selectedDoctorDisplay || 'Choose a registered doctor...'}
+                </Text>
+              </View>
+              <MaterialCommunityIcons
+                name={doctorDropdownOpen ? 'chevron-up' : 'chevron-down'}
+                size={22}
+                color={COLORS.navy}
+              />
+            </TouchableOpacity>
+
+            {/* Dropdown Menu List */}
+            {doctorDropdownOpen && (
+              <View style={styles.dropdownListContainer}>
+                <ScrollView style={{ maxHeight: 180 }} nestedScrollEnabled keyboardShouldPersistTaps="handled">
+                  {isLoadingDoctors ? (
+                    <View style={{ padding: 14, alignItems: 'center' }}>
+                      <ActivityIndicator size="small" color={COLORS.navy} />
+                      <Text style={{ color: COLORS.textSecondary, fontSize: 12, marginTop: 4 }}>Loading doctors...</Text>
+                    </View>
+                  ) : registeredDoctors.length === 0 ? (
+                    <View style={{ padding: 14, alignItems: 'center' }}>
+                      <Text style={{ color: COLORS.textSecondary, fontSize: 12 }}>No registered doctors found.</Text>
+                    </View>
+                  ) : (
+                    registeredDoctors.map((doc: any) => {
+                      const isSelected = doctorId === doc.id;
+                      const rawName = doc.user?.fullName || 'Physician';
+                      const docName = rawName.startsWith('Dr') ? rawName : `Dr. ${rawName}`;
+                      const spec = doc.specialization || doc.pmdcNumber || 'General Physician';
+                      return (
+                        <TouchableOpacity
+                          key={doc.id}
+                          style={[styles.dropdownItem, isSelected && styles.dropdownItemSelected]}
+                          onPress={() => {
+                            setDoctorId(doc.id);
+                            setSelectedDoctorDisplay(`${docName} (${spec})`);
+                            setDoctorDropdownOpen(false);
+                          }}
+                        >
+                          <View style={{ flex: 1 }}>
+                            <Text style={[styles.doctorItemName, isSelected && { color: COLORS.navy, fontWeight: '700' }]}>
+                              {docName}
+                            </Text>
+                            <Text style={styles.doctorItemSub} numberOfLines={1}>
+                              {spec} · {doc.user?.email || doc.id.slice(0, 8)}
+                            </Text>
+                          </View>
+                          {isSelected && (
+                            <MaterialCommunityIcons name="check-circle" size={18} color={COLORS.careEmerald} />
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })
+                  )}
+                </ScrollView>
+              </View>
+            )}
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 12 }}>
+              <Divider style={{ flex: 1, backgroundColor: COLORS.dividerLight }} />
+              <Text style={{ marginHorizontal: 8, color: COLORS.textSecondary, fontSize: 11, fontWeight: '600' }}>
+                OR ENTER DOCTOR ID MANUALLY
+              </Text>
+              <Divider style={{ flex: 1, backgroundColor: COLORS.dividerLight }} />
+            </View>
+
             <TextInput
               label="Doctor ID"
               value={doctorId}
-              onChangeText={setDoctorId}
-              style={styles.input}
-              textColor="#FFF"
-              theme={{ colors: { primary: '#EF4444', text: '#FFF', placeholder: '#94A3B8' } }}
+              onChangeText={(text) => {
+                setDoctorId(text);
+                const matched = registeredDoctors.find((d: any) => d.id === text.trim());
+                if (matched) {
+                  const rawName = matched.user?.fullName || 'Physician';
+                  const docName = rawName.startsWith('Dr') ? rawName : `Dr. ${rawName}`;
+                  const spec = (matched as any).specialization || matched.pmdcNumber || 'Consultant';
+                  setSelectedDoctorDisplay(`${docName} (${spec})`);
+                } else {
+                  setSelectedDoctorDisplay('');
+                }
+              }}
+              mode="outlined"
+              style={{ backgroundColor: COLORS.surface }}
+              activeOutlineColor={COLORS.navy}
+              placeholder="e.g. uuid-doctor-id"
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setSelectedEmergencyId(null)} textColor="#94A3B8">Cancel</Button>
-            <Button onPress={handleAssign} textColor="#EF4444" loading={assignMutation.isPending}>Assign</Button>
+            <Button
+              onPress={() => {
+                setSelectedEmergencyId(null);
+                setDoctorDropdownOpen(false);
+                setDoctorId('');
+                setSelectedDoctorDisplay('');
+              }}
+              textColor={COLORS.textBody}
+            >
+              Cancel
+            </Button>
+            <Button
+              onPress={handleAssignDoctor}
+              textColor={COLORS.navy}
+              loading={assignDoctorMutation.isPending}
+              disabled={!doctorId.trim() || assignDoctorMutation.isPending}
+            >
+              Assign
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        {/* Assign Paramedic Dialog */}
+        <Dialog
+          visible={!!selectedDispatchId}
+          onDismiss={() => setSelectedDispatchId(null)}
+          style={{ backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.md }}
+        >
+          <Dialog.Title style={{ color: COLORS.textDark, fontWeight: '700' }}>Assign Paramedic</Dialog.Title>
+          <Dialog.Content>
+            <Text style={{ color: COLORS.textBody, marginBottom: 8, fontSize: 13 }}>
+              Enter Paramedic ID to allocate to this ambulance dispatch:
+            </Text>
+            <TextInput
+              label="Paramedic ID"
+              value={paramedicId}
+              onChangeText={setParamedicId}
+              mode="outlined"
+              style={{ backgroundColor: COLORS.surface }}
+              activeOutlineColor={COLORS.blue}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setSelectedDispatchId(null)} textColor={COLORS.textBody}>Cancel</Button>
+            <Button
+              onPress={handleAssignParamedic}
+              textColor={COLORS.blue}
+              loading={assignParamedicMutation.isPending}
+            >
+              Assign
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        {/* Resolve Emergency Dialog */}
+        <Dialog
+          visible={!!resolvingEmergencyId}
+          onDismiss={() => setResolvingEmergencyId(null)}
+          style={{ backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.md }}
+        >
+          <Dialog.Title style={{ color: COLORS.textDark, fontWeight: '700' }}>Resolve Emergency</Dialog.Title>
+          <Dialog.Content>
+            <Text style={{ color: COLORS.textBody, marginBottom: 8, fontSize: 13 }}>
+              Confirm resolution of this emergency. Active dispatches will be completed and vehicles released to available status.
+            </Text>
+            <TextInput
+              label="Resolution Notes (Optional)"
+              value={resolutionNotes}
+              onChangeText={setResolutionNotes}
+              mode="outlined"
+              multiline
+              numberOfLines={3}
+              style={{ backgroundColor: COLORS.surface }}
+              activeOutlineColor={COLORS.careEmerald}
+            />
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setResolvingEmergencyId(null)} textColor={COLORS.textBody}>Cancel</Button>
+            <Button
+              onPress={handleResolve}
+              textColor={COLORS.careEmerald}
+              loading={resolveMutation.isPending}
+            >
+              Confirm Resolve
+            </Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -119,17 +560,140 @@ export default function AdminEmergencyCenter() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1A0505' },
-  liveIndicator: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', padding: 10, backgroundColor: 'rgba(239, 68, 68, 0.1)' },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#EF4444', marginRight: 8 },
-  liveText: { color: '#EF4444', fontSize: 12, fontWeight: '700' },
-  content: { padding: SPACING.md, gap: 12, paddingBottom: 40 },
-  card: { backgroundColor: '#2A0808', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(245, 158, 11, 0.3)' },
-  escalatedCard: { borderColor: '#EF4444', borderWidth: 2 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  cardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  cardSub: { color: '#94A3B8', fontSize: 13, marginTop: 2 },
-  actionRow: { marginTop: 10, alignItems: 'flex-start' },
-  emptyText: { color: '#94A3B8', textAlign: 'center', marginTop: 40, fontSize: 16 },
-  input: { backgroundColor: 'rgba(0,0,0,0.3)', marginBottom: 10 },
+  container: { flex: 1, backgroundColor: COLORS.surface },
+  liveIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(239, 68, 68, 0.2)'
+  },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.red, marginRight: 8 },
+  liveText: { color: COLORS.red, fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
+  content: { padding: SPACING.md, gap: 14, paddingBottom: 40 },
+  card: {
+    backgroundColor: COLORS.surfaceCard,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.inputBorder,
+    elevation: 2
+  },
+  breachedCard: {
+    borderColor: COLORS.red,
+    borderWidth: 2
+  },
+  criticalCard: {
+    borderLeftWidth: 5,
+    borderLeftColor: COLORS.red
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8
+  },
+  cardTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  cardSourceText: { color: COLORS.textBody, fontSize: 12, marginTop: 1 },
+  breachBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: RADIUS.sm,
+    marginVertical: 8
+  },
+  breachBannerText: { color: COLORS.red, fontSize: 11, fontWeight: '800' },
+  infoBlock: {
+    backgroundColor: COLORS.surface,
+    padding: 10,
+    borderRadius: RADIUS.sm,
+    marginVertical: 6,
+    gap: 4
+  },
+  infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  infoLabel: { color: COLORS.textBody, fontSize: 13, fontWeight: '600' },
+  infoValue: { color: COLORS.textDark, fontSize: 13, fontWeight: '500' },
+  dispatchSection: {
+    marginTop: 10,
+    backgroundColor: 'rgba(11, 66, 104, 0.04)',
+    padding: 10,
+    borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(11, 66, 104, 0.12)'
+  },
+  dispatchHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8
+  },
+  dispatchTitle: { color: COLORS.navy, fontSize: 14, fontWeight: '700' },
+  dispatchDetailsGrid: { gap: 6 },
+  detailRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  detailText: { color: COLORS.textBody, fontSize: 12 },
+  actionRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    alignItems: 'center'
+  },
+  actionBtn: { borderRadius: RADIUS.sm },
+  centerContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 60, gap: 10 },
+  loadingText: { color: COLORS.textBody, fontSize: 14 },
+  errorText: { color: COLORS.red, fontSize: 14, textAlign: 'center' },
+  allClearTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: '700', marginTop: 8 },
+  allClearSubtitle: { color: COLORS.textBody, fontSize: 13, textAlign: 'center', paddingHorizontal: 20 },
+  dropdownButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.surface,
+    borderWidth: 1.5,
+    borderColor: COLORS.inputBorder,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  dropdownSelectedText: {
+    color: COLORS.textDark,
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  dropdownListContainer: {
+    backgroundColor: COLORS.surfaceCard,
+    borderWidth: 1,
+    borderColor: COLORS.inputBorder,
+    borderRadius: RADIUS.sm,
+    marginTop: 4,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  dropdownItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.dividerLight,
+  },
+  dropdownItemSelected: {
+    backgroundColor: 'rgba(11, 66, 104, 0.08)',
+  },
+  doctorItemName: {
+    color: COLORS.textDark,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  doctorItemSub: {
+    color: COLORS.textBody,
+    fontSize: 11,
+    marginTop: 2,
+  },
 });

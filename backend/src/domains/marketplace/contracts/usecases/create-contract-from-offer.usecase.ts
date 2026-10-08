@@ -16,6 +16,7 @@ export class CreateContractFromOfferUseCase {
 
     const offer = await MarketplaceRepository.findOfferById(offerId);
     if (!offer) throw new AppError('Offer not found', HTTP_STATUS.NOT_FOUND);
+    if (offer.listingId !== listingId) throw new AppError('Offer does not belong to this listing', HTTP_STATUS.CONFLICT);
     if (offer.status !== 'ACCEPTED') {
       throw new AppError(`Cannot create contract: Offer is ${offer.status}, must be ACCEPTED.`, HTTP_STATUS.BAD_REQUEST);
     }

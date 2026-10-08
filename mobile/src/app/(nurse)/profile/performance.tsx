@@ -5,25 +5,13 @@ import { useAuthStore } from '../../../store/auth';
 import { useNurseScore, useNurseBadges } from '../../../hooks/useNurse';
 import { ErrorState } from '../../../components/common/ErrorState';
 
-const COLORS = {
-  bg: '#0A1628',
-  card: '#111D35',
-  border: '#1E2D4A',
-  teal: '#0D9488',
-  emerald: '#10B981',
-  amber: '#F59E0B',
-  blue: '#3B82F6',
-  red: '#EF4444',
-  textPrimary: '#F1F5F9',
-  textSecondary: '#94A3B8',
-  textMuted: '#475569'
-};
+import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 const BADGE_MAP: Record<string, { label: string; color: string }> = {
   FIRST_VISIT: { label: '🏅 First Visit Done', color: COLORS.emerald },
   TEN_VISITS: { label: '⭐ 10 Visits milestone', color: COLORS.blue },
   TOP_RATED: { label: '👑 Top Rated Expert', color: COLORS.amber },
-  VERIFIED_SPECIALIST: { label: '🎖 Verified Specialist', color: COLORS.teal },
+  VERIFIED_SPECIALIST: { label: '🎖 Verified Specialist', color: COLORS.navy },
   RELIABLE: { label: '🔒 Highly Reliable', color: COLORS.emerald }
 };
 
@@ -43,7 +31,7 @@ export default function NursePerformanceScreen() {
   if (isLoading && !nurseScore) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={COLORS.teal} />
+        <ActivityIndicator size="large" color={COLORS.navy} />
         <Text style={styles.loadingText}>Fetching performance metrics...</Text>
       </View>
     );
@@ -66,6 +54,8 @@ export default function NursePerformanceScreen() {
         <Text style={styles.subtitle}>Track your ratings, internal metrics, and special achievement badges</Text>
       </View>
 
+      <Text style={{ color: COLORS.textBody }}>Skill ratings use recorded administrator assessments of verified specialties. They are internal assessments, not clinical certification. Reliability uses completed check-ins within 15 minutes of the scheduled start.</Text>
+      <Text style={{ color: COLORS.textDark }}>Recommendation rate: {nurseScore?.recommendationRate == null ? 'No reviews yet' : `${nurseScore.recommendationRate.toFixed(0)}%`} ({nurseScore?.reviewCount || 0} reviews)</Text>
       {/* Circle Composite Score */}
       <View style={styles.scoreCircleContainer}>
         <View style={styles.circle}>
@@ -83,9 +73,9 @@ export default function NursePerformanceScreen() {
           <View style={styles.metricRow}>
             <View style={styles.metricLabelRow}>
               <Text style={styles.metricLabel}>Skill Rating</Text>
-              <Text style={styles.metricVal}>{Math.round(score.skillScore)}%</Text>
+              <Text style={styles.metricVal}>{nurseScore?.skillAssessmentCount ? `${Math.round(score.skillScore)}%` : 'Not assessed'}</Text>
             </View>
-            <ProgressBar progress={score.skillScore / 100} color={COLORS.teal} style={styles.progressBar} />
+            <ProgressBar progress={score.skillScore / 100} color={COLORS.navy} style={styles.progressBar} />
           </View>
 
           <View style={styles.metricRow}>
@@ -114,6 +104,7 @@ export default function NursePerformanceScreen() {
         </Card.Content>
       </Card>
 
+      {nurseScore?.assessedSkills?.map(skill => <Card key={skill.specialization} style={styles.card}><Card.Content><Text style={styles.cardTitle}>{skill.specialization.replaceAll('_', ' ')} · {skill.proficiencyRating}/5</Text><Text style={styles.metricLabel}>{skill.assessmentNotes}</Text><Text style={styles.metricLabel}>{new Date(skill.assessedAt).toLocaleDateString()}</Text></Card.Content></Card>)}
       {/* Overall Summary stats */}
       <View style={styles.statsRow}>
         <Card style={[styles.statCard, { marginRight: 10 }]}>
@@ -142,7 +133,7 @@ export default function NursePerformanceScreen() {
           ) : (
             <View style={styles.badgeContainer}>
               {(nurseBadges || []).map((badge: any) => {
-                const badgeInfo = BADGE_MAP[badge.badgeType] || { label: badge.badgeType, color: COLORS.textSecondary };
+                const badgeInfo = BADGE_MAP[badge.badgeType] || { label: badge.badgeType, color: COLORS.textBody };
                 return (
                   <Chip
                     key={badge.id}
@@ -162,39 +153,39 @@ export default function NursePerformanceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.bg },
+  container: { flex: 1, backgroundColor: COLORS.surface },
   content: { padding: 20, paddingBottom: 40 },
   header: { marginBottom: 20 },
-  title: { color: COLORS.textPrimary, fontSize: 22, fontWeight: '700' },
-  subtitle: { color: COLORS.textSecondary, fontSize: 13, marginTop: 4 },
-  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.bg },
-  loadingText: { color: COLORS.textSecondary, marginTop: 12 },
+  title: { color: COLORS.textDark, fontSize: 22, fontWeight: '700' },
+  subtitle: { color: COLORS.textBody, fontSize: 13, marginTop: 4 },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface },
+  loadingText: { color: COLORS.textBody, marginTop: 12 },
   scoreCircleContainer: { alignItems: 'center', marginVertical: 24 },
   circle: {
     width: 140,
     height: 140,
     borderRadius: 70,
     borderWidth: 6,
-    borderColor: COLORS.teal,
+    borderColor: COLORS.navy,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.card
+    backgroundColor: COLORS.surfaceCard
   },
-  circleNumber: { color: COLORS.textPrimary, fontSize: 36, fontWeight: '800' },
-  circleLabel: { color: COLORS.textSecondary, fontSize: 11, fontWeight: '600', textTransform: 'uppercase', marginTop: 4 },
-  card: { backgroundColor: COLORS.card, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border, marginBottom: 20 },
-  cardTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '700' },
-  divider: { backgroundColor: COLORS.border, marginVertical: 10 },
+  circleNumber: { color: COLORS.textDark, fontSize: 36, fontWeight: '800' },
+  circleLabel: { color: COLORS.textBody, fontSize: 11, fontWeight: '600', textTransform: 'uppercase', marginTop: 4 },
+  card: { backgroundColor: COLORS.surfaceCard, borderRadius: 16, borderWidth: 1, borderColor: COLORS.inputBorder, marginBottom: 20 },
+  cardTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  divider: { backgroundColor: COLORS.inputBorder, marginVertical: 10 },
   metricRow: { marginBottom: 16 },
   metricLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  metricLabel: { color: COLORS.textSecondary, fontSize: 14, fontWeight: '500' },
-  metricVal: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '700' },
+  metricLabel: { color: COLORS.textBody, fontSize: 14, fontWeight: '500' },
+  metricVal: { color: COLORS.textDark, fontSize: 14, fontWeight: '700' },
   progressBar: { height: 8, borderRadius: 4 },
   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
-  statCard: { flex: 1, backgroundColor: COLORS.card, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
+  statCard: { flex: 1, backgroundColor: COLORS.surfaceCard, borderRadius: 16, borderWidth: 1, borderColor: COLORS.inputBorder },
   statCenter: { alignItems: 'center' },
-  statNumber: { color: COLORS.textPrimary, fontSize: 24, fontWeight: '800' },
-  statLabel: { color: COLORS.textSecondary, fontSize: 12, marginTop: 4 },
+  statNumber: { color: COLORS.textDark, fontSize: 24, fontWeight: '800' },
+  statLabel: { color: COLORS.textBody, fontSize: 12, marginTop: 4 },
   badgeContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   badgeChip: { paddingHorizontal: 6, paddingVertical: 4 },
   emptyText: { color: COLORS.textMuted, fontSize: 13, textAlign: 'center', lineHeight: 18, paddingVertical: 10 }

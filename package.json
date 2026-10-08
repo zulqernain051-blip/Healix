@@ -7,6 +7,13 @@
     "backend:dev": "pnpm --filter healix-backend dev",
     "backend:build": "pnpm --filter healix-backend build",
     "backend:start": "pnpm --filter healix-backend start",
-    "mobile:start": "pnpm --filter healix-mobile start"
+    "backend:test": "pnpm --filter healix-backend test",
+    "backend:typecheck": "pnpm --filter healix-backend typecheck",
+    "mobile:start": "pnpm --filter healix-mobile start",
+    "mobile:lint": "pnpm --filter healix-mobile lint",
+    "web:dev": "npm --prefix web run dev",
+    "web:build": "npm --prefix web run build",
+    "qa:test": "npm --prefix qa-tests test",
+    "qa:list": "npm --prefix qa-tests run test:list"
   }
 }

@@ -1,5 +1,7 @@
+import supportRouter from '../domains/identity/admin/support.routes';
 import { Router } from 'express';
 import authRouter from '../domains/identity/auth';
+import analyticsRouter from '../domains/analytics/analytics.routes';
 import patientRouter from '../domains/identity/patient';
 import nurseRouter from '../domains/identity/nurse/nurse.routes';
 import visitRouter from '../domains/care/visit/visit.routes';
@@ -20,6 +22,8 @@ const router = Router();
 
 // Register the Authentication feature routes under Version 1
 router.use('/auth', authRouter);
+router.use(supportRouter);
+router.use(analyticsRouter);
 router.use('/patients', patientRouter);
 router.use('/nurses', nurseRouter);
 router.use('/', visitRouter);

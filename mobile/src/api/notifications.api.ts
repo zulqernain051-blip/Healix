@@ -11,7 +11,7 @@ export interface Notification {
 }
 
 export const notificationsApi = {
-  getNotifications: () => apiClient.get<{ success: boolean; data: Notification[] }>('/notifications'),
+  getNotifications: () => apiClient.get<Notification[]>('/notifications'),
   markAsRead: (id: string) => apiClient.put(`/notifications/${id}/read`, {}),
   markAllAsRead: () => apiClient.put('/notifications/read-all', {}),
 };

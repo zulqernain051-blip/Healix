@@ -5,27 +5,27 @@ export const secondOpinionSchema = z.object({
 });
 
 export const diagnosisSchema = z.object({
-  code: z.string().min(1, 'ICD code is required'),
-  description: z.string().min(1, 'Description is required'),
+  code: z.string().trim().min(1, 'ICD code is required'),
+  description: z.string().trim().min(1, 'Description is required'),
   notes: z.string().optional(),
   parentId: z.string().uuid().optional() // self-referencing for corrections
 });
 
 export const carePlanMilestoneSchema = z.object({
-  title: z.string().min(1, 'Milestone title is required'),
+  title: z.string().trim().min(1, 'Milestone title is required'),
   targetDate: z.string().datetime()
 });
 
 export const carePlanSchema = z.object({
-  title: z.string().min(1, 'Plan title is required'),
+  title: z.string().trim().min(1, 'Plan title is required'),
   description: z.string().optional(),
   milestones: z.array(carePlanMilestoneSchema).min(1, 'At least one milestone is required')
 });
 
 export const prescriptionItemSchema = z.object({
-  medicationName: z.string().min(1, 'Medication name is required'),
-  dosage: z.string().min(1, 'Dosage is required'),
-  frequency: z.string().min(1, 'Frequency is required'),
+  medicationName: z.string().trim().min(1, 'Medication name is required'),
+  dosage: z.string().trim().min(1, 'Dosage is required'),
+  frequency: z.string().trim().min(1, 'Frequency is required'),
   durationDays: z.number().int().positive()
 });
 
@@ -40,6 +40,7 @@ export const decisionSchema = z.object({
   decision: z.enum(['CONTINUE_MONITORING', 'RECOMMEND_ADMISSION', 'REQUEST_EMERGENCY', 'FOLLOW_UP']),
   justification: z.string().min(10, 'Justification must be at least 10 characters long'),
   autoDispatch: z.boolean().default(false) // toggle settings for dispatch
+  ,hospitalId: z.string().uuid().optional()
 });
 
 export const homeVisitSchema = z.object({

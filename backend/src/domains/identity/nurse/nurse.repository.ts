@@ -72,43 +72,20 @@ export class NurseRepository {
   // TODO Phase 6:
   // Move to Finance bounded context after Finance Domain and Domain Events exist.
   public static async findEarnings(nurseId: string) {
-    const visits = await prisma.visit.findMany({
-      where: { nurseId, status: 'COMPLETED' },
-      include: {
-        request: {
-          include: { payment: true, contract: true }
-        }
-      }
+    // A request payment is counted once, even if the request has recurring visits.
+    const payments = await prisma.payment.findMany({
+      where: { request: { visits: { some: { nurseId, status: 'COMPLETED' } } } },
+      include: { request: { select: { type: true, scheduledAt: true } } },
+      orderBy: { createdAt: 'desc' }
     });
-
-    let totalEarned = 0;
-    let pendingAmount = 0;
-    let completedCount = 0;
-    let pendingCount = 0;
-    const history: any[] = [];
-
-    for (const v of visits) {
-      if (v.request?.payment) {
-        // Calculate the nurse cut (80% of payment amount, or based on contract)
-        const amount = Number(v.request.payment.amount) * 0.8;
-        
-        if (v.request.payment.status === 'PAID') {
-          totalEarned += amount;
-          completedCount++;
-        } else {
-          pendingAmount += amount;
-          pendingCount++;
-        }
-
-        history.push({
-          id: v.request.payment.id,
-          amount,
-          status: v.request.payment.status,
-          createdAt: v.request.payment.createdAt
-        });
-      }
-    }
-
-    return { totalEarned, completedCount, pendingAmount, pendingCount, history };
+    const paid = payments.filter(p => p.status === 'PAID');
+    const pending = payments.filter(p => p.status === 'PENDING');
+    return {
+      totalEarned: paid.reduce((sum, p) => sum + p.amount, 0),
+      pendingAmount: pending.reduce((sum, p) => sum + p.amount, 0),
+      completedCount: paid.length, pendingCount: pending.length,
+      basis: 'Recorded care payments; gross amount before fees. Payout settlement is not connected.',
+      history: payments.map(p => ({ id: p.id, amount: p.amount, status: p.status, createdAt: p.createdAt, paidAt: p.paidAt, type: p.request.type }))
+    };
   }
 }

@@ -51,13 +51,11 @@ export class SubmitPrescriptionUseCase {
       }
     }
 
-    const mockPdfUrl = `http://healix.com/prescriptions/${Date.now()}.pdf`;
-
     return this.clinicalRepository.createPrescription(
       patientId,
       doctorId,
       visitId,
-      mockPdfUrl,
+      '',
       data.instructions,
       data.items,
       data.supersedesId

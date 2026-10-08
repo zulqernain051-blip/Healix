@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface AddEmergencyContactModalProps {
   visible: boolean;
@@ -15,18 +15,21 @@ export const AddEmergencyContactModal: React.FC<AddEmergencyContactModalProps> =
   const [phone, setPhone] = useState('');
   const [relationship, setRelationship] = useState('');
 
+  const [formError, setFormError] = useState('');
   const handleSubmit = async () => {
     if (!name.trim() || !phone.trim() || !relationship.trim()) return;
-    await onSubmit(name, phone, relationship);
+    setFormError('');
+    try { await onSubmit(name, phone, relationship);
     setName(''); setPhone(''); setRelationship('');
     onClose();
+    } catch(e: any) { setFormError(e.message || 'Could not save. Please try again.'); }
   };
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={styles.modal}>
-          <Text style={styles.title}>Add Emergency Contact</Text>
+          {!!formError && <Text accessibilityRole="alert" style={{color:COLORS.red}}>{formError}</Text>}<Text style={styles.title}>Add Emergency Contact</Text>
           <TextInput style={styles.input} placeholder="Contact Name" placeholderTextColor="#6B8E8A" value={name} onChangeText={setName} />
           <TextInput style={styles.input} placeholder="Phone Number" placeholderTextColor="#6B8E8A" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
           <TextInput style={styles.input} placeholder="Relationship (e.g. Sister, Brother)" placeholderTextColor="#6B8E8A" value={relationship} onChangeText={setRelationship} />

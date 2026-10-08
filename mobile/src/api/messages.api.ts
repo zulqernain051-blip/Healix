@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { apiClient } from './client';
 
 export interface ChatMessage {
@@ -55,16 +56,18 @@ export const messagesApi = {
 
   sendMessage: async (data: { threadId: string; contentType: 'TEXT' | 'IMAGE' | 'FILE' | 'VIDEO' | 'DOCUMENT'; contentUrlOrText: string; replyToId?: string }): Promise<ChatMessage> => {
     const response = await apiClient.post(`/chat/threads/${data.threadId}/messages`, data);
-    return response.data.data;
+    return response;
   },
 
   sendMediaMessage: async (threadId: string, uri: string, mimeType: string, filename: string, replyToId?: string, durationMs?: number): Promise<ChatMessage> => {
     const formData = new FormData();
-    formData.append('file', {
-      uri,
-      name: filename,
-      type: mimeType
-    } as any);
+    if (Platform.OS === 'web') {
+      const response = await fetch(uri);
+      if (!response.ok) throw new Error('Could not read attachment');
+      formData.append('file', await response.blob(), filename);
+    } else {
+      formData.append('file', { uri, name: filename, type: mimeType } as any);
+    }
 
     if (replyToId) {
       formData.append('replyToId', replyToId);
@@ -79,7 +82,7 @@ export const messagesApi = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data.data;
+    return response;
   },
 
   markAsRead: async (threadId: string): Promise<void> => {

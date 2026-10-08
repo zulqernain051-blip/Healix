@@ -1,0 +1,9 @@
+import { useEffect, useState } from 'react';
+import { api } from '../store/auth';
+export default function AccountSecurity() {
+ const [enabled,setEnabled] = useState(false), [loaded,setLoaded] = useState(false), [requested,setRequested] = useState(false), [code,setCode] = useState(''), [error,setError] = useState(''), [busy,setBusy] = useState(false);
+ const load = async () => { const me = await api('GET','/auth/me'); setEnabled(!!me.mfaEnabled); setLoaded(true); };
+ useEffect(() => { load().catch(e => setError(e.message)); }, []);
+ const run = async (confirm:boolean) => { setBusy(true); setError(''); try { await api('POST', confirm ? enabled ? '/auth/mfa/disable' : '/auth/mfa/verify-enable' : enabled ? '/auth/mfa/request-disable' : '/auth/mfa/enable', confirm ? {code} : {}); if (confirm) { setRequested(false); setCode(''); await load(); } else setRequested(true); } catch(e:any) { setError(e.message); } finally { setBusy(false); } };
+ return <div className="page"><h2>Account Security</h2>{error && <p role="alert">{error}</p>}<div className="card"><p>Email two-step verification: {loaded ? enabled ? 'enabled' : 'disabled' : 'loading'}</p><p>When enabled, sign-in requires your password and an email code.</p><button className="btn btn-primary" disabled={!loaded || busy} onClick={() => void run(false)}>{requested ? 'Resend code' : enabled ? 'Request disable code' : 'Request enable code'}</button>{requested && <form onSubmit={e => { e.preventDefault(); void run(true); }}><label>Email code<input className="form-input" autoComplete="one-time-code" value={code} onChange={e => setCode(e.target.value.replace(/\D/g,'').slice(0,6))}/></label><button className="btn btn-primary" disabled={busy || code.length !== 6}>Confirm {enabled ? 'disable' : 'enable'}</button></form>}</div></div>;
+}

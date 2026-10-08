@@ -40,6 +40,7 @@ export class CreateVisitFromContractUseCase {
     // 3. Create Visit within its domain
     return VisitRepository.createVisitFromContract({
       requestId: contract.careRequestId,
+      sourceContractId: contract.id,
       nurseId: contract.nurseId,
       agreedStartTime
     });

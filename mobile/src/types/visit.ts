@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { CareRequestResponse } from './care';
 import { User } from './auth';
 
-export type VisitStatus = 'SCHEDULED' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'DECLINED';
+export type VisitStatus = 'SCHEDULED' | 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED' | 'DECLINED' | 'CANCELLED';
 export type VerificationMethod = 'QR' | 'GPS' | 'MANUAL';
 export type SymptomSeverity = 'MILD' | 'MODERATE' | 'SEVERE';
 
@@ -59,7 +59,10 @@ export interface Visit {
   status: VisitStatus;
   nurseConfirmed?: boolean;
   patientConfirmed?: boolean;
+  completionApprovedAt?: string | null;
+  completionDisputeReason?: string | null;
   
+  review?: { stars: number; reviewText?: string; recommend: boolean };
   // Relations that may be included by the backend
   request?: CareRequestResponse;
   nurse?: { id: string; user: User };
