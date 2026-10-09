@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, TextInput, ActivityIndicator, Alert, Platform } from 'react-native';
@@ -17,6 +20,11 @@ interface MessageItem {
 }
 
 export default function AIAssistantScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user, accessToken } = useAuthStore();
   const firstName = user?.fullName ? user.fullName.split(' ')[0] : 'Patient';
 
@@ -140,7 +148,7 @@ export default function AIAssistantScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.headerRow}>
@@ -166,8 +174,8 @@ export default function AIAssistantScreen() {
             </Text>
             <Button
               mode="contained"
-              buttonColor="#EF4444"
-              textColor="#FFFFFF"
+              buttonColor={COLORS.redFill}
+              textColor={COLORS.textDark}
               onPress={handleTriggerEmergencySos}
               style={{ marginTop: 8, borderRadius: RADIUS.md }}
               labelStyle={{ fontWeight: '800' }}
@@ -194,7 +202,7 @@ export default function AIAssistantScreen() {
 
           {loading && (
             <View style={styles.loadingRow}>
-              <ActivityIndicator size="small" color="#00E676" />
+              <ActivityIndicator size="small" color={COLORS.emerald} />
               <Text style={styles.loadingText}>Healix AI is analyzing clinical knowledge...</Text>
             </View>
           )}
@@ -223,7 +231,7 @@ export default function AIAssistantScreen() {
           <TextInput
             style={styles.textInput}
             placeholder="Ask AI a health question or symptom..."
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={input}
             onChangeText={setInput}
             multiline
@@ -241,17 +249,17 @@ export default function AIAssistantScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
     maxWidth: Platform.OS === 'web' ? 800 : '100%',
     width: '100%',
     alignSelf: 'center',
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   headerRow: {
     flexDirection: 'row',
@@ -259,9 +267,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 230, 118, 0.15)',
+    borderBottomColor: COLORS.emeraldLight,
   },
   backBtn: {
     width: 40,
@@ -270,7 +278,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backIcon: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 28,
     fontWeight: '300',
   },
@@ -278,7 +286,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
   },
@@ -291,29 +299,29 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
     marginRight: 4,
   },
   onlineText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 10,
   },
   emergencyBanner: {
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+    backgroundColor: COLORS.redLight,
     borderWidth: 1,
-    borderColor: '#EF4444',
+    borderColor: COLORS.red,
     padding: 14,
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.md,
     borderRadius: RADIUS.lg,
   },
   emergencyBannerTitle: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: 14,
     fontWeight: '800',
   },
   emergencyBannerSub: {
-    color: '#F1F5F9',
+    color: COLORS.textDark,
     fontSize: 11,
     marginTop: 4,
     lineHeight: 16,
@@ -328,25 +336,25 @@ const styles = StyleSheet.create({
     marginVertical: SPACING.md,
   },
   loadingText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
     marginLeft: SPACING.sm,
   },
   alertBubble: {
-    backgroundColor: 'rgba(239, 68, 68, 0.25)',
+    backgroundColor: COLORS.redLight,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: '#EF4444',
+    borderColor: COLORS.red,
   },
   alertBubbleText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '600',
   },
   alertTime: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
     marginTop: 4,
     textAlign: 'right',
@@ -355,7 +363,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.lg,
   },
   suggestedTitle: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: TYPOGRAPHY.sizes.xs,
     fontWeight: '600',
     marginBottom: SPACING.sm,
@@ -363,19 +371,19 @@ const styles = StyleSheet.create({
   promptItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.xs,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   promptIcon: {
     fontSize: 14,
     marginRight: SPACING.sm,
   },
   promptText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.xs,
     flex: 1,
   },
@@ -383,14 +391,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: SPACING.md,
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 230, 118, 0.15)',
+    borderTopColor: COLORS.emeraldLight,
   },
   textInput: {
     flex: 1,
-    backgroundColor: '#051815',
-    color: '#FFFFFF',
+    backgroundColor: COLORS.bg,
+    color: COLORS.textDark,
     borderRadius: RADIUS.round,
     paddingHorizontal: SPACING.md,
     paddingVertical: Platform.OS === 'ios' ? 10 : 8,
@@ -402,16 +410,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     justifyContent: 'center',
     alignItems: 'center',
   },
   sendBtnDisabled: {
-    backgroundColor: '#6B8E8A',
+    backgroundColor: COLORS.surfaceMuted,
   },
   sendIcon: {
     fontSize: 18,
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontWeight: '900',
   },
-});
+}));

@@ -1,6 +1,8 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { localDateTime } from '../../../utils/dates';
-import { COLORS } from '../../../theme';
+
 import { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert, TextInput, Switch, TouchableOpacity } from 'react-native';
 import { Button, Card, Divider } from 'react-native-paper';
@@ -10,6 +12,9 @@ import { useSubmitCarePlan, useCaseReview } from '../../../hooks/useDoctor';
 
 
 export default function CreateCarePlanScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams(); // CaseAssignment ID
   const caseId = id as string;
 
@@ -75,7 +80,7 @@ export default function CreateCarePlanScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button icon="arrow-left" labelStyle={{ color: COLORS.navy }} onPress={() => goBack()}>Back</Button>
+        <Button icon="arrow-left" labelStyle={{ color: COLORS.primaryText }} onPress={() => goBack()}>Back</Button>
         <Text style={styles.headerTitle}>Create Care Plan</Text>
         <View style={{ width: 60 }} />
       </View>
@@ -129,7 +134,7 @@ export default function CreateCarePlanScreen() {
           </Card>
         ))}
 
-        <Button mode="text" textColor={COLORS.navy} onPress={addMilestone} style={{ alignSelf: 'flex-start' }}>
+        <Button mode="text" textColor={COLORS.primaryText} onPress={addMilestone} style={{ alignSelf: 'flex-start' }}>
           + Add Milestone
         </Button>
 
@@ -148,7 +153,7 @@ export default function CreateCarePlanScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.surface },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: COLORS.surfaceCard, borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder },
   headerTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold' },
@@ -166,4 +171,4 @@ const styles = StyleSheet.create({
   radioActive: { backgroundColor: COLORS.navy, borderColor: COLORS.navy },
   radioText: { color: COLORS.textBody, fontSize: 12 },
   footer: { padding: 16, backgroundColor: COLORS.surfaceCard, borderTopWidth: 1, borderTopColor: COLORS.inputBorder }
-});
+}));

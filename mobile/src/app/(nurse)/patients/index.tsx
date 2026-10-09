@@ -1,4 +1,7 @@
 
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
+
 import { SafeAreaView, StyleSheet, View, Text, FlatList, TouchableOpacity, StatusBar } from 'react-native';
 import { Avatar } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
@@ -9,6 +12,11 @@ import { LoadingState } from '../../../components/common/LoadingState';
 
 
 export default function PatientsListScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user, accessToken } = useAuthStore();
   const nurseId = user?.nurseId || user?.id || '';
   const { data: assignedVisits, isLoading } = useNurseVisits(nurseId);
@@ -38,7 +46,7 @@ export default function PatientsListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.header}>
         <Text style={styles.title}>Assigned Patients Directory</Text>
         <Text style={styles.subtitle}>Patients registered for your home care visits</Text>
@@ -62,7 +70,7 @@ export default function PatientsListScreen() {
                   size={44}
                   label={item.name.split(' ').map((n: string) => n[0]).join('')}
                   style={styles.avatarBg}
-                  color="#00E676"
+                  color={COLORS.emerald}
                 />
                 <View style={{ flex: 1, marginLeft: 16 }}>
                   <Text style={styles.name}>{item.name}</Text>
@@ -79,16 +87,16 @@ export default function PatientsListScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
-  header: { padding: 20, paddingBottom: 30, backgroundColor: '#061C19' },
-  title: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
-  subtitle: { color: '#00E676', fontSize: 14, marginTop: 6, fontWeight: '600' },
-  body: { flex: 1, backgroundColor: '#F8FAFC', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
-  card: { backgroundColor: '#FFFFFF', padding: 16, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  avatarBg: { backgroundColor: '#F1F5F9', borderWidth: 2, borderColor: '#00E676' },
-  name: { color: '#1E293B', fontSize: 16, fontWeight: '700' },
-  subText: { color: '#64748B', fontSize: 12, marginTop: 4 },
-  visitDateText: { color: '#00E676', fontSize: 11, marginTop: 4, fontWeight: '600' },
-  chevron: { color: '#94A3B8', fontSize: 24 },
-});
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  header: { padding: 20, paddingBottom: 30, backgroundColor: COLORS.bg },
+  title: { color: COLORS.textDark, fontSize: 24, fontWeight: '800' },
+  subtitle: { color: COLORS.emerald, fontSize: 14, marginTop: 6, fontWeight: '600' },
+  body: { flex: 1, backgroundColor: COLORS.surfaceCard, borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
+  card: { backgroundColor: COLORS.surfaceCard, padding: 16, borderRadius: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: COLORS.inputBorder, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  avatarBg: { backgroundColor: COLORS.surfaceCard, borderWidth: 2, borderColor: COLORS.emerald },
+  name: { color: COLORS.textMuted, fontSize: 16, fontWeight: '700' },
+  subText: { color: COLORS.textBody, fontSize: 12, marginTop: 4 },
+  visitDateText: { color: COLORS.emerald, fontSize: 11, marginTop: 4, fontWeight: '600' },
+  chevron: { color: COLORS.textBody, fontSize: 24 },
+}));

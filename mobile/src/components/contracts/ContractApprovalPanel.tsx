@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text, Button } from 'react-native-paper';
 import { Contract } from '../../types/contract';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 interface Props {
   contract: Contract;
@@ -23,6 +25,9 @@ export const ContractApprovalPanel: React.FC<Props> = ({
   isRejecting = false,
   style,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const isPending = contract.status === 'PENDING_APPROVAL';
   const hasApproved = isPatientView ? contract.patientApproved : contract.nurseApproved;
   const otherPartyApproved = isPatientView ? contract.nurseApproved : contract.patientApproved;
@@ -53,7 +58,7 @@ export const ContractApprovalPanel: React.FC<Props> = ({
               loading={isApproving}
               disabled={isApproving || isRejecting}
               style={styles.approveBtn}
-              buttonColor={COLORS.emerald}
+              buttonColor={COLORS.emeraldFill} textColor={COLORS.onAccent}
             >
               Approve Contract
             </Button>
@@ -82,7 +87,7 @@ export const ContractApprovalPanel: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.md,
@@ -99,7 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: COLORS.glassBorder,
   },
   partyText: {
     ...TYPOGRAPHY.bodyMedium,
@@ -129,7 +134,7 @@ const styles = StyleSheet.create({
   waitingBox: {
     marginTop: SPACING.lg,
     padding: SPACING.md,
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: COLORS.glassSurface,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
   },
@@ -138,4 +143,4 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontStyle: 'italic',
   },
-});
+}));

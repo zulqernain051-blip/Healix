@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useRef, useEffect } from 'react';
 import {
@@ -22,6 +25,11 @@ import { ChatInput } from '../../../components/chat/ChatInput';
 import { SPACING } from '../../../theme';
 
 export default function NurseChatScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -110,7 +118,7 @@ export default function NurseChatScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header */}
         <View style={styles.header}>
@@ -122,7 +130,7 @@ export default function NurseChatScreen() {
             size={38}
             label={contactName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
             style={styles.avatarBg}
-            color="#00E676"
+            color={COLORS.emerald}
           />
 
           <View style={styles.headerInfo}>
@@ -131,8 +139,8 @@ export default function NurseChatScreen() {
           </View>
 
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={handleRequestEmergency} style={[styles.headerActionBtn, { backgroundColor: '#ef4444' }]}>
-              <Text style={[styles.headerActionIcon, { color: '#fff' }]}>🚨</Text>
+            <TouchableOpacity onPress={handleRequestEmergency} style={[styles.headerActionBtn, { backgroundColor: COLORS.red }]}>
+              <Text style={[styles.headerActionIcon, { color: COLORS.textDark }]}>🚨</Text>
             </TouchableOpacity>
             </View>
         </View>
@@ -172,26 +180,26 @@ export default function NurseChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#0A1628' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: COLORS.bg },
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#061C19', paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: '#1E2D4A' },
+  header: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.bg, paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder },
   backBtn: { padding: 8, marginRight: 8, marginLeft: -8 },
-  backIcon: { color: '#00E676', fontSize: 32, lineHeight: 32, marginTop: -4 },
-  avatarBg: { backgroundColor: '#E2E8F0', marginRight: 12 },
+  backIcon: { color: COLORS.emerald, fontSize: 32, lineHeight: 32, marginTop: -4 },
+  avatarBg: { backgroundColor: COLORS.surfaceCard, marginRight: 12 },
   headerInfo: { flex: 1 },
-  headerName: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  headerStatus: { color: '#94A3B8', fontSize: 12, marginTop: 2 },
+  headerName: { color: COLORS.onAccent, fontSize: 16, fontWeight: '700' },
+  headerStatus: { color: COLORS.textBody, fontSize: 12, marginTop: 2 },
   headerActions: { flexDirection: 'row', gap: 8 },
-  headerActionBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#111D35', alignItems: 'center', justifyContent: 'center' },
+  headerActionBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.bg, alignItems: 'center', justifyContent: 'center' },
   headerActionIcon: { fontSize: 16 },
-  encryptionNotice: { backgroundColor: '#1E2D4A', padding: 8, alignItems: 'center' },
-  encryptionText: { color: '#94A3B8', fontSize: 11, fontWeight: '600' },
-  messagesList: { flex: 1, backgroundColor: '#0A1628' },
+  encryptionNotice: { backgroundColor: COLORS.bg, padding: 8, alignItems: 'center' },
+  encryptionText: { color: COLORS.textBody, fontSize: 11, fontWeight: '600' },
+  messagesList: { flex: 1, backgroundColor: COLORS.bg },
   messagesContent: { padding: SPACING.md, paddingBottom: 20 },
-  emptyText: { color: '#64748B', textAlign: 'center', marginTop: 40, fontSize: 14 },
-  typingIndicatorContainer: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, backgroundColor: '#0A1628' },
-  typingText: { color: '#0D9488', fontSize: 12, fontStyle: 'italic' },
-});
+  emptyText: { color: COLORS.textBody, textAlign: 'center', marginTop: 40, fontSize: 14 },
+  typingIndicatorContainer: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, backgroundColor: COLORS.bg },
+  typingText: { color: COLORS.teal, fontSize: 12, fontStyle: 'italic' },
+}));
 
 

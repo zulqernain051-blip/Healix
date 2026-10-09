@@ -1,10 +1,15 @@
+
+
+
 import { Text, Button } from 'react-native-paper';
 import { View } from 'react-native';
 import { useAuthStore } from '../../../store/auth';
 import { useFavoriteNurses, useToggleFavoriteNurse } from '../../../hooks/useMarketplace';
-import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../../components/common/WorkflowPage';
 import { appAlert } from '../../../components/common/AppDialogs';
 export default function FavoriteNurses() {
+  const s = useFlowStyles();
+
  const patientId = useAuthStore(state => state.user?.patientId) || '';
  const nurses = useFavoriteNurses(patientId), toggle = useToggleFavoriteNurse(patientId);
  const remove = async(nurseId:string) => { try { await toggle.mutateAsync({nurseId,remove:true}); } catch(e:any) { appAlert('Could not remove favorite',e.message); } };

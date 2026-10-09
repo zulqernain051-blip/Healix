@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Card, Divider } from 'react-native-paper';
@@ -9,14 +12,20 @@ interface VisitInfoCardProps {
   visit: Visit;
 }
 
-const DetailRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+const DetailRow: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+  const styles = useThemeValue(createStyles);
+  return (
   <View style={styles.detailRow}>
     <Text style={styles.detailLabel}>{label}</Text>
     <Text style={styles.detailValue}>{value}</Text>
   </View>
 );
+};
 
 export const VisitInfoCard: React.FC<VisitInfoCardProps> = ({ visit }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const patient = visit.request?.patient;
   const nurse = visit.nurse;
 
@@ -60,13 +69,13 @@ export const VisitInfoCard: React.FC<VisitInfoCardProps> = ({ visit }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: SPACING.lg },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: SPACING.lg },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  sectionHeader: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', marginVertical: 12 },
+  sectionHeader: { color: COLORS.textDark, fontSize: 15, fontWeight: '700' },
+  divider: { backgroundColor: COLORS.emeraldLight, marginVertical: 12 },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  detailLabel: { color: '#94A3B8', fontSize: 13 },
-  detailValue: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', flexShrink: 1, textAlign: 'right', maxWidth: '55%' },
-});
+  detailLabel: { color: COLORS.textBody, fontSize: 13 },
+  detailValue: { color: COLORS.textDark, fontSize: 13, fontWeight: '600', flexShrink: 1, textAlign: 'right', maxWidth: '55%' },
+}));
 

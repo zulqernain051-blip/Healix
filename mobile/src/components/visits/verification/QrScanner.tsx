@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert, Platform } from 'react-native';
 import { Text, Button, ActivityIndicator } from 'react-native-paper';
@@ -12,6 +15,9 @@ interface QrScannerProps {
 }
 
 export const QrScanner: React.FC<QrScannerProps> = ({ visitId, onSuccess, onCancel }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const verifyQr = useVerifyQr();
@@ -47,10 +53,10 @@ export const QrScanner: React.FC<QrScannerProps> = ({ visitId, onSuccess, onCanc
       <View style={styles.container}>
         <Text style={styles.title}>Camera Permission Required</Text>
         <Text style={styles.subtitle}>Grant camera access to scan patient QR codes.</Text>
-        <Button mode="contained" buttonColor="#00E676" textColor="#061C19" onPress={requestPermission}>
+        <Button mode="contained" buttonColor={COLORS.emeraldFill} textColor={COLORS.textMuted} onPress={requestPermission}>
           Grant Permission
         </Button>
-        <Button mode="text" textColor="#94A3B8" onPress={onCancel} style={{ marginTop: 12 }}>
+        <Button mode="text" textColor={COLORS.textBody} onPress={onCancel} style={{ marginTop: 12 }}>
           Cancel
         </Button>
       </View>
@@ -70,25 +76,25 @@ export const QrScanner: React.FC<QrScannerProps> = ({ visitId, onSuccess, onCanc
         />
       </View>
 
-      {verifyQr.isPending && <ActivityIndicator size="large" color="#00E676" style={{ marginTop: 20 }} />}
+      {verifyQr.isPending && <ActivityIndicator size="large" color={COLORS.emerald} style={{ marginTop: 20 }} />}
 
       {scanned && !verifyQr.isPending && (
-        <Button mode="contained" buttonColor="#00E676" textColor="#061C19" onPress={() => setScanned(false)} style={{ marginTop: 16 }}>
+        <Button mode="contained" buttonColor={COLORS.emeraldFill} textColor={COLORS.textMuted} onPress={() => setScanned(false)} style={{ marginTop: 16 }}>
           Scan Again
         </Button>
       )}
 
-      <Button mode="text" textColor="#94A3B8" onPress={onCancel} style={{ marginTop: 12 }}>
+      <Button mode="text" textColor={COLORS.textBody} onPress={onCancel} style={{ marginTop: 12 }}>
         Back to Method Selection
       </Button>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, alignItems: 'center', padding: SPACING.lg },
-  title: { color: '#FFFFFF', fontSize: 20, fontWeight: '800', marginBottom: 8 },
-  subtitle: { color: '#94A3B8', fontSize: 14, marginBottom: 20 },
-  cameraFrame: { width: 280, height: 280, borderRadius: RADIUS.xl, overflow: 'hidden', borderWidth: 2, borderColor: '#00E676' },
-});
+  title: { color: COLORS.textDark, fontSize: 20, fontWeight: '800', marginBottom: 8 },
+  subtitle: { color: COLORS.textBody, fontSize: 14, marginBottom: 20 },
+  cameraFrame: { width: 280, height: 280, borderRadius: RADIUS.xl, overflow: 'hidden', borderWidth: 2, borderColor: COLORS.emerald },
+}));
 

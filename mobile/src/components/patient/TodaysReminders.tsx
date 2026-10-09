@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, Checkbox } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface ReminderItem {
   id: string;
@@ -22,13 +24,16 @@ export const TodaysReminders: React.FC<TodaysRemindersProps> = ({
   onSeeAll,
   onToggle,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         {/* Header */}
         <TouchableOpacity style={styles.headerRow} onPress={onSeeAll} activeOpacity={0.7}>
           <View style={styles.headerLeft}>
-            <Ionicons name="notifications" size={18} color={COLORS.navy} />
+            <Ionicons name="notifications" size={18} color={COLORS.primaryText} />
             <Text style={styles.headerTitle}>  Prescription instructions</Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={COLORS.textBody} />
@@ -45,7 +50,7 @@ export const TodaysReminders: React.FC<TodaysRemindersProps> = ({
               ]}
             >
               <View style={styles.pillIconCircle}>
-                <Ionicons name="medical" size={16} color={COLORS.navy} />
+                <Ionicons name="medical" size={16} color={COLORS.primaryText} />
               </View>
               <View style={styles.reminderTextWrap}>
                 <Text style={styles.reminderName}>{reminder.name}</Text>
@@ -54,7 +59,7 @@ export const TodaysReminders: React.FC<TodaysRemindersProps> = ({
               {onToggle && <Checkbox
                 status={reminder.completed ? 'checked' : 'unchecked'}
                 onPress={() => onToggle?.(reminder.id)}
-                color={COLORS.navy}
+                color={COLORS.primaryText}
                 uncheckedColor={COLORS.inputBorder}
               />}
             </View>
@@ -70,7 +75,7 @@ export const TodaysReminders: React.FC<TodaysRemindersProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     paddingBottom: SPACING.xl,
   },
@@ -78,7 +83,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.xl,
     padding: SPACING.lg,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -148,4 +153,4 @@ const styles = StyleSheet.create({
     color: COLORS.textBody,
     fontSize: TYPOGRAPHY.sizes.sm,
   },
-});
+}));

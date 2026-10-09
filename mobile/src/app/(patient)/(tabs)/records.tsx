@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import {
   StyleSheet,
@@ -12,13 +15,18 @@ import { navigate } from '../../../utils/navigation';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function HealthRecordsScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const recordItems = [
       {
         id: 'clinical-outcomes',
         title: 'Clinical Outcomes & Diagnoses',
         subtitle: 'Doctor diagnoses and completed cases',
         icon: 'dY+',
-        bgColor: 'rgba(239, 68, 68, 0.12)', // Red-ish
+        bgColor: COLORS.redLight, // Red-ish
         route: '/(patient)/health/clinical-outcomes',
       },
   
@@ -27,7 +35,7 @@ export default function HealthRecordsScreen() {
       title: 'Vitals & Biometrics',
       subtitle: 'View your vital signs history and sparklines',
       icon: '🩺',
-      bgColor: 'rgba(0, 230, 118, 0.12)',
+      bgColor: COLORS.emeraldLight,
       route: '/(patient)/records/vitals',
     },
     {
@@ -35,7 +43,7 @@ export default function HealthRecordsScreen() {
       title: 'Prescriptions & Medications',
       subtitle: 'All active and past prescriptions',
       icon: '💊',
-      bgColor: 'rgba(59, 130, 246, 0.12)',
+      bgColor: COLORS.blueLight,
       route: '/(patient)/health/prescriptions',
     },
     {
@@ -43,7 +51,7 @@ export default function HealthRecordsScreen() {
       title: 'Medical Timeline & Labs',
       subtitle: 'Chronological health record and conditions',
       icon: '🧪',
-      bgColor: 'rgba(168, 85, 247, 0.12)',
+      bgColor: COLORS.purpleLight,
       route: '/(patient)/health/medical',
     },
     {
@@ -51,7 +59,7 @@ export default function HealthRecordsScreen() {
       title: 'Care Visits & History',
       subtitle: 'Your care requests and visit history',
       icon: '📋',
-      bgColor: 'rgba(245, 158, 11, 0.12)',
+      bgColor: COLORS.amberLight,
       route: '/(patient)/(tabs)/requests',
     },
     {
@@ -59,7 +67,7 @@ export default function HealthRecordsScreen() {
       title: 'Active Care Plans',
       subtitle: 'Your structured clinical care plans',
       icon: '📑',
-      bgColor: 'rgba(236, 72, 153, 0.12)',
+      bgColor: COLORS.redLight,
       route: '/(patient)/health/careplans',
     },
     {
@@ -67,7 +75,7 @@ export default function HealthRecordsScreen() {
       title: 'AI Risk History',
       subtitle: 'AI fusion risk assessment timeline',
       icon: '📊',
-      bgColor: 'rgba(14, 165, 233, 0.12)',
+      bgColor: COLORS.blueLight,
       route: '/(patient)/records/risk-history',
     },
     {
@@ -75,14 +83,14 @@ export default function HealthRecordsScreen() {
       title: 'Medical Information & Allergies',
       subtitle: 'Allergies, chronic conditions & profile',
       icon: '🏥',
-      bgColor: 'rgba(20, 184, 166, 0.12)',
+      bgColor: COLORS.emeraldLight,
       route: '/(patient)/health/medical',
     },
   ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         
         {/* Header */}
@@ -118,10 +126,10 @@ export default function HealthRecordsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     padding: SPACING.lg,
@@ -134,7 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
@@ -142,13 +150,13 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   recordCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   iconBg: {
     width: 44,
@@ -165,19 +173,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cardTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   cardSub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   chevron: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 22,
     fontWeight: '600',
   },
-});
+}));
 

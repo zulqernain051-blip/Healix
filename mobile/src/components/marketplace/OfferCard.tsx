@@ -1,9 +1,11 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text, Button } from 'react-native-paper';
 import { NurseOffer } from '../../types/marketplace';
 import { OfferStatusBadge } from './OfferStatusBadge';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 interface Props {
   offer: NurseOffer;
@@ -29,6 +31,9 @@ export const OfferCard: React.FC<Props> = ({
   isWithdrawing = false,
   style,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const isPending = offer.status === 'PENDING' && Date.parse(offer.expiresAt) > Date.now();
 
   return (
@@ -114,7 +119,7 @@ export const OfferCard: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
     backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.md,
@@ -142,7 +147,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   detailsBox: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: COLORS.glassSurface,
     padding: SPACING.md,
     borderRadius: RADIUS.sm,
     marginBottom: SPACING.sm,
@@ -197,4 +202,4 @@ const styles = StyleSheet.create({
     borderColor: COLORS.red,
     width: '100%',
   },
-});
+}));

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState, useMemo } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, RefreshControl, StatusBar, TouchableOpacity } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
@@ -15,6 +18,11 @@ import { SPACING, RADIUS } from '../../../theme';
  * We fetch the patient's care requests and filter those that have an associated visit.
  */
 export default function PatientVisitsScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const { data: requests, isLoading, error, refetch } = useCareRequests();
   const [refreshing, setRefreshing] = useState(false);
@@ -34,7 +42,7 @@ export default function PatientVisitsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.headerBox}>
         <Text style={styles.headerTitle}>My Visits</Text>
         <Text style={styles.headerSub}>Track your care visits</Text>
@@ -43,11 +51,11 @@ export default function PatientVisitsScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00E676" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.emerald} />}
       >
         {isLoading && !refreshing && (
           <View style={styles.centered}>
-            <ActivityIndicator size="large" color="#00E676" />
+            <ActivityIndicator size="large" color={COLORS.emerald} />
             <Text style={styles.mutedText}>Loading visits...</Text>
           </View>
         )}
@@ -98,25 +106,25 @@ export default function PatientVisitsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
   headerBox: { padding: 20, paddingBottom: 24 },
-  headerTitle: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
-  headerSub: { color: '#00E676', fontSize: 14, marginTop: 6, fontWeight: '600' },
-  scroll: { flex: 1, backgroundColor: '#F8FAFC', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
+  headerTitle: { color: COLORS.onAccent, fontSize: 24, fontWeight: '800' },
+  headerSub: { color: COLORS.emerald, fontSize: 14, marginTop: 6, fontWeight: '600' },
+  scroll: { flex: 1, backgroundColor: COLORS.surfaceCard, borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
   scrollContent: { padding: 20, paddingBottom: 40, paddingTop: 24 },
   centered: { alignItems: 'center', paddingTop: 60 },
-  mutedText: { color: '#94A3B8', fontSize: 13, textAlign: 'center', marginTop: 4 },
-  emptyTitle: { color: '#1E293B', fontSize: 18, fontWeight: '700' },
-  errorText: { color: '#EF4444', fontSize: 15, fontWeight: '600' },
+  mutedText: { color: COLORS.textBody, fontSize: 13, textAlign: 'center', marginTop: 4 },
+  emptyTitle: { color: COLORS.textMuted, fontSize: 18, fontWeight: '700' },
+  errorText: { color: COLORS.red, fontSize: 15, fontWeight: '600' },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
     padding: SPACING.lg,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: COLORS.inputBorder,
     marginBottom: SPACING.lg,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -124,7 +132,7 @@ const styles = StyleSheet.create({
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
   cardInfo: { flex: 1 },
-  cardType: { color: '#1E293B', fontSize: 15, fontWeight: '700' },
-  cardDate: { color: '#64748B', fontSize: 12, marginTop: 4 },
-  cardNotes: { color: '#94A3B8', fontSize: 12, marginTop: 8 },
-});
+  cardType: { color: COLORS.textMuted, fontSize: 15, fontWeight: '700' },
+  cardDate: { color: COLORS.textBody, fontSize: 12, marginTop: 4 },
+  cardNotes: { color: COLORS.textBody, fontSize: 12, marginTop: 8 },
+}));

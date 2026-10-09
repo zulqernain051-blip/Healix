@@ -1,7 +1,9 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 export interface RequestTemplate {
   id: string;
@@ -58,6 +60,9 @@ interface Props {
 }
 
 export const RequestTemplateSelector: React.FC<Props> = ({ selectedTemplateId, onSelect }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -95,7 +100,7 @@ export const RequestTemplateSelector: React.FC<Props> = ({ selectedTemplateId, o
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     marginBottom: SPACING.lg,
   },
@@ -104,28 +109,28 @@ const styles = StyleSheet.create({
   },
   templateCard: {
     width: 130,
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: COLORS.glassSurface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.55)',
+    borderColor: COLORS.glassBorder,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     justifyContent: 'flex-start',
   },
   templateCardActive: {
     borderColor: COLORS.accentBlue,
-    backgroundColor: 'rgba(41, 169, 245, 0.15)',
+    backgroundColor: COLORS.blueLight,
   },
   iconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: COLORS.glassSurface,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.sm,
   },
   iconContainerActive: {
-    backgroundColor: 'rgba(41, 169, 245, 0.2)',
+    backgroundColor: COLORS.blueLight,
   },
   icon: {
     fontSize: 20,
@@ -137,7 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   titleActive: {
-    color: COLORS.navy,
+    color: COLORS.primaryText,
   },
   desc: {
     fontSize: 11,
@@ -145,4 +150,4 @@ const styles = StyleSheet.create({
     color: COLORS.textBody,
     lineHeight: 14,
   },
-});
+}));

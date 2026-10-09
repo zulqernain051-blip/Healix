@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useEffect, useRef } from 'react';
 import {
   StyleSheet,
@@ -25,6 +28,9 @@ export interface AIChatBubbleProps {
 // ─────────────────────────────────────────────
 
 const LoadingDots: React.FC = () => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const dot1 = useRef(new Animated.Value(0.3)).current;
   const dot2 = useRef(new Animated.Value(0.3)).current;
   const dot3 = useRef(new Animated.Value(0.3)).current;
@@ -75,6 +81,9 @@ const LoadingDots: React.FC = () => {
 // ─────────────────────────────────────────────
 
 const AvatarCircle: React.FC<{ uri?: string }> = ({ uri }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   if (uri) {
     return <Image source={{ uri }} style={styles.avatar} />;
   }
@@ -97,6 +106,9 @@ export const AIChatBubble: React.FC<AIChatBubbleProps> = ({
   isLoading = false,
   avatarUri,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const isUser = isUserProp ?? (sender === 'user');
 
   // Slide from left (AI) or right (user) + fade
@@ -164,7 +176,7 @@ export const AIChatBubble: React.FC<AIChatBubbleProps> = ({
 // Styles
 // ─────────────────────────────────────────────
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   rowWrapper: {
     flexDirection: 'row',
     marginVertical: 6,
@@ -195,20 +207,20 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#0D9488',
+    borderColor: COLORS.teal,
   },
   avatarFallback: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#0D9488',
+    backgroundColor: COLORS.teal,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: '#10B981',
+    borderColor: COLORS.emerald,
   },
   avatarInitials: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 11,
     fontWeight: '800',
   },
@@ -219,13 +231,13 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   bubbleUser: {
-    backgroundColor: '#0D9488',
+    backgroundColor: COLORS.teal,
     borderBottomRightRadius: 4,
   },
   bubbleAI: {
-    backgroundColor: '#111D35',
+    backgroundColor: COLORS.bg,
     borderWidth: 1,
-    borderColor: '#0D9488',
+    borderColor: COLORS.teal,
     borderBottomLeftRadius: 4,
   },
   // Bubble tail — user (right)
@@ -237,8 +249,8 @@ const styles = StyleSheet.create({
     height: 0,
     borderLeftWidth: 8,
     borderTopWidth: 8,
-    borderLeftColor: '#0D9488',
-    borderTopColor: 'transparent',
+    borderLeftColor: COLORS.teal,
+    borderTopColor: COLORS.transparent,
   },
   // Bubble tail — AI (left)
   tailLeft: {
@@ -249,19 +261,19 @@ const styles = StyleSheet.create({
     height: 0,
     borderRightWidth: 8,
     borderTopWidth: 8,
-    borderRightColor: '#0D9488',
-    borderTopColor: 'transparent',
+    borderRightColor: COLORS.teal,
+    borderTopColor: COLORS.transparent,
   },
   messageText: {
     fontSize: 14,
     lineHeight: 20,
   },
   messageUser: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontWeight: '500',
   },
   messageAI: {
-    color: '#E2E8F0',
+    color: COLORS.textDark,
     fontWeight: '400',
   },
   dotsRow: {
@@ -275,11 +287,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.emerald,
   },
   timestamp: {
     fontSize: 10,
-    color: '#64748B',
+    color: COLORS.textBody,
     marginTop: 4,
   },
   timestampLeft: {
@@ -290,4 +302,4 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginRight: 4,
   },
-});
+}));

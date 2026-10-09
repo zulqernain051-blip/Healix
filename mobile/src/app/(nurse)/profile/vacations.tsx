@@ -1,11 +1,16 @@
+
+
+
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../../store/auth';
 import { nurseApi } from '../../../api/nurse.api';
-import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../../components/common/WorkflowPage';
 export default function VacationsScreen() {
+  const s = useFlowStyles();
+
   const id = useAuthStore(state => state.user?.nurseId) || ''; const qc = useQueryClient();
   const q = useQuery({ queryKey: ['nurse', id, 'vacations'], queryFn: () => nurseApi.getVacations(id), enabled: !!id });
   const [start, setStart] = useState(''); const [end, setEnd] = useState(''); const [reason, setReason] = useState(''); const [error, setError] = useState('');

@@ -1,13 +1,19 @@
+import { useAppTheme, useThemeValue, usePaperTheme } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { ScrollView, View, StyleSheet } from 'react-native';
-import { Appbar, Button, Card, Chip, Dialog, Portal, Text, TextInput, Switch, Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { Appbar, Button, Card, Chip, Dialog, Portal, Text, TextInput, Switch, Provider as PaperProvider } from 'react-native-paper';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../../api/admin.api';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { goBack, navigate } from '../../utils/navigation';
 
 const empty = { name: '', latitude: '', longitude: '', capacityStatus: 'AVAILABLE', affordabilityTier: 'LOW', isCharity: false };
 export default function AdminNetworkOperations() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+  const paperTheme = usePaperTheme();
+
   const client = useQueryClient();
   const query = useQuery({ queryKey: ['admin', 'hospitals'], queryFn: adminApi.getHospitals });
   const [edit, setEdit] = useState<any>(null);
@@ -23,7 +29,7 @@ export default function AdminNetworkOperations() {
       await client.invalidateQueries({ queryKey: ['admin', 'hospitals'] }); setEdit(null);
     } catch (e: any) { setError(e.message); } finally { setBusy(false); }
   };
-  return <PaperProvider theme={{ ...MD3LightTheme, colors: { ...MD3LightTheme.colors, primary: COLORS.navy } }}><View style={styles.root}><Appbar.Header style={styles.header}><Appbar.BackAction color={COLORS.headerText} onPress={goBack} /><Appbar.Content title="Hospital Network" color={COLORS.headerText} /></Appbar.Header><ScrollView contentContainerStyle={styles.content}>
+  return <PaperProvider theme={paperTheme}><View style={styles.root}><Appbar.Header style={styles.header}><Appbar.BackAction color={COLORS.headerText} onPress={goBack} /><Appbar.Content title="Hospital Network" color={COLORS.headerText} /></Appbar.Header><ScrollView contentContainerStyle={styles.content}>
     <Button onPress={() => navigate('/admin/ambulances')}>Open Ambulance Fleet & Dispatches</Button><Button mode="contained" onPress={() => { setError(''); setEdit({ ...empty }); }}>Add Hospital</Button>
     {(error || query.error) && <Text accessibilityRole="alert" style={styles.error}>{error || (query.error as Error).message}</Text>}
     {query.isLoading && <Text>Loading hospitals…</Text>}
@@ -36,4 +42,4 @@ export default function AdminNetworkOperations() {
   </Dialog.Content><Dialog.Actions><Button disabled={busy} onPress={() => setEdit(null)}>Cancel</Button><Button disabled={busy} loading={busy} onPress={() => void save()}>Save Capacity Update</Button></Dialog.Actions></Dialog>
   <Dialog visible={!!remove} onDismiss={() => !busy && setRemove(null)}><Dialog.Title>Delete hospital?</Dialog.Title><Dialog.Content><Text>Hospitals with dispatch history must be retained.</Text>{error && <Text style={styles.error}>{error}</Text>}</Dialog.Content><Dialog.Actions><Button disabled={busy} onPress={() => setRemove(null)}>Cancel</Button><Button disabled={busy} loading={busy} onPress={async () => { setBusy(true); setError(''); try { await adminApi.deleteHospital(remove!); await query.refetch(); setRemove(null); } catch (e: any) { setError(e.message); } finally { setBusy(false); } }}>Delete</Button></Dialog.Actions></Dialog></Portal></View></PaperProvider>;
 }
-const styles = StyleSheet.create({ root: { flex: 1, backgroundColor: COLORS.surface }, header: { backgroundColor: COLORS.navy }, content: { padding: SPACING.lg, gap: SPACING.md }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold }, error: { color: COLORS.red }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginVertical: SPACING.md }, input: { marginBottom: SPACING.sm } });
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({ root: { flex: 1, backgroundColor: COLORS.surface }, header: { backgroundColor: COLORS.navy }, content: { padding: SPACING.lg, gap: SPACING.md }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold }, error: { color: COLORS.red }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginVertical: SPACING.md }, input: { marginBottom: SPACING.sm } }));

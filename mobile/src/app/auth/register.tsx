@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView, Platform } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
@@ -12,6 +15,9 @@ import { ApiError } from '../../types/api';
  * frontend validations, and displays detailed error messages.
  */
 export default function RegisterScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const params = useLocalSearchParams();
   const role = (params.role as string) || 'PATIENT';
 
@@ -136,8 +142,8 @@ export default function RegisterScreen() {
           mode="outlined"
           error={fullName.length > 0 && fullName.trim().length < 3}
           style={styles.input}
-          outlineColor="#E5E7EB"
-          activeOutlineColor="#0D9488"
+          outlineColor={COLORS.inputBorder}
+          activeOutlineColor={COLORS.teal}
         />
         {fullName.length > 0 && fullName.trim().length < 3 && (
           <HelperText type="error" visible={true} style={styles.fieldError}>
@@ -154,8 +160,8 @@ export default function RegisterScreen() {
           autoCapitalize="none"
           error={email.length > 0 && !isEmailValid(email)}
           style={styles.input}
-          outlineColor="#E5E7EB"
-          activeOutlineColor="#0D9488"
+          outlineColor={COLORS.inputBorder}
+          activeOutlineColor={COLORS.teal}
         />
         {email.length > 0 && !isEmailValid(email) && (
           <HelperText type="error" visible={true} style={styles.fieldError}>
@@ -172,8 +178,8 @@ export default function RegisterScreen() {
           keyboardType="phone-pad"
           error={phone.length > 0 && !isPhoneValid(phone)}
           style={styles.input}
-          outlineColor="#E5E7EB"
-          activeOutlineColor="#0D9488"
+          outlineColor={COLORS.inputBorder}
+          activeOutlineColor={COLORS.teal}
         />
         {phone.length > 0 && !isPhoneValid(phone) && (
           <HelperText type="error" visible={true} style={styles.fieldError}>
@@ -195,8 +201,8 @@ export default function RegisterScreen() {
             />
           }
           style={styles.input}
-          outlineColor="#E5E7EB"
-          activeOutlineColor="#0D9488"
+          outlineColor={COLORS.inputBorder}
+          activeOutlineColor={COLORS.teal}
         />
         {password.length > 0 && !isPasswordValid(password) && (
           <HelperText type="error" visible={true} style={styles.fieldError}>
@@ -216,8 +222,8 @@ export default function RegisterScreen() {
               maxLength={15}
               error={cnic.length > 0 && !isCnicValid(cnic)}
               style={styles.input}
-              outlineColor="#E5E7EB"
-              activeOutlineColor="#0D9488"
+              outlineColor={COLORS.inputBorder}
+              activeOutlineColor={COLORS.teal}
             />
             {cnic.length > 0 && !isCnicValid(cnic) && (
               <HelperText type="error" visible={true} style={styles.fieldError}>
@@ -236,8 +242,8 @@ export default function RegisterScreen() {
               mode="outlined"
               error={pncNumber.length > 0 && !pncNumber.trim()}
               style={styles.input}
-              outlineColor="#E5E7EB"
-              activeOutlineColor="#0D9488"
+              outlineColor={COLORS.inputBorder}
+              activeOutlineColor={COLORS.teal}
             />
             {pncNumber.length > 0 && !pncNumber.trim() && (
               <HelperText type="error" visible={true} style={styles.fieldError}>
@@ -260,7 +266,7 @@ export default function RegisterScreen() {
           disabled={isLoading || !isFormValid()}
           style={styles.button}
           contentStyle={styles.buttonContent}
-          buttonColor="#0D9488">
+          buttonColor={COLORS.tealFill} textColor={COLORS.onAccent}>
           Register Account
         </Button>
 
@@ -280,12 +286,12 @@ export default function RegisterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.surfaceCard,
     alignSelf: 'center',
     width: '100%',
     maxWidth: Platform.OS === 'web' ? 480 : '100%',
@@ -293,21 +299,21 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: COLORS.textMuted,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: COLORS.textBody,
     textAlign: 'center',
     marginBottom: 32,
     marginTop: 6,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: 16,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -316,7 +322,7 @@ const styles = StyleSheet.create({
   input: {
     marginBottom: 4,
     marginTop: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
   },
   fieldError: {
     marginBottom: 4,
@@ -341,12 +347,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: '#6B7280',
+    color: COLORS.textBody,
     fontSize: 14,
   },
   link: {
-    color: '#0D9488',
+    color: COLORS.teal,
     fontWeight: 'bold',
     fontSize: 14,
   },
-});
+}));

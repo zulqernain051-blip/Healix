@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,6 +19,9 @@ export const OfflineSyncStatusBanner: React.FC<OfflineSyncStatusBannerProps> = (
   onSyncPress,
   isSyncing = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   if (pendingUploadsCount === 0) return null;
 
   return (
@@ -40,10 +46,10 @@ export const OfflineSyncStatusBanner: React.FC<OfflineSyncStatusBannerProps> = (
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   banner: {
-    backgroundColor: '#1E180E',
-    borderColor: '#F59E0B',
+    backgroundColor: COLORS.bg,
+    borderColor: COLORS.amber,
     borderWidth: 1,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
@@ -66,23 +72,23 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   title: {
-    color: '#F59E0B',
+    color: COLORS.amber,
     fontSize: 12,
     fontWeight: '700',
   },
   subText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
   },
   syncBtn: {
-    backgroundColor: '#F59E0B',
+    backgroundColor: COLORS.amberFill,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: RADIUS.sm,
   },
   syncBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 11,
     fontWeight: '700',
   },
-});
+}));

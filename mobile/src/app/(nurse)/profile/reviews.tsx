@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Card, Divider, Chip } from 'react-native-paper';
@@ -5,21 +8,12 @@ import { useAuthStore } from '../../../store/auth';
 import { useNurseReviews } from '../../../hooks/useNurse';
 import { ErrorState } from '../../../components/common/ErrorState';
 
-const COLORS = {
-  bg: '#0A1628',
-  card: '#111D35',
-  border: '#1E2D4A',
-  teal: '#0D9488',
-  emerald: '#10B981',
-  amber: '#F59E0B',
-  blue: '#3B82F6',
-  red: '#EF4444',
-  textPrimary: '#F1F5F9',
-  textSecondary: '#94A3B8',
-  textMuted: '#475569'
-};
+
 
 export default function NurseReviewsScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const nurseId = user?.nurseId || user?.id || '';
 
@@ -66,7 +60,7 @@ export default function NurseReviewsScreen() {
                 </View>
 
                 <Chip
-                  textStyle={{ color: '#FFF', fontSize: 10, fontWeight: '700' }}
+                  textStyle={{ color: COLORS.textDark, fontSize: 10, fontWeight: '700' }}
                   style={{ backgroundColor: review.recommend ? COLORS.emerald : COLORS.red }}
                 >
                   {review.recommend ? 'RECOMMENDED' : 'NOT RECOMMENDED'}
@@ -99,7 +93,7 @@ export default function NurseReviewsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   content: { padding: 20, paddingBottom: 40 },
   header: { marginBottom: 24 },
@@ -126,6 +120,6 @@ const styles = StyleSheet.create({
   divider: { backgroundColor: COLORS.border, marginVertical: 12 },
   reviewBody: { color: COLORS.textPrimary, fontSize: 14, lineHeight: 20, fontStyle: 'italic' },
   dateText: { color: COLORS.textMuted, fontSize: 12, marginTop: 12, textAlign: 'right' }
-});
+}));
 
 

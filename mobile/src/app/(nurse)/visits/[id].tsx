@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { VisitCompletionPanel } from '../../../components/visits/VisitCompletionPanel';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useState, useCallback, useEffect } from 'react';
@@ -20,6 +23,11 @@ import { RADIUS, SPACING } from '../../../theme';
 type ActivePanel = 'none' | 'verify' | 'qr' | 'vitals' | 'symptoms' | 'remarks';
 
 export default function NurseVisitDetailScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const visitId = id || '';
   const router = useRouter();
@@ -109,9 +117,9 @@ export default function NurseVisitDetailScreen() {
   if (isLoading && !visit) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+        <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#00E676" />
+          <ActivityIndicator size="large" color={COLORS.emerald} />
           <Text style={styles.loadingText}>Loading visit details...</Text>
         </View>
       </SafeAreaView>
@@ -121,10 +129,10 @@ export default function NurseVisitDetailScreen() {
   if (error || !visit) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+        <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
         <View style={styles.centered}>
           <Text style={styles.errorText}>{error ? (error as Error).message : 'Visit not found'}</Text>
-          <Button mode="text" textColor="#00E676" onPress={() => refetch()}>Retry</Button>
+          <Button mode="text" textColor={COLORS.emerald} onPress={() => refetch()}>Retry</Button>
         </View>
       </SafeAreaView>
     );
@@ -134,7 +142,7 @@ export default function NurseVisitDetailScreen() {
   if (activePanel === 'qr') {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+        <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
         <QrScanner visitId={visitId} onSuccess={handleVerificationSuccess} onCancel={() => setActivePanel('verify')} />
       </SafeAreaView>
     );
@@ -143,7 +151,7 @@ export default function NurseVisitDetailScreen() {
   // â”€â”€â”€ Main Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
 
       {/* Header */}
       <View style={styles.headerRow}>
@@ -155,7 +163,7 @@ export default function NurseVisitDetailScreen() {
       </View>
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
-        {!!actionError && <Text style={{ color: '#EF4444' }}>{actionError}</Text>}
+        {!!actionError && <Text style={{ color: COLORS.red }}>{actionError}</Text>}
         {visit.status === 'SCHEDULED' && <Button mode="contained" loading={accepting} disabled={accepting} onPress={() => void accept()}>Accept assigned visit</Button>}
         {/* Visit Info */}
         <VisitInfoCard visit={visit} />
@@ -169,8 +177,8 @@ export default function NurseVisitDetailScreen() {
 
             <Button
               mode="contained"
-              buttonColor="#00E676"
-              textColor="#061C19"
+              buttonColor={COLORS.emeraldFill}
+              textColor={COLORS.textMuted}
               onPress={() => setActivePanel('qr')}
               style={styles.verifyBtn}
               labelStyle={{ fontWeight: '700' }}
@@ -181,7 +189,7 @@ export default function NurseVisitDetailScreen() {
             <GpsVerification visitId={visitId} onSuccess={handleVerificationSuccess} />
             <ManualVerification visitId={visitId} onSuccess={handleVerificationSuccess} />
 
-            <Button mode="text" textColor="#94A3B8" onPress={() => setActivePanel('none')}>
+            <Button mode="text" textColor={COLORS.textBody} onPress={() => setActivePanel('none')}>
               Back to verification methods
             </Button>
           </View>
@@ -218,7 +226,7 @@ export default function NurseVisitDetailScreen() {
             <TextInput
               style={styles.notesInput}
               placeholder="Enter clinical notes..."
-              placeholderTextColor="#6B8E8A"
+              placeholderTextColor={COLORS.textBody}
               value={notes}
               onChangeText={setNotes}
               multiline
@@ -227,7 +235,7 @@ export default function NurseVisitDetailScreen() {
             />
             <Button
               mode="outlined"
-              textColor="#00E676"
+              textColor={COLORS.emerald}
               style={styles.saveNotesBtn}
               onPress={handleSaveNotes}
               loading={saveNotes.isPending}
@@ -242,24 +250,24 @@ export default function NurseVisitDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: COLORS.bg },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: SPACING.lg },
   backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
-  backIcon: { color: '#FFFFFF', fontSize: 28 },
-  headerTitle: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
+  backIcon: { color: COLORS.textDark, fontSize: 28 },
+  headerTitle: { color: COLORS.onAccent, fontSize: 17, fontWeight: '700' },
   scroll: { flex: 1 },
   content: { padding: SPACING.lg, paddingBottom: 40 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#94A3B8', marginTop: 10, fontSize: 14 },
-  errorText: { color: '#EF4444', fontSize: 15, fontWeight: '600', marginBottom: 10 },
+  loadingText: { color: COLORS.textBody, marginTop: 10, fontSize: 14 },
+  errorText: { color: COLORS.red, fontSize: 15, fontWeight: '600', marginBottom: 10 },
   verificationPanel: { marginBottom: SPACING.lg },
-  panelTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '800', marginBottom: 8 },
-  panelSub: { color: '#94A3B8', fontSize: 13, marginBottom: 16 },
+  panelTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: '800', marginBottom: 8 },
+  panelSub: { color: COLORS.textBody, fontSize: 13, marginBottom: 16 },
   verifyBtn: { borderRadius: RADIUS.md, marginBottom: SPACING.md },
-  notesCard: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', padding: SPACING.lg, marginBottom: SPACING.lg },
-  notesTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', marginBottom: 12 },
-  notesInput: { backgroundColor: '#051815', color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', padding: 12, borderRadius: RADIUS.md, fontSize: 13, minHeight: 100 },
-  saveNotesBtn: { borderColor: '#00E676', marginTop: 10 },
-});
+  notesCard: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, padding: SPACING.lg, marginBottom: SPACING.lg },
+  notesTitle: { color: COLORS.textDark, fontSize: 15, fontWeight: '700', marginBottom: 12 },
+  notesInput: { backgroundColor: COLORS.bg, color: COLORS.textDark, borderWidth: 1, borderColor: COLORS.emeraldLight, padding: 12, borderRadius: RADIUS.md, fontSize: 13, minHeight: 100 },
+  saveNotesBtn: { borderColor: COLORS.emerald, marginTop: 10 },
+}));
 

@@ -1,13 +1,18 @@
+
+
+
 import { useState } from 'react';
 import { View, Linking } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNurseProfile, useNurseVerification } from '../../../hooks/useNurse';
-import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../../components/common/WorkflowPage';
 import { apiClient } from '../../../api/client';
 import { downloadPrivateFile } from '../../../utils/fileTransfer';
 export default function NurseDocumentReview() {
+  const s = useFlowStyles();
+
   const { id = '' } = useLocalSearchParams<{ id: string }>(); const profile = useNurseProfile(id); const verification = useNurseVerification(id); const qc = useQueryClient();
   const [assessments, setAssessments] = useState<Record<string, { rating: string; notes: string }>>({});
   const [reason, setReason] = useState(''); const [busy, setBusy] = useState(false); const [error, setError] = useState('');

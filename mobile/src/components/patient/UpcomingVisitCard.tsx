@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface UpcomingVisitCardProps {
   staffName?: string;
@@ -19,6 +21,9 @@ export const UpcomingVisitCard: React.FC<UpcomingVisitCardProps> = ({
   onPress,
   onSeeAllPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const hasVisit = Boolean(staffName && staffName !== 'Assigned Staff' && scheduledAt && scheduledAt !== 'No upcoming visit');
 
   const staffInitials = staffName
@@ -52,7 +57,7 @@ export const UpcomingVisitCard: React.FC<UpcomingVisitCardProps> = ({
                 label={staffInitials}
                 style={styles.staffAvatar}
                 labelStyle={styles.staffAvatarLabel}
-                color="#FFFFFF"
+                color={COLORS.textDark}
               />
             </View>
             <TouchableOpacity style={styles.viewDetailsBtn} onPress={onPress} activeOpacity={0.85}>
@@ -61,7 +66,7 @@ export const UpcomingVisitCard: React.FC<UpcomingVisitCardProps> = ({
           </View>
         ) : (
           <TouchableOpacity style={styles.emptyContent} onPress={onSeeAllPress} activeOpacity={0.85}>
-            <Ionicons name="calendar-outline" size={24} color="rgba(255,255,255,0.5)" />
+            <Ionicons name="calendar-outline" size={24} color={COLORS.inverseMuted} />
             <View style={styles.emptyTextWrap}>
               <Text style={styles.emptyTitle}>No Upcoming Visits</Text>
               <Text style={styles.emptySub}>You have no scheduled care visits right now.</Text>
@@ -73,7 +78,7 @@ export const UpcomingVisitCard: React.FC<UpcomingVisitCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   wrapper: {
     marginTop: -30,
     marginBottom: SPACING.lg,
@@ -84,7 +89,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.navy,
     borderRadius: RADIUS.xl,
     padding: SPACING.lg,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 12,
@@ -104,7 +109,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
@@ -118,7 +123,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(41, 169, 245, 0.15)',
+    backgroundColor: COLORS.blueLight,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -127,17 +132,17 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.md,
   },
   visitTime: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
   visitStaff: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: COLORS.inverseMuted,
     fontSize: TYPOGRAPHY.sizes.xs,
     marginTop: 2,
   },
   staffAvatar: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    backgroundColor: COLORS.glassSurface,
   },
   staffAvatarLabel: {
     fontSize: 16,
@@ -149,10 +154,10 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm + 2,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: COLORS.glassBorder,
   },
   viewDetailsText: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
@@ -165,13 +170,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   emptyTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
   emptySub: {
-    color: 'rgba(255, 255, 255, 0.6)',
+    color: COLORS.inverseMuted,
     fontSize: TYPOGRAPHY.sizes.xs,
     marginTop: 2,
   },
-});
+}));

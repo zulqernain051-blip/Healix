@@ -1,7 +1,9 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface AddConditionModalProps {
   visible: boolean;
@@ -16,6 +18,9 @@ export const AddConditionModal: React.FC<AddConditionModalProps> = ({
   onSubmit,
   isLoading = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [name, setName] = useState('');
   const [diagnosedDate, setDiagnosedDate] = useState('');
   const [notes, setNotes] = useState('');
@@ -42,7 +47,7 @@ export const AddConditionModal: React.FC<AddConditionModalProps> = ({
           <TextInput
             style={styles.input}
             placeholder="Condition Name (e.g. Hypertension, Diabetes)"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={name}
             onChangeText={setName}
           />
@@ -50,7 +55,7 @@ export const AddConditionModal: React.FC<AddConditionModalProps> = ({
           <TextInput
             style={styles.input}
             placeholder="Diagnosed Date (e.g. 2022-05-10)"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={diagnosedDate}
             onChangeText={setDiagnosedDate}
           />
@@ -58,7 +63,7 @@ export const AddConditionModal: React.FC<AddConditionModalProps> = ({
           <TextInput
             style={styles.input}
             placeholder="Notes (optional)"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={notes}
             onChangeText={setNotes}
           />
@@ -82,39 +87,39 @@ export const AddConditionModal: React.FC<AddConditionModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: COLORS.modalBackdrop,
     justifyContent: 'center',
     padding: SPACING.lg,
   },
   modalContent: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
     marginBottom: 4,
   },
   sub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginBottom: SPACING.md,
   },
   input: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
     marginBottom: SPACING.md,
   },
   btnRow: {
@@ -124,19 +129,19 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: COLORS.glassSurface,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
   },
   cancelBtnText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
   },
   confirmBtn: {
     flex: 1,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
@@ -145,8 +150,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   confirmBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 11,
     fontWeight: '700',
   },
-});
+}));

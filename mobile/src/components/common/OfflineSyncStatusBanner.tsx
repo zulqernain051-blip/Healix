@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useEffect, useRef } from 'react';
 import { StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
@@ -18,6 +21,9 @@ export const OfflineSyncStatusBanner: React.FC<OfflineSyncStatusBannerProps> = (
   onRetrySync,
   isSyncing = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const slideAnim = useRef(new Animated.Value(-50)).current;
 
   useEffect(() => {
@@ -34,9 +40,9 @@ export const OfflineSyncStatusBanner: React.FC<OfflineSyncStatusBannerProps> = (
   }
 
   const getBannerColor = () => {
-    if (!isOnline) return { bg: '#1E1214', border: '#EF4444', text: '#FCA5A5', icon: '📡❌' };
-    if (isSyncing) return { bg: '#0A2D28', border: '#0D9488', text: '#5EEAD4', icon: '🔄' };
-    return { bg: '#1E1D0A', border: '#F59E0B', text: '#FDE68A', icon: '⏳' };
+    if (!isOnline) return { bg: COLORS.bg, border: COLORS.red, text: COLORS.amberLight, icon: '📡❌' };
+    if (isSyncing) return { bg: COLORS.bg, border: COLORS.teal, text: COLORS.emerald, icon: '🔄' };
+    return { bg: COLORS.bg, border: COLORS.amber, text: COLORS.amber, icon: '⏳' };
   };
 
   const styleConfig = getBannerColor();
@@ -54,7 +60,7 @@ export const OfflineSyncStatusBanner: React.FC<OfflineSyncStatusBannerProps> = (
     >
       <View style={styles.leftRow}>
         {isSyncing ? (
-          <ActivityIndicator size="small" color="#0D9488" style={{ marginRight: 8 }} />
+          <ActivityIndicator size="small" color={COLORS.teal} style={{ marginRight: 8 }} />
         ) : (
           <Text style={styles.icon}>{styleConfig.icon}</Text>
         )}
@@ -88,7 +94,7 @@ export const OfflineSyncStatusBanner: React.FC<OfflineSyncStatusBannerProps> = (
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -104,7 +110,7 @@ const styles = StyleSheet.create({
   icon: { fontSize: 16, marginRight: SPACING.sm },
   textWrap: { flex: 1 },
   title: { fontSize: TYPOGRAPHY.sizes.xs, fontWeight: '700' },
-  subText: { color: '#94A3B8', fontSize: 10, marginTop: 1 },
+  subText: { color: COLORS.textBody, fontSize: 10, marginTop: 1 },
   retryBtn: {
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -112,4 +118,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   retryText: { fontSize: 11, fontWeight: '700' },
-});
+}));

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -22,6 +25,9 @@ export const HealthSummaryCard: React.FC<HealthSummaryCardProps> = ({
   riskStatus = 'Stable',
   onPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <TouchableOpacity style={styles.summaryCard} onPress={onPress} activeOpacity={0.8}>
       <View style={styles.metricColumn}>
@@ -58,23 +64,23 @@ export const HealthSummaryCard: React.FC<HealthSummaryCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   summaryCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   metricColumn: {
     flex: 1,
     alignItems: 'center',
   },
   metricLabel: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginBottom: 4,
   },
@@ -83,29 +89,29 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   metricVal: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '800',
   },
   metricUnit: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
   },
   metricDivider: {
     width: 1,
     height: '70%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.glassSurface,
   },
   statusPillGreen: {
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+    backgroundColor: COLORS.emeraldLight,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 8,
     marginTop: 6,
   },
   statusPillTextGreen: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 10,
     fontWeight: '600',
   },
-});
+}));

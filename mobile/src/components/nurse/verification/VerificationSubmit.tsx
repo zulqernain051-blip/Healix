@@ -1,9 +1,12 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { PALETTE } from './constants';
 
 export const VerificationSubmit: React.FC = () => {
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.footer}>
       <Text style={styles.footerText}>
@@ -13,19 +16,19 @@ export const VerificationSubmit: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   footer: {
     marginTop: 24,
     padding: 16,
-    backgroundColor: PALETTE.surface,
+    backgroundColor: COLORS.surface,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: PALETTE.border,
+    borderColor: COLORS.inputBorder,
   },
   footerText: {
-    color: PALETTE.muted,
+    color: COLORS.textMuted,
     fontSize: 13,
     lineHeight: 20,
     textAlign: 'center',
   },
-});
+}));

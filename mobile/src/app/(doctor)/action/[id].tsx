@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState } from 'react';
 import { View, ScrollView, StyleSheet, Alert, ActivityIndicator, Platform } from 'react-native';
 import { Card, Button, Text, Divider, Portal, Dialog } from 'react-native-paper';
@@ -10,9 +12,12 @@ import { FollowUpForm } from '../../../components/doctor/FollowUpForm';
 import { CarePlanForm } from '../../../components/doctor/CarePlanForm';
 import { ClinicalDecisionForm } from '../../../components/doctor/ClinicalDecisionForm';
 
-import { COLORS } from '../../../theme';
+
 
 export default function DoctorActionScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id, form } = useLocalSearchParams();
   const caseId = id as string;
   const initialForm = (form as string) || 'NONE';
@@ -38,7 +43,7 @@ export default function DoctorActionScreen() {
   if (isLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-        <ActivityIndicator size="large" color={COLORS.navy} />
+        <ActivityIndicator size="large" color={COLORS.primaryText} />
       </View>
     );
   }
@@ -69,7 +74,7 @@ export default function DoctorActionScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Button icon="arrow-left" labelStyle={{ color: COLORS.navy }} onPress={() => goBack()}>Back</Button>
+        <Button icon="arrow-left" labelStyle={{ color: COLORS.primaryText }} onPress={() => goBack()}>Back</Button>
         <Text style={styles.headerTitle}>Clinical Actions</Text>
         <View style={{ width: 60 }} />
       </View>
@@ -104,7 +109,7 @@ export default function DoctorActionScreen() {
               mode="outlined"
               icon="stethoscope"
               style={styles.actionBtn}
-              textColor={COLORS.navy}
+              textColor={COLORS.primaryText}
               onPress={() => setActiveForm('DIAGNOSIS')}
             >
               Add Diagnosis
@@ -114,7 +119,7 @@ export default function DoctorActionScreen() {
               mode="outlined"
               icon="pill"
               style={styles.actionBtn}
-              textColor={COLORS.navy}
+              textColor={COLORS.primaryText}
               onPress={() => setActiveForm('PRESCRIPTION')}
             >
               Add Prescription
@@ -124,7 +129,7 @@ export default function DoctorActionScreen() {
               mode="outlined"
               icon="clipboard-pulse"
               style={styles.actionBtn}
-              textColor={COLORS.navy}
+              textColor={COLORS.primaryText}
               onPress={() => setActiveForm('CAREPLAN')}
             >
               Create Care Plan
@@ -134,7 +139,7 @@ export default function DoctorActionScreen() {
               mode="outlined"
               icon="calendar-plus"
               style={styles.actionBtn}
-              textColor={COLORS.navy}
+              textColor={COLORS.primaryText}
               onPress={() => setActiveForm('FOLLOWUP')}
             >
               Schedule Follow-up
@@ -187,7 +192,7 @@ export default function DoctorActionScreen() {
             </Text>
             <Button
               mode="contained"
-              buttonColor={COLORS.emerald}
+              buttonColor={COLORS.emeraldFill} textColor={COLORS.onAccent}
               style={styles.resolveBtn}
               onPress={() => setShowResolveDialog(true)}
             >
@@ -219,7 +224,7 @@ export default function DoctorActionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.surface },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: COLORS.surfaceCard, borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder },
   headerTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold' },
@@ -235,4 +240,4 @@ const styles = StyleSheet.create({
   divider: { backgroundColor: COLORS.inputBorder, marginBottom: 16 },
   helperText: { color: COLORS.textMuted, fontSize: 12, textAlign: 'center', marginBottom: 16 },
   resolveBtn: { paddingVertical: 6 }
-});
+}));

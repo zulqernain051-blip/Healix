@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { localDateTime } from '../../../utils/dates';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useState, useEffect } from 'react';
@@ -13,11 +15,16 @@ import { TextInput, Button, Text, HelperText } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { usePatientProfile, useUpdatePatientProfile } from '../../../hooks/usePatient';
-import { SPACING, RADIUS, COLORS } from '../../../theme';
+import { SPACING, RADIUS } from '../../../theme';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
 
 export default function ProfileEditScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user, loadUser } = useAuthStore();
   const patientId = user?.patientId || '';
 
@@ -87,7 +94,7 @@ export default function ProfileEditScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.headerRow}>
@@ -104,10 +111,10 @@ export default function ProfileEditScreen() {
             mode="outlined"
             error={fullName.length > 0 && fullName.trim().length < 3}
             style={styles.input}
-            outlineColor="rgba(0, 230, 118, 0.2)"
-            activeOutlineColor="#00E676"
-            textColor="#FFFFFF"
-            theme={{ colors: { onSurfaceVariant: '#94A3B8' } }}
+            outlineColor={COLORS.emeraldLight}
+            activeOutlineColor={COLORS.emerald}
+            textColor={COLORS.textDark}
+            theme={{ colors: { onSurfaceVariant: COLORS.textBody } }}
           />
           {fullName.length > 0 && fullName.trim().length < 3 && (
             <HelperText type="error" visible={true} style={styles.errorHelper}>
@@ -119,15 +126,15 @@ export default function ProfileEditScreen() {
             label="Date of Birth (YYYY-MM-DD)"
             value={dob}
             placeholder="e.g. 1995-12-30"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             onChangeText={setDob}
             mode="outlined"
             error={dob.length > 0 && !isDobValid(dob)}
             style={styles.input}
-            outlineColor="rgba(0, 230, 118, 0.2)"
-            activeOutlineColor="#00E676"
-            textColor="#FFFFFF"
-            theme={{ colors: { onSurfaceVariant: '#94A3B8' } }}
+            outlineColor={COLORS.emeraldLight}
+            activeOutlineColor={COLORS.emerald}
+            textColor={COLORS.textDark}
+            theme={{ colors: { onSurfaceVariant: COLORS.textBody } }}
           />
           {dob.length > 0 && !isDobValid(dob) && (
             <HelperText type="error" visible={true} style={styles.errorHelper}>
@@ -139,14 +146,14 @@ export default function ProfileEditScreen() {
             label="Gender"
             value={gender}
             placeholder="e.g. Male, Female"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             onChangeText={setGender}
             mode="outlined"
             style={styles.input}
-            outlineColor="rgba(0, 230, 118, 0.2)"
-            activeOutlineColor="#00E676"
-            textColor="#FFFFFF"
-            theme={{ colors: { onSurfaceVariant: '#94A3B8' } }}
+            outlineColor={COLORS.emeraldLight}
+            activeOutlineColor={COLORS.emerald}
+            textColor={COLORS.textDark}
+            theme={{ colors: { onSurfaceVariant: COLORS.textBody } }}
           />
 
           <TextInput mode="outlined" label="City (visible in the nurse marketplace)" value={city} onChangeText={setCity} textColor={COLORS.textPrimary} style={styles.input} />
@@ -154,16 +161,16 @@ export default function ProfileEditScreen() {
             label="Address"
             value={address}
             placeholder="e.g. House 12, Street 5, DHA Phase 6"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             onChangeText={value=>{setAddress(value);setLatitude('');setLongitude('');}}
             mode="outlined"
             multiline
             numberOfLines={2}
             style={styles.input}
-            outlineColor="rgba(0, 230, 118, 0.2)"
-            activeOutlineColor="#00E676"
-            textColor="#FFFFFF"
-            theme={{ colors: { onSurfaceVariant: '#94A3B8' } }}
+            outlineColor={COLORS.emeraldLight}
+            activeOutlineColor={COLORS.emerald}
+            textColor={COLORS.textDark}
+            theme={{ colors: { onSurfaceVariant: COLORS.textBody } }}
           />
 
           <View style={styles.row}>
@@ -171,31 +178,31 @@ export default function ProfileEditScreen() {
               label="Latitude"
               value={latitude}
               placeholder="e.g. 31.5204"
-              placeholderTextColor="#6B8E8A"
+              placeholderTextColor={COLORS.textBody}
               onChangeText={setLatitude}
               mode="outlined"
               keyboardType="numeric"
               style={[styles.input, { flex: 1, marginRight: 8 }]}
               error={latitude.length > 0 && isNaN(Number(latitude))}
-              outlineColor="rgba(0, 230, 118, 0.2)"
-              activeOutlineColor="#00E676"
-              textColor="#FFFFFF"
-              theme={{ colors: { onSurfaceVariant: '#94A3B8' } }}
+              outlineColor={COLORS.emeraldLight}
+              activeOutlineColor={COLORS.emerald}
+              textColor={COLORS.textDark}
+              theme={{ colors: { onSurfaceVariant: COLORS.textBody } }}
             />
             <TextInput
               label="Longitude"
               value={longitude}
               placeholder="e.g. 74.3587"
-              placeholderTextColor="#6B8E8A"
+              placeholderTextColor={COLORS.textBody}
               onChangeText={setLongitude}
               mode="outlined"
               keyboardType="numeric"
               style={[styles.input, { flex: 1, marginLeft: 8 }]}
               error={longitude.length > 0 && isNaN(Number(longitude))}
-              outlineColor="rgba(0, 230, 118, 0.2)"
-              activeOutlineColor="#00E676"
-              textColor="#FFFFFF"
-              theme={{ colors: { onSurfaceVariant: '#94A3B8' } }}
+              outlineColor={COLORS.emeraldLight}
+              activeOutlineColor={COLORS.emerald}
+              textColor={COLORS.textDark}
+              theme={{ colors: { onSurfaceVariant: COLORS.textBody } }}
             />
           </View>
           {(latitude.length > 0 && isNaN(Number(latitude))) || (longitude.length > 0 && isNaN(Number(longitude))) ? (
@@ -210,8 +217,8 @@ export default function ProfileEditScreen() {
             loading={isUpdating}
             disabled={isUpdating || !isFormValid()}
             style={styles.saveBtn}
-            buttonColor="#00E676"
-            textColor="#061C19"
+            buttonColor={COLORS.emeraldFill}
+            textColor={COLORS.textMuted}
           >
             Save Profile
           </Button>
@@ -220,7 +227,7 @@ export default function ProfileEditScreen() {
             mode="outlined"
             onPress={() => navigate('/(patient)/(tabs)/profile')}
             style={styles.cancelBtn}
-            textColor="#00E676"
+            textColor={COLORS.emerald}
           >
             Cancel
           </Button>
@@ -230,18 +237,18 @@ export default function ProfileEditScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: COLORS.bg },
   container: { flexGrow: 1, padding: SPACING.lg, paddingBottom: 60, maxWidth: 800, width: '100%', alignSelf: 'center' },
   headerRow: { marginTop: SPACING.md, marginBottom: SPACING.xs },
-  headerTitle: { color: '#FFFFFF', fontSize: 28, fontWeight: '800' },
-  subtitle: { color: '#94A3B8', fontSize: 14, marginBottom: SPACING.xl },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.1)' },
-  input: { marginBottom: 4, marginTop: 8, backgroundColor: '#061C19' },
+  headerTitle: { color: COLORS.onAccent, fontSize: 28, fontWeight: '800' },
+  subtitle: { color: COLORS.textBody, fontSize: 14, marginBottom: SPACING.xl },
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.emeraldLight },
+  input: { marginBottom: 4, marginTop: 8, backgroundColor: COLORS.bg },
   row: { flexDirection: 'row', justifyContent: 'space-between' },
-  errorHelper: { color: '#FF5252', fontSize: 12, marginBottom: 8 },
+  errorHelper: { color: COLORS.red, fontSize: 12, marginBottom: 8 },
   saveBtn: { marginTop: SPACING.xl, paddingVertical: 6, borderRadius: RADIUS.md },
-  cancelBtn: { marginTop: SPACING.sm, paddingVertical: 6, borderRadius: RADIUS.md, borderColor: 'rgba(0, 230, 118, 0.3)' },
-});
+  cancelBtn: { marginTop: SPACING.sm, paddingVertical: 6, borderRadius: RADIUS.md, borderColor: COLORS.emeraldLight },
+}));
 
 

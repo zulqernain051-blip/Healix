@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -20,11 +23,14 @@ export const NurseScoreCard: React.FC<NurseScoreCardProps> = ({
   reliabilityScore,
   performanceScore,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const metrics = [
-    { label: 'Assessed Skill', score: skillScore, color: '#00E676' },
-    { label: 'Experience', score: experienceScore, color: '#3B82F6' },
-    { label: 'Reliability', score: reliabilityScore, color: '#F59E0B' },
-    { label: 'Performance', score: performanceScore, color: '#A855F7' },
+    { label: 'Assessed Skill', score: skillScore, color: COLORS.emerald },
+    { label: 'Experience', score: experienceScore, color: COLORS.primaryText },
+    { label: 'Reliability', score: reliabilityScore, color: COLORS.amber },
+    { label: 'Performance', score: performanceScore, color: COLORS.purple },
   ];
 
   return (
@@ -55,18 +61,18 @@ export const NurseScoreCard: React.FC<NurseScoreCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#FFFFFF', padding: 20, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  title: { color: '#1E293B', fontSize: 15, fontWeight: '700', marginBottom: 20 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.surfaceCard, padding: 20, borderRadius: 16, borderWidth: 1, borderColor: COLORS.inputBorder, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  title: { color: COLORS.textMuted, fontSize: 15, fontWeight: '700', marginBottom: 20 },
   compositeRow: { flexDirection: 'row', alignItems: 'center' },
-  scoreCircle: { width: 90, height: 90, borderRadius: 45, backgroundColor: '#F8FAFC', justifyContent: 'center', alignItems: 'center', borderWidth: 4, borderColor: '#00E676', marginRight: 20 },
-  scoreNumber: { color: '#1E293B', fontSize: 28, fontWeight: '800' },
-  scoreLabel: { color: '#64748B', fontSize: 11, fontWeight: '600', marginTop: -2 },
+  scoreCircle: { width: 90, height: 90, borderRadius: 45, backgroundColor: COLORS.surfaceCard, justifyContent: 'center', alignItems: 'center', borderWidth: 4, borderColor: COLORS.emerald, marginRight: 20 },
+  scoreNumber: { color: COLORS.textMuted, fontSize: 28, fontWeight: '800' },
+  scoreLabel: { color: COLORS.textBody, fontSize: 11, fontWeight: '600', marginTop: -2 },
   barsCol: { flex: 1, gap: 12 },
   barGroup: {},
   barLabelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  barLabel: { color: '#64748B', fontSize: 12, fontWeight: '600' },
+  barLabel: { color: COLORS.textBody, fontSize: 12, fontWeight: '600' },
   barValue: { fontSize: 12, fontWeight: '700' },
-  barTrack: { height: 6, backgroundColor: '#F1F5F9', borderRadius: 3, overflow: 'hidden' },
+  barTrack: { height: 6, backgroundColor: COLORS.surfaceCard, borderRadius: 3, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 3 },
-});
+}));

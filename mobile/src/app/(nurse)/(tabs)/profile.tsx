@@ -1,3 +1,5 @@
+import { useAppTheme } from '../../../theme/ThemeProvider';
+
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Text, Avatar, Button, TextInput } from 'react-native-paper';
@@ -11,9 +13,12 @@ import { navigate } from '../../../utils/navigation';
 import { EditBioModal } from '../../../components/nurse/EditBioModal';
 import { EditQualificationModal } from '../../../components/nurse/EditQualificationModal';
 import { EditSpecializationModal } from '../../../components/nurse/EditSpecializationModal';
-import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
-import { COLORS } from '../../../theme';
+import { WorkflowPage, useFlowStyles } from '../../../components/common/WorkflowPage';
+
 export default function NurseProfileScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const s = useFlowStyles();
+
   const { user, logout } = useAuthStore(); const id = user?.nurseId || ''; const q = useNurseProfile(id); const verification = useNurseVerification(id); const remove = useDeleteQualification(); const qc = useQueryClient();
   const [modal, setModal] = useState(''); const [busy, setBusy] = useState(false); const [error, setError] = useState(''); const [certificate, setCertificate] = useState<Record<string, string>>({});
   const run = async (task: () => Promise<unknown>) => { setBusy(true); setError(''); try { await task(); await qc.invalidateQueries({ queryKey: ['nurse', id] }); } catch(e: any) { setError(e.message); } finally { setBusy(false); } };

@@ -1,7 +1,9 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 import { CareRequestResponse } from '../../types/care';
 
 interface CareJourneyCardProps {
@@ -21,6 +23,9 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
   onViewContractPress,
   onRebookPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const reqData = request as any;
   const visit = reqData?.visit || (reqData?.visits && reqData.visits.length > 0 ? reqData.visits[0] : null);
   const nurse = visit?.nurse?.user || reqData?.nurse?.user;
@@ -85,10 +90,10 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
                       {
                         backgroundColor:
                           latestAssessment.riskTier === 'HIGH' || latestAssessment.riskTier === 'CRITICAL'
-                            ? 'rgba(239, 68, 68, 0.12)'
+                            ? COLORS.redLight
                             : latestAssessment.riskTier === 'MEDIUM'
-                            ? 'rgba(245, 158, 11, 0.12)'
-                            : 'rgba(16, 185, 129, 0.12)',
+                            ? COLORS.amberLight
+                            : COLORS.emeraldLight,
                       },
                     ]}
                   >
@@ -98,10 +103,10 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
                         {
                           color:
                             latestAssessment.riskTier === 'HIGH' || latestAssessment.riskTier === 'CRITICAL'
-                              ? '#DC2626'
+                              ? COLORS.red
                               : latestAssessment.riskTier === 'MEDIUM'
-                              ? '#D97706'
-                              : '#059669',
+                              ? COLORS.amber
+                              : COLORS.emerald,
                         },
                       ]}
                     >
@@ -181,11 +186,11 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
         }}
       >
         <View style={styles.cardHeader}>
-          <View style={[styles.avatarRing, { borderColor: 'rgba(41, 169, 245, 0.4)' }]}>
+          <View style={[styles.avatarRing, { borderColor: COLORS.blueLight }]}>
             <Avatar.Text
               size={48}
               label={contractNurseInitials}
-              style={{ backgroundColor: 'rgba(41, 169, 245, 0.12)' }}
+              style={{ backgroundColor: COLORS.blueLight }}
               labelStyle={[styles.avatarLabelTeal, { color: COLORS.accentBlue }]}
               color={COLORS.accentBlue}
             />
@@ -241,15 +246,15 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
           {hasOffers ? (
             /* Stacked Avatars Visual — only when offers exist */
             <View style={styles.stackedAvatarsRow}>
-              <View style={[styles.miniAvatar, { backgroundColor: '#E0E7FF', zIndex: 3 }]}>
-                <Text style={[styles.miniAvatarText, { color: '#4338CA' }]}>HM</Text>
+              <View style={[styles.miniAvatar, { backgroundColor: COLORS.surfaceCard, zIndex: 3 }]}>
+                <Text style={[styles.miniAvatarText, { color: COLORS.primaryText }]}>HM</Text>
               </View>
-              <View style={[styles.miniAvatar, { backgroundColor: '#E0F2FE', marginLeft: -12, zIndex: 2 }]}>
-                <Text style={[styles.miniAvatarText, { color: '#0369A1' }]}>AR</Text>
+              <View style={[styles.miniAvatar, { backgroundColor: COLORS.surfaceCard, marginLeft: -12, zIndex: 2 }]}>
+                <Text style={[styles.miniAvatarText, { color: COLORS.primaryText }]}>AR</Text>
               </View>
               {offersCount > 2 && (
-                <View style={[styles.miniAvatar, { backgroundColor: '#FEF3C7', marginLeft: -12, zIndex: 1 }]}>
-                  <Text style={[styles.miniAvatarText, { color: '#B45309' }]}>+{offersCount - 2}</Text>
+                <View style={[styles.miniAvatar, { backgroundColor: COLORS.amberLight, marginLeft: -12, zIndex: 1 }]}>
+                  <Text style={[styles.miniAvatarText, { color: COLORS.red }]}>+{offersCount - 2}</Text>
                 </View>
               )}
             </View>
@@ -331,10 +336,10 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
                       {
                         backgroundColor:
                           latestAssessment.riskTier === 'HIGH' || latestAssessment.riskTier === 'CRITICAL'
-                            ? 'rgba(239, 68, 68, 0.12)'
+                            ? COLORS.redLight
                             : latestAssessment.riskTier === 'MEDIUM'
-                            ? 'rgba(245, 158, 11, 0.12)'
-                            : 'rgba(16, 185, 129, 0.12)',
+                            ? COLORS.amberLight
+                            : COLORS.emeraldLight,
                       },
                     ]}
                   >
@@ -344,10 +349,10 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
                         {
                           color:
                             latestAssessment.riskTier === 'HIGH' || latestAssessment.riskTier === 'CRITICAL'
-                              ? '#DC2626'
+                              ? COLORS.red
                               : latestAssessment.riskTier === 'MEDIUM'
-                              ? '#D97706'
-                              : '#059669',
+                              ? COLORS.amber
+                              : COLORS.emerald,
                         },
                       ]}
                     >
@@ -402,11 +407,11 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
   return (
     <TouchableOpacity style={styles.card} activeOpacity={0.88} onPress={onCardPress}>
       <View style={styles.cardHeader}>
-        <View style={[styles.avatarRing, { borderColor: 'rgba(239, 68, 68, 0.25)' }]}>
+        <View style={[styles.avatarRing, { borderColor: COLORS.redLight }]}>
           <Avatar.Text
             size={48}
             label={nurseInitials}
-            style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)' }}
+            style={{ backgroundColor: COLORS.redLight }}
             labelStyle={styles.avatarLabelTeal}
             color={COLORS.red}
           />
@@ -435,14 +440,14 @@ export const CareJourneyCard: React.FC<CareJourneyCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
     backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.xl,
     padding: SPACING.lg,
     borderWidth: 1,
     borderColor: COLORS.inputBorder,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -459,13 +464,13 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     borderWidth: 2,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    borderColor: COLORS.emeraldLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
   },
   avatarTeal: {
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    backgroundColor: COLORS.emeraldLight,
   },
   avatarLabelTeal: {
     fontSize: 16,
@@ -482,7 +487,7 @@ const styles = StyleSheet.create({
     height: 32,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: COLORS.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -504,7 +509,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   timingAmber: {
-    color: '#B45309', // Amber-700 for high-contrast visibility
+    color: COLORS.red, // Amber-700 for high-contrast visibility
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.bold,
     marginTop: 3,
@@ -515,7 +520,7 @@ const styles = StyleSheet.create({
     marginTop: 3,
   },
   primaryActionButton: {
-    backgroundColor: '#6D28D9', // Deep royal indigo matching the screenshot button
+    backgroundColor: COLORS.purpleFill, // Deep royal indigo matching the screenshot button
     borderRadius: RADIUS.round,
     paddingVertical: SPACING.md - 2,
     alignItems: 'center',
@@ -523,7 +528,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   primaryActionText: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.sm + 1,
     fontWeight: TYPOGRAPHY.weights.bold,
   },
@@ -546,8 +551,8 @@ const styles = StyleSheet.create({
     height: 54,
     borderRadius: 27,
     borderWidth: 2,
-    borderColor: 'rgba(245, 158, 11, 0.3)',
-    backgroundColor: 'rgba(245, 158, 11, 0.06)',
+    borderColor: COLORS.amberLight,
+    backgroundColor: COLORS.amberLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -556,19 +561,19 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#F59E0B',
+    backgroundColor: COLORS.amber,
   },
   waitingBar: {
-    backgroundColor: 'rgba(245, 158, 11, 0.08)',
+    backgroundColor: COLORS.amberLight,
     borderRadius: RADIUS.round,
     paddingVertical: SPACING.md - 2,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.2)',
+    borderColor: COLORS.amberLight,
   },
   waitingBarText: {
-    color: '#B45309',
+    color: COLORS.amber,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
@@ -588,7 +593,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
   },
   miniScoreBadge: {
-    backgroundColor: 'rgba(11, 66, 104, 0.08)',
+    backgroundColor: COLORS.headerOverlayMid,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: RADIUS.round,
@@ -596,7 +601,7 @@ const styles = StyleSheet.create({
   miniScoreText: {
     fontSize: 10,
     fontWeight: '800',
-    color: COLORS.navy,
+    color: COLORS.primaryText,
   },
   vitalsSummaryText: {
     fontSize: 11,
@@ -604,4 +609,4 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontWeight: '500',
   },
-});
+}));

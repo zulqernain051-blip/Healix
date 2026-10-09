@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar, FlatList } from 'react-native';
 import { Card, Button, Chip, Divider } from 'react-native-paper';
@@ -6,6 +9,11 @@ import { useAdminNurses, useAdminPendingNurses, useApproveNurse, useRejectNurse,
 import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminNurses() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { data: pendingNurses_raw, isLoading: isLoadingPending } = useAdminPendingNurses();
   const pendingNurses: any[] = Array.isArray(pendingNurses_raw) ? pendingNurses_raw : (pendingNurses_raw as any)?.users || [];
   const { data: nurses_raw, isLoading: isLoadingNurses } = useAdminNurses();
@@ -65,8 +73,8 @@ export default function AdminNurses() {
             </Text>
           </View>
           <Chip
-            textStyle={{ color: '#061C19', fontSize: 10, fontWeight: '800' }}
-            style={{ backgroundColor: nurse.verificationStatus === 'VERIFIED' ? '#00E676' : '#F59E0B' }}
+            textStyle={{ color: COLORS.textMuted, fontSize: 10, fontWeight: '800' }}
+            style={{ backgroundColor: nurse.verificationStatus === 'VERIFIED' ? COLORS.emerald : COLORS.amber }}
           >
             {nurse.verificationStatus}
           </Chip>
@@ -88,8 +96,8 @@ export default function AdminNurses() {
           <View style={styles.actionsRow}>
             <Button
               mode="contained"
-              buttonColor="#00E676"
-              textColor="#061C19"
+              buttonColor={COLORS.emeraldFill}
+              textColor={COLORS.textMuted}
               onPress={() => handleApprove(nurse.id)}
               style={{ flex: 0.48, borderRadius: RADIUS.md }}
               labelStyle={{ fontWeight: '700' }}
@@ -98,9 +106,9 @@ export default function AdminNurses() {
             </Button>
             <Button
               mode="outlined"
-              textColor="#EF4444"
+              textColor={COLORS.red}
               onPress={() => handleReject(nurse.id)}
-              style={{ flex: 0.48, borderColor: '#EF4444', borderRadius: RADIUS.md }}
+              style={{ flex: 0.48, borderColor: COLORS.red, borderRadius: RADIUS.md }}
               labelStyle={{ fontWeight: '700' }}
             >
               Reject File
@@ -112,8 +120,8 @@ export default function AdminNurses() {
   );
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#061C19' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigate('/admin')} style={styles.backBtn}>
@@ -145,7 +153,7 @@ export default function AdminNurses() {
         </View>
 
         {isLoading && activeList.length === 0 ? (
-          <ActivityIndicator color="#00E676" size="large" style={{ marginTop: 40 }} />
+          <ActivityIndicator color={COLORS.emerald} size="large" style={{ marginTop: 40 }} />
         ) : (
           <FlatList
             data={activeList}
@@ -166,30 +174,30 @@ export default function AdminNurses() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19', padding: SPACING.lg },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg, padding: SPACING.lg },
   listContent: { paddingBottom: 40 },
   header: { marginBottom: 20 },
   backBtn: { marginBottom: 8 },
-  backText: { color: '#00E676', fontSize: 13, fontWeight: '700' },
-  title: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
-  subtitle: { color: '#94A3B8', fontSize: 12, marginTop: 4 },
+  backText: { color: COLORS.emerald, fontSize: 13, fontWeight: '700' },
+  title: { color: COLORS.textDark, fontSize: 20, fontWeight: '800' },
+  subtitle: { color: COLORS.textBody, fontSize: 12, marginTop: 4 },
   tabRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  tabBtn: { flex: 1, backgroundColor: '#0A2D28', paddingVertical: 10, borderRadius: RADIUS.md, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
-  tabBtnActive: { backgroundColor: '#0E3630', borderColor: '#00E676' },
-  tabBtnText: { color: '#94A3B8', fontSize: 11, fontWeight: '600' },
-  tabBtnTextActive: { color: '#00E676', fontWeight: '800' },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: 12 },
+  tabBtn: { flex: 1, backgroundColor: COLORS.bg, paddingVertical: 10, borderRadius: RADIUS.md, alignItems: 'center', borderWidth: 1, borderColor: COLORS.emeraldLight },
+  tabBtnActive: { backgroundColor: COLORS.bg, borderColor: COLORS.emerald },
+  tabBtnText: { color: COLORS.textBody, fontSize: 11, fontWeight: '600' },
+  tabBtnTextActive: { color: COLORS.emerald, fontWeight: '800' },
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: 12 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  nurseName: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  contactInfo: { color: '#94A3B8', fontSize: 11, marginTop: 2 },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', marginVertical: 10 },
+  nurseName: { color: COLORS.textDark, fontSize: 15, fontWeight: '700' },
+  contactInfo: { color: COLORS.textBody, fontSize: 11, marginTop: 2 },
+  divider: { backgroundColor: COLORS.emeraldLight, marginVertical: 10 },
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  detailLabel: { color: '#94A3B8', fontSize: 12 },
-  detailValue: { color: '#FFFFFF', fontSize: 12, fontWeight: '600' },
+  detailLabel: { color: COLORS.textBody, fontSize: 12 },
+  detailValue: { color: COLORS.textDark, fontSize: 12, fontWeight: '600' },
   actionsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 14 },
-  emptyCard: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, padding: 32, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
+  emptyCard: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, padding: 32, alignItems: 'center', borderWidth: 1, borderColor: COLORS.emeraldLight },
   emptyIcon: { fontSize: 36, marginBottom: 10 },
-  emptyTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  emptySub: { color: '#94A3B8', fontSize: 12, textAlign: 'center', marginTop: 4 },
-});
+  emptyTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  emptySub: { color: COLORS.textBody, fontSize: 12, textAlign: 'center', marginTop: 4 },
+}));

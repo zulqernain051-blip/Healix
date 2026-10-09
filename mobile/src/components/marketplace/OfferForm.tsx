@@ -1,9 +1,11 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, SegmentedButtons, Text } from 'react-native-paper';
 import { z } from 'zod';
 import { PriceType, SubmitOfferDto, NurseOffer } from '../../types/marketplace';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { localDateTime } from '../../utils/dates';
 
 // Derived from backend validation: submitOfferSchema
@@ -21,6 +23,9 @@ interface Props {
 }
 
 export const OfferForm: React.FC<Props> = ({ onSubmit, isSubmitting, defaultProposedStart, initialOffer }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [priceStr, setPriceStr] = useState(initialOffer ? String(initialOffer.price) : '');
   const [priceType, setPriceType] = useState<PriceType>(initialOffer?.priceType || 'HOURLY');
   const [message, setMessage] = useState(initialOffer?.message || '');
@@ -122,7 +127,7 @@ export const OfferForm: React.FC<Props> = ({ onSubmit, isSubmitting, defaultProp
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     backgroundColor: COLORS.surfaceCard,
     padding: SPACING.lg,
@@ -145,7 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   segmented: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
   },
   input: {
     backgroundColor: COLORS.surface,
@@ -159,4 +164,4 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
     borderRadius: RADIUS.sm,
   },
-});
+}));

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { Text, StyleSheet, ScrollView } from 'react-native';
 import { TextInput, Button, Card, HelperText } from 'react-native-paper';
@@ -6,15 +9,12 @@ import { useMutation } from '@tanstack/react-query';
 import { authApi } from '../../api/auth.api';
 import { useAuthStore } from '../../store/auth';
 
-const COLORS = {
-  bg: '#F9FAFB',
-  card: '#FFFFFF',
-  teal: '#0D9488',
-  textPrimary: '#111827',
-  textSecondary: '#6B7280'
-};
+
 
 export default function MfaVerifyScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { emailOrPhone } = useLocalSearchParams<{ emailOrPhone: string }>();
   const [code, setCode] = useState('');
   const setSession = useAuthStore((state) => state.setSession);
@@ -45,7 +45,7 @@ export default function MfaVerifyScreen() {
           keyboardType="number-pad"
           maxLength={6}
           style={styles.input}
-          outlineColor="#E5E7EB"
+          outlineColor={COLORS.inputBorder}
           activeOutlineColor={COLORS.teal}
         />
         {mfaMutation.error && (
@@ -59,7 +59,7 @@ export default function MfaVerifyScreen() {
           loading={mfaMutation.isPending}
           disabled={mfaMutation.isPending || code.length !== 6}
           style={styles.button}
-          buttonColor={COLORS.teal}>
+          buttonColor={COLORS.tealFill} textColor={COLORS.onAccent}>
           Verify & Login
         </Button>
       </Card>
@@ -67,11 +67,11 @@ export default function MfaVerifyScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flexGrow: 1, padding: 24, justifyContent: 'center', backgroundColor: COLORS.bg },
   header: { fontSize: 24, fontWeight: 'bold', color: COLORS.textPrimary, textAlign: 'center', marginBottom: 8 },
   subtitle: { fontSize: 16, color: COLORS.textSecondary, textAlign: 'center', marginBottom: 24 },
   card: { padding: 20, backgroundColor: COLORS.card, borderRadius: 12 },
   input: { marginBottom: 16, backgroundColor: COLORS.card },
   button: { paddingVertical: 6, marginTop: 16, borderRadius: 8 }
-});
+}));

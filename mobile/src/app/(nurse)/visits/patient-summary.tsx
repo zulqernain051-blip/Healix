@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { SafeAreaView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
@@ -6,6 +9,9 @@ import { usePatientProfile } from '../../../hooks/usePatient';
 import { ErrorState } from '../../../components/common/ErrorState';
 
 export default function PatientSummaryScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { patientId } = useLocalSearchParams<{ patientId: string }>();
   const { data: patientProfile, isLoading, error } = usePatientProfile(patientId || '');
 
@@ -13,7 +19,7 @@ export default function PatientSummaryScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator color="#00E676" size="large" />
+          <ActivityIndicator color={COLORS.emerald} size="large" />
           <Text style={styles.loadingText}>Loading patient summary...</Text>
         </View>
       </SafeAreaView>
@@ -47,12 +53,12 @@ export default function PatientSummaryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
-  header: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#0A2D28' },
-  title: { color: '#00E676', fontSize: 20, fontWeight: '700' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  header: { padding: 16, borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder },
+  title: { color: COLORS.emerald, fontSize: 20, fontWeight: '700' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#94A3B8', marginTop: 10, fontSize: 14 },
-});
+  loadingText: { color: COLORS.textBody, marginTop: 10, fontSize: 14 },
+}));
 
 

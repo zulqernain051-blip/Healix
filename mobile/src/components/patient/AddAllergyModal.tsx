@@ -1,7 +1,9 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface AddAllergyModalProps {
   visible: boolean;
@@ -16,6 +18,9 @@ export const AddAllergyModal: React.FC<AddAllergyModalProps> = ({
   onSubmit,
   isLoading = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [allergen, setAllergen] = useState('');
   const [severity, setSeverity] = useState<'MILD' | 'MODERATE' | 'SEVERE'>('MILD');
 
@@ -40,7 +45,7 @@ export const AddAllergyModal: React.FC<AddAllergyModalProps> = ({
           <TextInput
             style={styles.input}
             placeholder="e.g. Penicillin, Peanuts"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={allergen}
             onChangeText={setAllergen}
           />
@@ -82,43 +87,43 @@ export const AddAllergyModal: React.FC<AddAllergyModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: COLORS.modalBackdrop,
     justifyContent: 'center',
     padding: SPACING.lg,
   },
   modalContent: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
     marginBottom: 4,
   },
   sub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginBottom: SPACING.md,
   },
   input: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
     marginBottom: SPACING.md,
   },
   label: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginBottom: SPACING.xs,
   },
@@ -132,20 +137,20 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderRadius: RADIUS.sm,
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   sevPillActive: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   sevText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
   },
   sevTextActive: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '700',
   },
   btnRow: {
@@ -154,19 +159,19 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: COLORS.glassSurface,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
   },
   cancelBtnText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
   },
   confirmBtn: {
     flex: 1,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
@@ -175,8 +180,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   confirmBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 11,
     fontWeight: '700',
   },
-});
+}));

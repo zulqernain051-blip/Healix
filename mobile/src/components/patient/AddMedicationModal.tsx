@@ -1,7 +1,9 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface AddMedicationModalProps {
   visible: boolean;
@@ -11,6 +13,9 @@ interface AddMedicationModalProps {
 }
 
 export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({ visible, onClose, onSubmit, isLoading = false }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [name, setName] = useState('');
   const [dosage, setDosage] = useState('');
   const [frequency, setFrequency] = useState('');
@@ -30,9 +35,9 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({ visible,
       <View style={styles.overlay}>
         <View style={styles.modal}>
           {!!formError && <Text accessibilityRole="alert" style={{color:COLORS.red}}>{formError}</Text>}<Text style={styles.title}>Add Medication</Text>
-          <TextInput style={styles.input} placeholder="Medication Name" placeholderTextColor="#6B8E8A" value={name} onChangeText={setName} />
-          <TextInput style={styles.input} placeholder="Dosage (e.g. 500mg)" placeholderTextColor="#6B8E8A" value={dosage} onChangeText={setDosage} />
-          <TextInput style={styles.input} placeholder="Frequency (e.g. Twice daily)" placeholderTextColor="#6B8E8A" value={frequency} onChangeText={setFrequency} />
+          <TextInput style={styles.input} placeholder="Medication Name" placeholderTextColor={COLORS.textBody} value={name} onChangeText={setName} />
+          <TextInput style={styles.input} placeholder="Dosage (e.g. 500mg)" placeholderTextColor={COLORS.textBody} value={dosage} onChangeText={setDosage} />
+          <TextInput style={styles.input} placeholder="Frequency (e.g. Twice daily)" placeholderTextColor={COLORS.textBody} value={frequency} onChangeText={setFrequency} />
           <View style={styles.btnRow}>
             <TouchableOpacity style={styles.cancelBtn} onPress={onClose} disabled={isLoading}><Text style={styles.cancelText}>Cancel</Text></TouchableOpacity>
             <TouchableOpacity style={[styles.confirmBtn, (!name.trim() || !dosage.trim() || !frequency.trim()) && styles.disabled]} onPress={handleSubmit} disabled={!name.trim() || !dosage.trim() || !frequency.trim() || isLoading}>
@@ -45,15 +50,15 @@ export const AddMedicationModal: React.FC<AddMedicationModalProps> = ({ visible,
   );
 };
 
-const styles = StyleSheet.create({
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.75)', justifyContent: 'center', padding: SPACING.lg },
-  modal: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, padding: SPACING.xl, borderWidth: 1, borderColor: 'rgba(0,230,118,0.2)' },
-  title: { color: '#FFFFFF', fontSize: TYPOGRAPHY.sizes.md, fontWeight: '700', marginBottom: SPACING.md },
-  input: { backgroundColor: '#051815', borderRadius: RADIUS.md, padding: SPACING.md, color: '#FFFFFF', fontSize: 12, borderWidth: 1, borderColor: 'rgba(0,230,118,0.15)', marginBottom: SPACING.md },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: COLORS.modalBackdrop, justifyContent: 'center', padding: SPACING.lg },
+  modal: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, padding: SPACING.xl, borderWidth: 1, borderColor: COLORS.emeraldLight },
+  title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.md, fontWeight: '700', marginBottom: SPACING.md },
+  input: { backgroundColor: COLORS.bg, borderRadius: RADIUS.md, padding: SPACING.md, color: COLORS.textDark, fontSize: 12, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: SPACING.md },
   btnRow: { flexDirection: 'row', gap: SPACING.md, marginTop: SPACING.sm },
-  cancelBtn: { flex: 1, backgroundColor: 'rgba(255,255,255,0.08)', paddingVertical: SPACING.md, borderRadius: RADIUS.md, alignItems: 'center' },
-  cancelText: { color: '#94A3B8', fontSize: 11, fontWeight: '600' },
-  confirmBtn: { flex: 1, backgroundColor: '#00E676', paddingVertical: SPACING.md, borderRadius: RADIUS.md, alignItems: 'center' },
+  cancelBtn: { flex: 1, backgroundColor: COLORS.glassSurface, paddingVertical: SPACING.md, borderRadius: RADIUS.md, alignItems: 'center' },
+  cancelText: { color: COLORS.textBody, fontSize: 11, fontWeight: '600' },
+  confirmBtn: { flex: 1, backgroundColor: COLORS.emeraldFill, paddingVertical: SPACING.md, borderRadius: RADIUS.md, alignItems: 'center' },
   disabled: { opacity: 0.5 },
-  confirmText: { color: '#061C19', fontSize: 11, fontWeight: '700' },
-});
+  confirmText: { color: COLORS.onAccent, fontSize: 11, fontWeight: '700' },
+}));

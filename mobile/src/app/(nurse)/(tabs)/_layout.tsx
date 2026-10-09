@@ -1,12 +1,17 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, TouchableWithoutFeedback, Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { navigate } from '../../../utils/navigation';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function NurseTabsLayout() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [moreVisible, setMoreVisible] = useState(false);
 
   const handleMoreItemPress = (path: any) => {
@@ -27,7 +32,7 @@ export default function NurseTabsLayout() {
             paddingBottom: 8,
             paddingTop: 6,
           },
-          tabBarActiveTintColor: COLORS.navy,
+          tabBarActiveTintColor: COLORS.primaryText,
           tabBarInactiveTintColor: COLORS.textMuted,
           tabBarLabelStyle: {
             fontSize: 10,
@@ -99,52 +104,52 @@ export default function NurseTabsLayout() {
                 <View style={styles.menuHeader}>
                   <Text style={styles.menuTitle}>Nurse Options</Text>
                   <TouchableOpacity onPress={() => setMoreVisible(false)} style={styles.closeBtn}>
-                    <Ionicons name="close" size={24} color="#94A3B8" />
+                    <Ionicons name="close" size={24} color={COLORS.textBody} />
                   </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity style={styles.menuItem} onPress={() => handleMoreItemPress('/(nurse)/ai')}>
-                  <View style={[styles.iconBox, { backgroundColor: 'rgba(56, 189, 248, 0.1)' }]}>
-                    <Ionicons name="sparkles" size={22} color="#38BDF8" />
+                  <View style={[styles.iconBox, { backgroundColor: COLORS.blueLight }]}>
+                    <Ionicons name="sparkles" size={22} color={COLORS.primaryText} />
                   </View>
                   <View style={styles.menuItemText}>
                     <Text style={styles.menuItemTitle}>AI Assistant</Text>
                     <Text style={styles.menuItemSub}>Clinical support & insights</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color="#6B8E8A" />
+                  <Ionicons name="chevron-forward" size={20} color={COLORS.textBody} />
                 </TouchableOpacity>
                 
                 <TouchableOpacity style={styles.menuItem} onPress={() => handleMoreItemPress('/(nurse)/patients')}>
-                  <View style={[styles.iconBox, { backgroundColor: 'rgba(168, 85, 247, 0.1)' }]}>
-                    <Ionicons name="people" size={22} color="#A855F7" />
+                  <View style={[styles.iconBox, { backgroundColor: COLORS.purpleLight }]}>
+                    <Ionicons name="people" size={22} color={COLORS.purple} />
                   </View>
                   <View style={styles.menuItemText}>
                     <Text style={styles.menuItemTitle}>Patients</Text>
                     <Text style={styles.menuItemSub}>Active patient roster</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color="#6B8E8A" />
+                  <Ionicons name="chevron-forward" size={20} color={COLORS.textBody} />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.menuItem} onPress={() => handleMoreItemPress('/(nurse)/schedule')}>
-                  <View style={[styles.iconBox, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
-                    <Ionicons name="calendar" size={22} color="#EF4444" />
+                  <View style={[styles.iconBox, { backgroundColor: COLORS.redLight }]}>
+                    <Ionicons name="calendar" size={22} color={COLORS.red} />
                   </View>
                   <View style={styles.menuItemText}>
                     <Text style={styles.menuItemTitle}>Schedule</Text>
                     <Text style={styles.menuItemSub}>Shifts and availability</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color="#6B8E8A" />
+                  <Ionicons name="chevron-forward" size={20} color={COLORS.textBody} />
                 </TouchableOpacity>
                 
                 <TouchableOpacity style={styles.menuItem} onPress={() => handleMoreItemPress('/(nurse)/sync')}>
-                  <View style={[styles.iconBox, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
-                    <Ionicons name="sync" size={22} color="#10B981" />
+                  <View style={[styles.iconBox, { backgroundColor: COLORS.emeraldLight }]}>
+                    <Ionicons name="sync" size={22} color={COLORS.emerald} />
                   </View>
                   <View style={styles.menuItemText}>
                     <Text style={styles.menuItemTitle}>Data Sync</Text>
                     <Text style={styles.menuItemSub}>Offline mode & syncing</Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color="#6B8E8A" />
+                  <Ionicons name="chevron-forward" size={20} color={COLORS.textBody} />
                 </TouchableOpacity>
 
               </View>
@@ -156,20 +161,20 @@ export default function NurseTabsLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(3, 18, 16, 0.7)',
+    backgroundColor: COLORS.bg,
     justifyContent: 'flex-end',
   },
   menuContainer: {
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
     borderTopLeftRadius: RADIUS.xl,
     borderTopRightRadius: RADIUS.xl,
     padding: SPACING.lg,
     paddingBottom: Platform.OS === 'ios' ? 40 : SPACING.xl,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 230, 118, 0.2)',
+    borderTopColor: COLORS.emeraldLight,
   },
   menuHeader: {
     flexDirection: 'row',
@@ -179,7 +184,7 @@ const styles = StyleSheet.create({
   },
   menuTitle: {
     ...TYPOGRAPHY.h3,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontWeight: 'bold',
   },
   closeBtn: {
@@ -188,12 +193,12 @@ const styles = StyleSheet.create({
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    backgroundColor: COLORS.glassSurface,
     padding: SPACING.md,
     borderRadius: RADIUS.md,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.05)',
+    borderColor: COLORS.glassBorder,
   },
   iconBox: {
     width: 44,
@@ -207,14 +212,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 2,
   },
   menuItemSub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
   },
-});
+}));
 

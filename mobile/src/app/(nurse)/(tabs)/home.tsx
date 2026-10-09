@@ -1,6 +1,8 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, RefreshControl, StatusBar } from 'react-native';
-import { COLORS } from '../../../theme';
+
 import { Text } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
@@ -16,6 +18,11 @@ import { ErrorState } from '../../../components/common/ErrorState';
 import { NurseQuickActions } from '../../../components/nurse/NurseQuickActions';
 
 export default function NurseHomeScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user, accessToken } = useAuthStore();
   const nurseId = user?.nurseId;
   const token = accessToken;
@@ -63,7 +70,7 @@ export default function NurseHomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       
       {/* Header Greeting (Teal Background) */}
       <View style={styles.headerBox}>
@@ -77,7 +84,7 @@ export default function NurseHomeScreen() {
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00E676" colors={[COLORS.navy]} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.emerald} colors={[COLORS.navy]} />}
       >
         {/* Quick Actions */}
         <View style={styles.section}>
@@ -150,18 +157,18 @@ export default function NurseHomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.navyDark },
   headerBox: { padding: 20, paddingBottom: 30, backgroundColor: COLORS.navyDark },
-  greetingTitle: { color: COLORS.surfaceCard, fontSize: 24, fontWeight: '800' },
-  greetingSub: { color: COLORS.navy, fontSize: 14, marginTop: 6, fontWeight: '600' },
+  greetingTitle: { color: COLORS.onAccent, fontSize: 24, fontWeight: '800' },
+  greetingSub: { color: COLORS.primaryText, fontSize: 14, marginTop: 6, fontWeight: '600' },
   scroll: { flex: 1, backgroundColor: COLORS.surface, borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
   scrollContent: { padding: 20, paddingBottom: 40, paddingTop: 30 },
   section: { marginBottom: 28 },
   sectionTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: '800', marginBottom: 16 },
-  emptyReviewCard: { backgroundColor: COLORS.surfaceCard, padding: 24, borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: COLORS.inputBorder, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  emptyReviewCard: { backgroundColor: COLORS.surfaceCard, padding: 24, borderRadius: 16, alignItems: 'center', borderWidth: 1, borderColor: COLORS.inputBorder, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   emptyReviewIcon: { fontSize: 28, marginBottom: 8 },
   emptyReviewTitle: { color: COLORS.textDark, fontSize: 15, fontWeight: '700' },
   emptyReviewSub: { color: COLORS.textMuted, fontSize: 13, textAlign: 'center', marginTop: 4 },
-});
+}));
 

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -10,6 +13,9 @@ interface ConditionCardProps {
 }
 
 export const ConditionCard: React.FC<ConditionCardProps> = ({ name, diagnosedDate, notes }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.card}>
       <Text style={styles.name}>{name}</Text>
@@ -19,27 +25,27 @@ export const ConditionCard: React.FC<ConditionCardProps> = ({ name, diagnosedDat
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   name: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   sub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   notes: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
     marginTop: 4,
   },
-});
+}));

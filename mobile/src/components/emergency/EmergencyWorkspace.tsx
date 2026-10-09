@@ -1,17 +1,23 @@
+import { useAppTheme, useThemeValue, usePaperTheme } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useEffect, useState } from 'react';
 import { ScrollView, View, StyleSheet, Linking } from 'react-native';
-import { Appbar, Button, Card, Chip, Dialog, Portal, Text, TextInput, ActivityIndicator, Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { Appbar, Button, Card, Chip, Dialog, Portal, Text, TextInput, ActivityIndicator, Provider as PaperProvider } from 'react-native-paper';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Location from 'expo-location';
 import { useAuthStore } from '../../store/auth';
 import { emergencyApi, Ambulance } from '../../api/emergency.api';
 import { ClinicalDecisionForm } from '../doctor/ClinicalDecisionForm';
 import { apiClient } from '../../api/client';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { goBack } from '../../utils/navigation';
 
 const nextStatus: Record<string, string[]> = { PENDING: ['DISPATCHED', 'CANCELLED'], DISPATCHED: ['EN_ROUTE', 'ARRIVED', 'CANCELLED'], EN_ROUTE: ['ARRIVED', 'CANCELLED'], ARRIVED: ['COMPLETED', 'CANCELLED'] };
 export function EmergencyWorkspace({ fleet = false }: { fleet?: boolean }) {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+  const paperTheme = usePaperTheme();
+
   const { user, logout } = useAuthStore();
   const role = user?.role;
   const admin = role === 'ADMIN';
@@ -61,7 +67,7 @@ export function EmergencyWorkspace({ fleet = false }: { fleet?: boolean }) {
   }, [sharing]);
   const confirm = (label: string, task: (notes: string) => Promise<unknown>) => { setNotes(''); setConfirmation({ label, run: task }); };
   const dataError = dispatches.error || vehicles.error || paramedics.error || events.error;
-  return <PaperProvider theme={{ ...MD3LightTheme, colors: { ...MD3LightTheme.colors, primary: COLORS.navy } }}><View style={styles.root}>
+  return <PaperProvider theme={paperTheme}><View style={styles.root}>
     <Appbar.Header style={styles.header}><Appbar.BackAction onPress={goBack} color={COLORS.headerText} /><Appbar.Content title={fleet ? 'Ambulance Fleet' : 'Emergency Dispatches'} color={COLORS.headerText} />{role === 'PARAMEDIC' && <Appbar.Action icon="logout" onPress={() => void logout()} color={COLORS.headerText} />}</Appbar.Header>
     <ScrollView contentContainerStyle={styles.content}>
       {(error || dataError) && <Text accessibilityRole="alert" style={styles.error}>{error || (dataError as Error).message}</Text>}
@@ -105,4 +111,4 @@ export function EmergencyWorkspace({ fleet = false }: { fleet?: boolean }) {
     <Dialog visible={!!confirmation} onDismiss={() => !busy && setConfirmation(null)}><Dialog.Title>{confirmation?.label}</Dialog.Title><Dialog.Content><TextInput label="Notes (optional)" value={notes} onChangeText={setNotes} multiline />{error && <Text style={styles.error}>{error}</Text>}</Dialog.Content><Dialog.Actions><Button disabled={busy} onPress={() => setConfirmation(null)}>Cancel</Button><Button disabled={busy} loading={busy} onPress={() => confirmation && void run(() => confirmation.run(notes))}>Confirm</Button></Dialog.Actions></Dialog></Portal>
   </View></PaperProvider>;
 }
-const styles = StyleSheet.create({ root: { flex: 1, backgroundColor: COLORS.surface }, header: { backgroundColor: COLORS.navy }, content: { padding: SPACING.lg, gap: SPACING.md }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold, marginVertical: SPACING.sm }, error: { color: COLORS.red }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginVertical: SPACING.md }, input: { marginBottom: SPACING.sm } });
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({ root: { flex: 1, backgroundColor: COLORS.surface }, header: { backgroundColor: COLORS.navy }, content: { padding: SPACING.lg, gap: SPACING.md }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold, marginVertical: SPACING.sm }, error: { color: COLORS.red }, row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, marginVertical: SPACING.md }, input: { marginBottom: SPACING.sm } }));

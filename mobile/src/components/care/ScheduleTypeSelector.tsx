@@ -1,7 +1,9 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { ScheduleType } from '../../types/care';
 
 interface Props {
@@ -10,6 +12,9 @@ interface Props {
 }
 
 export const ScheduleTypeSelector: React.FC<Props> = ({ scheduleType, onChange }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Schedule Type *</Text>
@@ -34,7 +39,7 @@ export const ScheduleTypeSelector: React.FC<Props> = ({ scheduleType, onChange }
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     marginBottom: SPACING.md,
   },
@@ -51,15 +56,15 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     paddingVertical: SPACING.md,
-    backgroundColor: 'rgba(255, 255, 255, 0.40)',
+    backgroundColor: COLORS.glassSurface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.60)',
+    borderColor: COLORS.glassBorder,
     borderRadius: RADIUS.round,
     alignItems: 'center',
   },
   buttonActive: {
     borderColor: COLORS.accentBlue,
-    backgroundColor: 'rgba(41, 169, 245, 0.18)',
+    backgroundColor: COLORS.blueLight,
   },
   text: {
     fontSize: TYPOGRAPHY.sizes.sm,
@@ -67,6 +72,6 @@ const styles = StyleSheet.create({
     color: COLORS.textBody,
   },
   textActive: {
-    color: COLORS.navy,
+    color: COLORS.primaryText,
   },
-});
+}));

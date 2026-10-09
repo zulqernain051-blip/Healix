@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -14,6 +17,9 @@ export const PendingAIReviewCard: React.FC<PendingAIReviewCardProps> = ({
   escalationCount,
   onPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   if (pendingCount === 0 && escalationCount === 0) return null;
 
   return (
@@ -35,7 +41,7 @@ export const PendingAIReviewCard: React.FC<PendingAIReviewCardProps> = ({
         <View style={styles.divider} />
 
         <View style={styles.statBox}>
-          <Text style={[styles.statVal, { color: '#F59E0B' }]}>{escalationCount}</Text>
+          <Text style={[styles.statVal, { color: COLORS.amber }]}>{escalationCount}</Text>
           <Text style={styles.statLabel}>Doctor Escalations</Text>
         </View>
       </View>
@@ -43,14 +49,14 @@ export const PendingAIReviewCard: React.FC<PendingAIReviewCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0E3630',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   headerRow: {
     flexDirection: 'row',
@@ -67,12 +73,12 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   title: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   chevron: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 20,
   },
   statsRow: {
@@ -85,18 +91,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statVal: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '800',
   },
   statLabel: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
     marginTop: 2,
   },
   divider: {
     width: 1,
     height: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.glassSurface,
   },
-});
+}));

@@ -1,8 +1,12 @@
+import { useAppTheme } from '../../../theme/ThemeProvider';
+
 import React from 'react';
 import { Stack } from 'expo-router';
-import { COLORS } from '../../../theme';
+
 
 export default function HealthStack() {
+  const { colors: COLORS } = useAppTheme();
+
   return (
     <Stack
       screenOptions={{

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { View, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Text, Card, Chip, Appbar } from 'react-native-paper';
@@ -8,6 +11,9 @@ import { SPACING, RADIUS } from '../../theme';
 type TabType = 'REQUESTS' | 'OFFERS' | 'CONTRACTS' | 'VISITS';
 
 export default function AdminCareOperations() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>('REQUESTS');
 
@@ -57,7 +63,7 @@ export default function AdminCareOperations() {
 
   const renderContent = () => {
     if (activeTab === 'REQUESTS') {
-      if (loadingRequests) return <ActivityIndicator color="#00E676" style={{ marginTop: 20 }} />;
+      if (loadingRequests) return <ActivityIndicator color={COLORS.emerald} style={{ marginTop: 20 }} />;
       if (!requests?.length) return <Text style={styles.emptyText}>No requests found</Text>;
       return requests.map(req => (
         <Card key={req.id} style={styles.card}>
@@ -75,7 +81,7 @@ export default function AdminCareOperations() {
     }
     
     if (activeTab === 'OFFERS') {
-      if (loadingOffers) return <ActivityIndicator color="#00E676" style={{ marginTop: 20 }} />;
+      if (loadingOffers) return <ActivityIndicator color={COLORS.emerald} style={{ marginTop: 20 }} />;
       if (!offers?.length) return <Text style={styles.emptyText}>No offers found</Text>;
       return offers.map(off => (
         <Card key={off.id} style={styles.card}>
@@ -92,7 +98,7 @@ export default function AdminCareOperations() {
     }
 
     if (activeTab === 'CONTRACTS') {
-      if (loadingContracts) return <ActivityIndicator color="#00E676" style={{ marginTop: 20 }} />;
+      if (loadingContracts) return <ActivityIndicator color={COLORS.emerald} style={{ marginTop: 20 }} />;
       if (!contracts?.length) return <Text style={styles.emptyText}>No contracts found</Text>;
       return contracts.map(con => (
         <Card key={con.id} style={styles.card}>
@@ -109,7 +115,7 @@ export default function AdminCareOperations() {
     }
 
     if (activeTab === 'VISITS') {
-      if (loadingVisits) return <ActivityIndicator color="#00E676" style={{ marginTop: 20 }} />;
+      if (loadingVisits) return <ActivityIndicator color={COLORS.emerald} style={{ marginTop: 20 }} />;
       if (!visits?.length) return <Text style={styles.emptyText}>No visits found</Text>;
       return visits.map(vis => (
         <Card key={vis.id} style={styles.card}>
@@ -128,9 +134,9 @@ export default function AdminCareOperations() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Appbar.Header style={{ backgroundColor: '#061C19' }}>
-        <Appbar.BackAction onPress={() => router.back()} color="#FFF" />
-        <Appbar.Content title="Care Operations" titleStyle={{ color: '#FFF' }} />
+      <Appbar.Header style={{ backgroundColor: COLORS.bg }}>
+        <Appbar.BackAction onPress={() => router.back()} color={COLORS.textDark} />
+        <Appbar.Content title="Care Operations" titleStyle={{ color: COLORS.textDark }} />
       </Appbar.Header>
       
       {renderTabs()}
@@ -142,18 +148,18 @@ export default function AdminCareOperations() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
-  tabsContainer: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: 'rgba(0, 230, 118, 0.15)' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  tabsContainer: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: COLORS.emeraldLight },
   tabsScroll: { paddingHorizontal: SPACING.md, gap: 10 },
-  tab: { backgroundColor: '#0A2D28' },
-  activeTab: { backgroundColor: '#00E676' },
-  tabText: { color: '#94A3B8' },
-  activeTabText: { color: '#061C19', fontWeight: 'bold' },
+  tab: { backgroundColor: COLORS.bg },
+  activeTab: { backgroundColor: COLORS.emerald },
+  tabText: { color: COLORS.textBody },
+  activeTabText: { color: COLORS.textMuted, fontWeight: 'bold' },
   content: { padding: SPACING.md, gap: 12, paddingBottom: 40 },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  cardTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  cardSub: { color: '#94A3B8', fontSize: 13, marginTop: 2 },
-  emptyText: { color: '#94A3B8', textAlign: 'center', marginTop: 40, fontSize: 16 },
-});
+  cardTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  cardSub: { color: COLORS.textBody, fontSize: 13, marginTop: 2 },
+  emptyText: { color: COLORS.textBody, textAlign: 'center', marginTop: 40, fontSize: 16 },
+}));

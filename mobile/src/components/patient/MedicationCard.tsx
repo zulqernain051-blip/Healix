@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -11,6 +14,9 @@ interface MedicationCardProps {
 }
 
 export const MedicationCard: React.FC<MedicationCardProps> = ({ name, dosage, frequency, active }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.card}>
       <View style={styles.info}>
@@ -26,24 +32,24 @@ export const MedicationCard: React.FC<MedicationCardProps> = ({ name, dosage, fr
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   info: { flex: 1 },
-  name: { color: '#FFFFFF', fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '700' },
-  sub: { color: '#94A3B8', fontSize: 11, marginTop: 2 },
+  name: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '700' },
+  sub: { color: COLORS.textBody, fontSize: 11, marginTop: 2 },
   badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: RADIUS.round, borderWidth: 1 },
-  activeBadge: { backgroundColor: 'rgba(0, 230, 118, 0.12)', borderColor: '#00E676' },
-  activeText: { color: '#00E676' },
-  inactiveBadge: { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: '#6B8E8A' },
-  inactiveText: { color: '#6B8E8A' },
+  activeBadge: { backgroundColor: COLORS.emeraldLight, borderColor: COLORS.emerald },
+  activeText: { color: COLORS.emerald },
+  inactiveBadge: { backgroundColor: COLORS.glassSurface, borderColor: COLORS.inputBorder },
+  inactiveText: { color: COLORS.textBody },
   badgeText: { fontSize: 10, fontWeight: '700' },
-});
+}));

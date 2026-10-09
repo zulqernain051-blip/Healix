@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 interface QuickActionsGridProps {
   onRequestPress: () => void;
@@ -26,6 +28,9 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
   onMessagesPress,
   onHealthPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const actions: QuickActionItem[] = [
     {
       icon: 'add-circle',
@@ -87,7 +92,7 @@ export const QuickActionsGrid: React.FC<QuickActionsGridProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     paddingVertical: SPACING.lg,
   },
@@ -132,4 +137,4 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.xs,
     lineHeight: 16,
   },
-});
+}));

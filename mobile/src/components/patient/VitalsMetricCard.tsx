@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -18,6 +21,9 @@ export const VitalsMetricCard: React.FC<VitalsMetricCardProps> = ({
   status,
   sparkHeights,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.metricCard}>
       <View style={styles.cardTopRow}>
@@ -43,7 +49,7 @@ export const VitalsMetricCard: React.FC<VitalsMetricCardProps> = ({
               styles.sparkBar,
               {
                 height: (h / 100) * 32,
-                backgroundColor: i === sparkHeights.length - 1 ? '#00E676' : 'rgba(0, 230, 118, 0.4)',
+                backgroundColor: i === sparkHeights.length - 1 ? COLORS.emerald : COLORS.emeraldLight,
               },
             ]}
           />
@@ -53,13 +59,13 @@ export const VitalsMetricCard: React.FC<VitalsMetricCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   metricCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   cardTopRow: {
     flexDirection: 'row',
@@ -68,7 +74,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   metricTitle: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
     marginBottom: 4,
   },
@@ -77,29 +83,29 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   metricVal: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.xl,
     fontWeight: '800',
   },
   metricUnit: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: TYPOGRAPHY.sizes.xs,
   },
   normalPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
   },
   greenDot: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 8,
     marginRight: 4,
   },
   normalText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -114,4 +120,4 @@ const styles = StyleSheet.create({
     width: 6,
     borderRadius: 3,
   },
-});
+}));

@@ -1,15 +1,22 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text, Card, Avatar, ProgressBar, Button } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useCarePlans, useCompleteMilestone } from '../../../hooks/useHealth';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 import { LoadingState } from '../../../components/common/LoadingState';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { ErrorState } from '../../../components/common/ErrorState';
 
 export default function CarePlansScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
 
@@ -29,7 +36,7 @@ export default function CarePlansScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         
         {/* Header */}
@@ -46,7 +53,7 @@ export default function CarePlansScreen() {
             subtitle="Assigned recovery programs"
             subtitleStyle={styles.cardSub}
             left={(props) => (
-              <Avatar.Icon {...props} icon="clipboard-check-outline" color="#FFFFFF" style={{ backgroundColor: '#10B981' }} />
+              <Avatar.Icon {...props} icon="clipboard-check-outline" color={COLORS.textDark} style={{ backgroundColor: COLORS.emerald }} />
             )}
           />
           <Card.Content>
@@ -63,7 +70,7 @@ export default function CarePlansScreen() {
                       <Text style={styles.progressLabel}>Rehab Progress</Text>
                       <Text style={styles.progressPercent}>{Math.round(plan.progress || 0)}%</Text>
                     </View>
-                    <ProgressBar progress={(plan.progress || 0) / 100} color="#10B981" style={styles.progressBar} />
+                    <ProgressBar progress={(plan.progress || 0) / 100} color={COLORS.emerald} style={styles.progressBar} />
                   </View>
 
                   <View style={styles.milestonesContainer}>
@@ -96,10 +103,10 @@ export default function CarePlansScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     padding: SPACING.lg,
@@ -116,49 +123,49 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
   subtitle: {
     fontSize: 13,
-    color: '#94A3B8',
+    color: COLORS.textBody,
     marginBottom: SPACING.lg,
   },
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   cardTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontWeight: '700',
     fontSize: 16,
   },
   cardSub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
   },
   emptyText: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     textAlign: 'center',
     marginVertical: 16,
     fontStyle: 'italic',
   },
   planItem: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 230, 118, 0.1)',
+    borderBottomColor: COLORS.emeraldLight,
     paddingVertical: 16,
   },
   planTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.textDark,
   },
   planDesc: {
     fontSize: 13,
-    color: '#94A3B8',
+    color: COLORS.textBody,
     marginTop: 4,
   },
   progressContainer: {
@@ -171,12 +178,12 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontWeight: '500',
   },
   progressPercent: {
     fontSize: 12,
-    color: '#00E676',
+    color: COLORS.emerald,
     fontWeight: 'bold',
   },
   milestonesContainer: { marginTop: 12, marginBottom: 12 },
@@ -184,18 +191,18 @@ const styles = StyleSheet.create({
   milestoneRow: { flexDirection: "row", alignItems: "center", marginBottom: 8 },
   checkbox: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: COLORS.teal, alignItems: "center", justifyContent: "center", marginRight: 12 },
   checkboxActive: { backgroundColor: COLORS.teal },
-  checkText: { color: "#FFF", fontSize: 14, fontWeight: "bold" },
+  checkText: { color: COLORS.textDark, fontSize: 14, fontWeight: "bold" },
   milestoneText: { color: COLORS.textSecondary, fontSize: 14, flex: 1 },
   milestoneCompleted: { textDecorationLine: "line-through", color: COLORS.textMuted },
   progressBar: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+    backgroundColor: COLORS.emeraldLight,
   },
   dateLabel: {
     fontSize: 11,
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     marginTop: 4,
   },
-});
+}));
 

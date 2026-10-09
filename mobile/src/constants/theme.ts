@@ -6,21 +6,22 @@
 import '@/global.css';
 
 import { Platform } from 'react-native';
+import { THEMES } from '../theme';
 
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: THEMES['minimal-clean'].colors.textDark,
+    background: THEMES['minimal-clean'].colors.surface,
+    backgroundElement: THEMES['minimal-clean'].colors.surfaceCard,
+    backgroundSelected: THEMES['minimal-clean'].colors.surfaceMuted,
+    textSecondary: THEMES['minimal-clean'].colors.textBody,
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    text: THEMES['dark-futuristic'].colors.textDark,
+    background: THEMES['dark-futuristic'].colors.surface,
+    backgroundElement: THEMES['dark-futuristic'].colors.surfaceCard,
+    backgroundSelected: THEMES['dark-futuristic'].colors.surfaceMuted,
+    textSecondary: THEMES['dark-futuristic'].colors.textBody,
   },
 } as const;
 

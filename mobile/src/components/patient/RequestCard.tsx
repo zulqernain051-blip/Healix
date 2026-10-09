@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -18,36 +21,39 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   status,
   onPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const renderBadge = () => {
     switch (status) {
       case 'ASSIGNED':
         return (
-          <View style={[styles.badge, { backgroundColor: 'rgba(0, 230, 118, 0.12)', borderColor: '#00E676' }]}>
-            <Text style={[styles.badgeText, { color: '#00E676' }]}>Assigned</Text>
+          <View style={[styles.badge, { backgroundColor: COLORS.emeraldLight, borderColor: COLORS.emerald }]}>
+            <Text style={[styles.badgeText, { color: COLORS.emerald }]}>Assigned</Text>
           </View>
         );
       case 'IN_PROGRESS':
         return (
-          <View style={[styles.badge, { backgroundColor: 'rgba(245, 158, 11, 0.12)', borderColor: '#F59E0B' }]}>
-            <Text style={[styles.badgeText, { color: '#F59E0B' }]}>In Progress</Text>
+          <View style={[styles.badge, { backgroundColor: COLORS.amberLight, borderColor: COLORS.amber }]}>
+            <Text style={[styles.badgeText, { color: COLORS.amber }]}>In Progress</Text>
           </View>
         );
       case 'COMPLETED':
         return (
-          <View style={[styles.badge, { backgroundColor: 'rgba(13, 148, 136, 0.15)', borderColor: '#0D9488' }]}>
-            <Text style={[styles.badgeText, { color: '#0D9488' }]}>Completed</Text>
+          <View style={[styles.badge, { backgroundColor: COLORS.tealLight, borderColor: COLORS.teal }]}>
+            <Text style={[styles.badgeText, { color: COLORS.teal }]}>Completed</Text>
           </View>
         );
       case 'CANCELLED':
         return (
-          <View style={[styles.badge, { backgroundColor: 'rgba(239, 68, 68, 0.12)', borderColor: '#EF4444' }]}>
-            <Text style={[styles.badgeText, { color: '#EF4444' }]}>Cancelled</Text>
+          <View style={[styles.badge, { backgroundColor: COLORS.redLight, borderColor: COLORS.red }]}>
+            <Text style={[styles.badgeText, { color: COLORS.red }]}>Cancelled</Text>
           </View>
         );
       default:
         return (
-          <View style={[styles.badge, { backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: '#94A3B8' }]}>
-            <Text style={[styles.badgeText, { color: '#94A3B8' }]}>{status}</Text>
+          <View style={[styles.badge, { backgroundColor: COLORS.glassSurface, borderColor: COLORS.inputBorder }]}>
+            <Text style={[styles.badgeText, { color: COLORS.textBody }]}>{status}</Text>
           </View>
         );
     }
@@ -70,13 +76,13 @@ export const RequestCard: React.FC<RequestCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   header: {
     flexDirection: 'row',
@@ -86,7 +92,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 12,
-    backgroundColor: 'rgba(0, 230, 118, 0.1)',
+    backgroundColor: COLORS.emeraldLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -98,17 +104,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   reqId: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.xs,
     fontWeight: '700',
   },
   reqType: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   reqDate: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
     marginTop: 2,
   },
@@ -122,4 +128,4 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
   },
-});
+}));

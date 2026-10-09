@@ -1,9 +1,11 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { Contract } from '../../types/contract';
 import { ContractStatusBadge } from './ContractStatusBadge';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 interface Props {
   contract: Contract;
@@ -13,6 +15,9 @@ interface Props {
 }
 
 export const ContractCard: React.FC<Props> = ({ contract, isPatientView = false, onPress, style }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const otherPartyName = isPatientView
     ? contract.nurse?.user?.fullName || 'Nurse'
     : contract.patient?.user?.fullName || 'Patient';
@@ -50,7 +55,7 @@ export const ContractCard: React.FC<Props> = ({ contract, isPatientView = false,
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.md,
@@ -78,7 +83,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   detailsBox: {
-    backgroundColor: 'rgba(255,255,255,0.02)',
+    backgroundColor: COLORS.glassSurface,
     padding: SPACING.md,
     borderRadius: RADIUS.sm,
   },
@@ -106,4 +111,4 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     fontSize: 12,
   },
-});
+}));

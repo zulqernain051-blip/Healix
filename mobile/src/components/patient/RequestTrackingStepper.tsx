@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -15,6 +18,9 @@ interface RequestTrackingStepperProps {
 }
 
 export const RequestTrackingStepper: React.FC<RequestTrackingStepperProps> = ({ steps }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.card}>
       {steps.map((step, index) => {
@@ -65,13 +71,13 @@ export const RequestTrackingStepper: React.FC<RequestTrackingStepperProps> = ({ 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   item: {
     flexDirection: 'row',
@@ -90,59 +96,59 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dotCompleted: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   dotCurrent: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
     borderWidth: 2,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   innerDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   dotPending: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
     borderWidth: 1.5,
-    borderColor: '#6B8E8A',
+    borderColor: COLORS.inputBorder,
   },
   checkIcon: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontSize: 12,
     fontWeight: '800',
   },
   line: {
     width: 2,
     height: 36,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.glassSurface,
     marginVertical: 4,
   },
   lineActive: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   rightCol: {
     flex: 1,
     paddingBottom: SPACING.md,
   },
   stepTitle: {
-    color: '#E2E8F0',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '600',
   },
   stepTitleCurrent: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontWeight: '700',
   },
   stepSub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   stepTime: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
     marginTop: 2,
   },
-});
+}));

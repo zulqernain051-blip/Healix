@@ -1,4 +1,6 @@
-import { COLORS } from '../../theme';
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
+
 import { useState } from 'react';
 import { View, StyleSheet, TextInput, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Button, Text, Card, Checkbox } from 'react-native-paper';
@@ -6,6 +8,9 @@ import { useScheduleFollowUp } from '../../hooks/useDoctor';
 
 
 export function FollowUpForm({ caseId, hasCurrentNurse, onComplete, onCancel }: { caseId: string, hasCurrentNurse: boolean, onComplete: () => void, onCancel: () => void }) {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { mutateAsync: scheduleFollowUp, isPending } = useScheduleFollowUp();
   const [daysFromNow, setDaysFromNow] = useState('7');
   const [instructions, setInstructions] = useState('');
@@ -71,7 +76,7 @@ export function FollowUpForm({ caseId, hasCurrentNurse, onComplete, onCancel }: 
             <Checkbox.Android 
               status={preferCurrentNurse ? 'checked' : 'unchecked'} 
               onPress={() => setPreferCurrentNurse(!preferCurrentNurse)}
-              color={COLORS.navy}
+              color={COLORS.primaryText}
             />
             <Text style={styles.checkboxLabel}>Prefer keeping the current nurse</Text>
           </TouchableOpacity>
@@ -86,7 +91,7 @@ export function FollowUpForm({ caseId, hasCurrentNurse, onComplete, onCancel }: 
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: { backgroundColor: COLORS.surfaceCard, borderColor: COLORS.inputBorder, borderWidth: 1, marginBottom: 16 },
   title: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
   label: { color: COLORS.textBody, marginBottom: 6, fontSize: 14 },
@@ -94,4 +99,4 @@ const styles = StyleSheet.create({
   checkboxRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   checkboxLabel: { color: COLORS.textDark, fontSize: 14, marginLeft: 8 },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }
-});
+}));

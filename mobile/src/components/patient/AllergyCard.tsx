@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -9,6 +12,9 @@ interface AllergyCardProps {
 }
 
 export const AllergyCard: React.FC<AllergyCardProps> = ({ allergen, severity }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const isSevere = severity === 'SEVERE';
   const isModerate = severity === 'MODERATE';
 
@@ -39,27 +45,27 @@ export const AllergyCard: React.FC<AllergyCardProps> = ({ allergen, severity }) 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   infoGroup: {
     flex: 1,
   },
   allergenName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   label: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
@@ -67,27 +73,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: RADIUS.round,
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
     borderWidth: 1,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   badgeText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 10,
     fontWeight: '700',
   },
   moderateBadge: {
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-    borderColor: '#F59E0B',
+    backgroundColor: COLORS.amberLight,
+    borderColor: COLORS.amber,
   },
   moderateText: {
-    color: '#F59E0B',
+    color: COLORS.amber,
   },
   severeBadge: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderColor: '#EF4444',
+    backgroundColor: COLORS.redLight,
+    borderColor: COLORS.red,
   },
   severeText: {
-    color: '#EF4444',
+    color: COLORS.red,
   },
-});
+}));

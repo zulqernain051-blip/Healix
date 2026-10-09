@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import React from 'react';
 import {
@@ -16,6 +19,11 @@ import { navigate } from '../../../utils/navigation';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function ProfileScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user, logout } = useAuthStore();
 
   const userName = user?.fullName || 'Patient Profile';
@@ -63,7 +71,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         
         {/* Header */}
@@ -77,7 +85,7 @@ export default function ProfileScreen() {
             size={72}
             label={userName.split(' ').map(n => n[0]).join('')}
             style={styles.avatarBg}
-            color="#00E676"
+            color={COLORS.emerald}
           />
           <Text style={styles.nameText}>{userName}</Text>
           <Text style={styles.contactText}>{userPhone}</Text>
@@ -112,10 +120,10 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     padding: SPACING.lg,
@@ -128,33 +136,33 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
   profileHeaderCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     alignItems: 'center',
     marginBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   avatarBg: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderWidth: 2,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
     marginBottom: SPACING.md,
   },
   nameText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
     marginBottom: 2,
   },
   contactText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
@@ -163,19 +171,19 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   menuCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   menuIconBg: {
     width: 38,
     height: 38,
     borderRadius: 10,
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
@@ -184,27 +192,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   menuTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '600',
     flex: 1,
   },
   chevron: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 22,
   },
   signOutBtn: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    backgroundColor: COLORS.redLight,
     borderRadius: RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#EF4444',
+    borderColor: COLORS.red,
   },
   signOutText: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
-});
+}));
 

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -8,11 +11,16 @@ interface ErrorStateProps {
 }
 
 export const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const message = typeof error === 'string' ? error : error.message;
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.container}>
         <Text style={styles.icon}>⚠️</Text>
         <Text style={styles.message}>{message}</Text>
@@ -26,10 +34,10 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, onRetry }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
@@ -42,7 +50,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   message: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: 14,
     textAlign: 'center',
     marginTop: 4,
@@ -53,11 +61,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   retryText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 14,
     fontWeight: '600',
   },
-});
+}));

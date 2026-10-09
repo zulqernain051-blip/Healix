@@ -1,9 +1,14 @@
+
+
+
 import { useState } from 'react';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import { authApi } from '../../api/auth.api';
-import { WorkflowPage, flowStyles as s } from '../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../components/common/WorkflowPage';
 export default function SecurityScreen() {
+  const s = useFlowStyles();
+
  const q = useQuery({ queryKey: ['auth', 'security'], queryFn: authApi.getMe });
  const enabled = !!(q.data as any)?.mfaEnabled;
  const [requested, setRequested] = useState(false), [code, setCode] = useState(''), [busy, setBusy] = useState(false), [error, setError] = useState('');

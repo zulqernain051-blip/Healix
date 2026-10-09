@@ -1,3 +1,5 @@
+import { useAppTheme } from '../../theme/ThemeProvider';
+
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Button, Text, TextInput, Checkbox, PaperProvider } from 'react-native-paper';
@@ -8,11 +10,15 @@ import { useAuthStore } from '../../store/auth';
 import { apiClient } from '../../api/client';
 import { visitsApi } from '../../api/visits.api';
 import { uploadFile, downloadPrivateFile } from '../../utils/fileTransfer';
-import { flowStyles as s, workflowTheme } from '../common/WorkflowPage';
-import { COLORS } from '../../theme';
+import { useFlowStyles, useWorkflowTheme } from '../common/WorkflowPage';
+
 import { confirmAction } from '../common/AppDialogs';
 type Evidence={id:string;type:string;urlOrText:string;uploadedAt:string;consentGiven:boolean};
 export function VisitCompletionPanel({visit,onChanged}:{visit:Visit;onChanged:()=>Promise<unknown>}) {
+  const { colors: COLORS } = useAppTheme();
+  const s = useFlowStyles();
+  const workflowTheme = useWorkflowTheme();
+
  const role=useAuthStore(state=>state.user?.role);
  const [consent,setConsent]=useState(false),[reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const records=useQuery({queryKey:['visit-evidence',visit.id,role],queryFn:async()=>{

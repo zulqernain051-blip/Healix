@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,8 +8,11 @@ import { useNurseVisits } from '../../../hooks/useVisits';
 import { VisitSummaryCard } from '../../../components/visits/VisitSummaryCard';
 import { navigate } from '../../../utils/navigation';
 import { scheduleRange, shiftScheduleDate, ScheduleView } from '../../../utils/schedule';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 export default function NurseScheduleScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const nurseId = useAuthStore(state => state.user?.nurseId);
   const { data = [], isLoading, isRefetching, error, refetch } = useNurseVisits(nurseId || '');
   const [view, setView] = useState<ScheduleView>('DAY');
@@ -33,12 +38,12 @@ export default function NurseScheduleScreen() {
     </ScrollView>
   </SafeAreaView>;
 }
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, padding: SPACING.lg, gap: SPACING.md, backgroundColor: COLORS.surface },
-  title: { color: COLORS.navy, fontSize: TYPOGRAPHY.sizes.xxl, fontWeight: TYPOGRAPHY.weights.bold },
+  title: { color: COLORS.primaryText, fontSize: TYPOGRAPHY.sizes.xxl, fontWeight: TYPOGRAPHY.weights.bold },
   row: { flexDirection: 'row', gap: SPACING.sm },
   button: { flex: 1, minHeight: SPACING.lg * 3, padding: SPACING.sm, alignItems: 'center', justifyContent: 'center', borderRadius: RADIUS.md, backgroundColor: COLORS.surfaceMuted },
   active: { backgroundColor: COLORS.quickBlue, borderWidth: 1, borderColor: COLORS.accentBlue },
   text: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.md },
   caption: { color: COLORS.textBody, fontSize: TYPOGRAPHY.sizes.sm }, error: { color: COLORS.red, padding: SPACING.lg },
-});
+}));

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -13,7 +16,7 @@ import {
 } from 'react-native';
 import { Text } from 'react-native-paper';
 import { DocKey } from './types';
-import { CHECK_ITEMS, PALETTE } from './constants';
+import { CHECK_ITEMS } from './constants';
 
 interface UploadModalProps {
   visible: boolean;
@@ -23,6 +26,9 @@ interface UploadModalProps {
 }
 
 export const DocumentUploadStep: React.FC<UploadModalProps> = ({ visible, docKey, onClose, onUpload }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [url, setUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -89,12 +95,12 @@ export const DocumentUploadStep: React.FC<UploadModalProps> = ({ visible, docKey
               setError('');
             }}
             placeholder="https://example.com/document.pdf"
-            placeholderTextColor={PALETTE.muted}
+            placeholderTextColor={COLORS.textMuted}
             autoCapitalize="none"
             keyboardType="url"
             returnKeyType="done"
             onSubmitEditing={handleUpload}
-            selectionColor={PALETTE.teal}
+            selectionColor={COLORS.teal}
           />
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
@@ -113,7 +119,7 @@ export const DocumentUploadStep: React.FC<UploadModalProps> = ({ visible, docKey
               disabled={uploading}
             >
               {uploading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={COLORS.textDark} size="small" />
               ) : (
                 <Text style={styles.uploadBtnText}>Upload</Text>
               )}
@@ -125,26 +131,26 @@ export const DocumentUploadStep: React.FC<UploadModalProps> = ({ visible, docKey
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: PALETTE.overlay,
+    backgroundColor: COLORS.modalBackdrop,
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    backgroundColor: PALETTE.surface,
+    backgroundColor: COLORS.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingHorizontal: 24,
     paddingTop: 12,
     paddingBottom: Platform.OS === 'ios' ? 40 : 28,
     borderTopWidth: 1,
-    borderColor: PALETTE.border,
+    borderColor: COLORS.inputBorder,
   },
   modalHandle: {
     width: 44,
     height: 4,
-    backgroundColor: PALETTE.border,
+    backgroundColor: COLORS.inputBorder,
     borderRadius: 2,
     alignSelf: 'center',
     marginBottom: 20,
@@ -152,43 +158,43 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: PALETTE.white,
+    color: COLORS.textDark,
     marginBottom: 4,
   },
   modalSubtitle: {
     fontSize: 14,
-    color: PALETTE.teal,
+    color: COLORS.teal,
     marginBottom: 24,
     fontWeight: '600',
   },
   inputLabel: {
     fontSize: 13,
-    color: PALETTE.muted,
+    color: COLORS.textMuted,
     fontWeight: '600',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   textInput: {
-    backgroundColor: PALETTE.card,
+    backgroundColor: COLORS.surfaceCard,
     borderWidth: 1,
-    borderColor: PALETTE.border,
+    borderColor: COLORS.inputBorder,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
-    color: PALETTE.white,
+    color: COLORS.textDark,
     fontSize: 14,
     marginBottom: 8,
   },
   errorText: {
-    color: PALETTE.red,
+    color: COLORS.red,
     fontSize: 12,
     marginBottom: 6,
     marginLeft: 4,
   },
   urlHint: {
     fontSize: 12,
-    color: PALETTE.muted,
+    color: COLORS.textMuted,
     marginBottom: 28,
     marginLeft: 2,
     lineHeight: 18,
@@ -202,13 +208,13 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: PALETTE.border,
+    borderColor: COLORS.inputBorder,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: PALETTE.card,
+    backgroundColor: COLORS.surfaceCard,
   },
   cancelBtnText: {
-    color: PALETTE.muted,
+    color: COLORS.textMuted,
     fontSize: 15,
     fontWeight: '600',
   },
@@ -216,10 +222,10 @@ const styles = StyleSheet.create({
     flex: 2,
     paddingVertical: 14,
     borderRadius: 14,
-    backgroundColor: PALETTE.teal,
+    backgroundColor: COLORS.tealFill,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: PALETTE.teal,
+    shadowColor: COLORS.teal,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
@@ -229,8 +235,8 @@ const styles = StyleSheet.create({
     opacity: 0.65,
   },
   uploadBtnText: {
-    color: '#fff',
+    color: COLORS.onAccent,
     fontSize: 15,
     fontWeight: '700',
   },
-});
+}));

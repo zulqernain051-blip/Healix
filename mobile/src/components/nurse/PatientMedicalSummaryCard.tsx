@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useEffect, useRef } from 'react';
 import {
   StyleSheet,
@@ -64,6 +67,9 @@ export const PatientMedicalSummaryCard: React.FC<PatientMedicalSummaryCardProps>
   emergencyContacts: emergencyContactsProp = [],
   onViewFullRecordPress: onViewFullRecordPressProp,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   // Merge patient object with flat props, patient object takes precedence
   const name = patient?.patientName ?? patientNameProp;
   const cnic = patient?.cnic ?? cnicProp;
@@ -189,14 +195,14 @@ export const PatientMedicalSummaryCard: React.FC<PatientMedicalSummaryCardProps>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   headerRow: {
     flexDirection: 'row',
@@ -212,36 +218,36 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   patientName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
   },
   patientSub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   linkText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
     fontWeight: '700',
   },
   bloodTypeChip: {
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderColor: 'rgba(239, 68, 68, 0.4)',
+    backgroundColor: COLORS.redLight,
+    borderColor: COLORS.redLight,
     borderWidth: 1,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: RADIUS.sm,
   },
   bloodTypeText: {
-    color: '#FCA5A5',
+    color: COLORS.amberLight,
     fontSize: 10,
     fontWeight: '700',
   },
   allergyWarningBanner: {
-    backgroundColor: '#1E1214',
-    borderColor: '#EF4444',
+    backgroundColor: COLORS.bg,
+    borderColor: COLORS.red,
     borderWidth: 1,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
@@ -257,12 +263,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   warningTitle: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: 10,
     fontWeight: '800',
   },
   warningText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 11,
     fontWeight: '700',
     marginTop: 1,
@@ -271,7 +277,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.xs,
   },
   sectionTitle: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
     marginBottom: 4,
@@ -282,24 +288,24 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   chip: {
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: RADIUS.sm,
   },
   chipText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 10,
     fontWeight: '600',
   },
   noneText: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 11,
   },
   contactRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     padding: SPACING.sm,
     borderRadius: RADIUS.md,
     marginTop: 4,
@@ -308,23 +314,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contactName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 11,
     fontWeight: '700',
   },
   contactPhone: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
   },
   callBtn: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: RADIUS.sm,
   },
   callIcon: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 11,
     fontWeight: '700',
   },
-});
+}));

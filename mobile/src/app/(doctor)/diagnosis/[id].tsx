@@ -1,4 +1,6 @@
-import { COLORS } from '../../../theme';
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
+
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { Card, TextInput, Button, Divider, List } from 'react-native-paper';
@@ -7,6 +9,9 @@ import { useCaseReview, useSubmitDiagnosis } from '../../../hooks/useDoctor';
 
 
 export default function DiagnosisScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const { id } = useLocalSearchParams(); // Case ID
   const caseId = id as string;
@@ -126,7 +131,7 @@ export default function DiagnosisScreen() {
 
           <Button
             mode="contained"
-            buttonColor={COLORS.emerald}
+            buttonColor={COLORS.emeraldFill} textColor={COLORS.onAccent}
             onPress={handleSubmit}
             loading={submitting}
             disabled={!canEdit || submitting || code.trim().length === 0 || description.trim().length === 0}
@@ -157,7 +162,7 @@ export default function DiagnosisScreen() {
                   <Button
                     compact
                     mode="outlined"
-                    textColor={COLORS.navy}
+                    textColor={COLORS.primaryText}
                     style={{ alignSelf: 'center', borderColor: COLORS.inputBorder }}
                     onPress={() => handleSelectCorrection(diag)}
                   >
@@ -174,7 +179,7 @@ export default function DiagnosisScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.surface },
   content: { padding: 20, paddingBottom: 40 },
   header: { marginBottom: 20 },
@@ -184,7 +189,7 @@ const styles = StyleSheet.create({
   cardTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
   divider: { backgroundColor: COLORS.inputBorder, marginVertical: 10 },
   input: { backgroundColor: COLORS.surfaceCard, color: COLORS.textDark, marginBottom: 12 },
-  correctionBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F59E0B1A', padding: 8, borderRadius: 6, marginBottom: 12 },
+  correctionBanner: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: COLORS.amber, padding: 8, borderRadius: 6, marginBottom: 12 },
   emptyText: { color: COLORS.textMuted, fontSize: 13, textAlign: 'center', marginVertical: 12 },
   historyRow: { borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder, paddingVertical: 8 }
-});
+}));

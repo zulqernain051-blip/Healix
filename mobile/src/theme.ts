@@ -1,65 +1,163 @@
-import { Platform } from 'react-native';
-
-export const COLORS = {
-  // 90% Neutral Base (Obsidian, deep slates, clean subtle borders)
-  bg: '#030712',            // Deepest Obsidian Black
-  card: '#0B1527',          // Night Slate for main elements
-  cardElevated: '#112239',  // Slightly lighter slate for layered dialogs/active headers
-  border: 'rgba(255, 255, 255, 0.06)',     // Subtle border line
-  borderActive: 'rgba(255, 255, 255, 0.12)', // Active element boundaries
-  textPrimary: '#F9FAFB',   // Off-white high visibility text
-  textSecondary: '#9CA3AF', // Gray for labels and descriptions
-  textMuted: '#6B7280',     // Dark gray for placeholders and help texts
-
-  // 8% Primary & Action Branding
-  teal: '#0D9488',          // Clinical Teal (Brand theme)
-  tealLight: 'rgba(13, 148, 136, 0.15)',
-  tealDark: '#065F56',      // Darker teal for headers/overlays
-  blue: '#2563EB',          // Electric Blue for navigation and main interactions
-  blueLight: 'rgba(37, 99, 235, 0.15)',
-  emerald: '#10B981',        // Success states, approved badges
-  emeraldLight: 'rgba(16, 185, 129, 0.12)',
-
-  // 2% Emergency & Warnings
-  red: '#EF4444',           // Critical alert red (SOS calls)
-  redLight: 'rgba(239, 68, 68, 0.15)',
-  amber: '#F59E0B',         // Warning/pending alerts
-  amberLight: 'rgba(245, 158, 11, 0.12)',
-
-  // Surfaces & Inputs (Design language adoption)
-  surface: '#F8FAFC',       // Light surface for white-body areas
-  surfaceCard: '#FFFFFF',   // Pure white cards
-  surfaceMuted: '#F1F5F9',  // Muted surface for input backgrounds
-  inputBorder: '#E2E8F0',   // Subtle input border
-  textDark: '#1E293B',      // Dark text on light surfaces
-  textDarkSecondary: '#64748B', // Secondary text on light surfaces
-  dividerLight: '#E2E8F0',  // Divider on light backgrounds
-  headerBg: '#0A3D3F',      // Header background (deep teal)
-  headerText: '#FFFFFF',    // White text on headers
-  successBg: 'rgba(16, 185, 129, 0.08)', // Subtle success background
-
-  // ─── New Design System (Patient Home Redesign) ────────────
-  navy: '#0B4268',             // Primary navy
-  navyDark: '#06294B',         // Dark navy
-  accentBlue: '#29A9F5',       // Accent blue
-  careEmerald: '#10B981',      // Care emerald
-  textBody: '#475569',         // Body text on light bg
-  // Quick action card backgrounds
-  quickBlue: '#EBF5FF',
-  quickGreen: '#ECFDF5',
-  quickPurple: '#F3E8FF',
-  quickPink: '#FFF1F2',
-  // Quick action icon colors
-  iconBlue: '#2563EB',
-  iconGreen: '#10B981',
-  iconPurple: '#8B5CF6',
-  iconPink: '#F43F5E',
-
-  // Aliases for standardized components
-  primary: '#0D9488',
-  background: '#030712',
-  text: '#F9FAFB',
+/** Registered color themes. Layout, type, spacing, and radius tokens are shared. */
+const minimalClean = {
+  tealFill: "#006BD6", blueFill: "#006BD6", emeraldFill: "#087B54", redFill: "#C72F46", amberFill: "#946000", purpleFill: "#7146B9", pinkFill: "#BE3565", headerAvatarBg: "rgba(255,255,255,0.18)",
+  bg: "#F6FBFF",
+  card: "#FFFFFF",
+  cardElevated: "#EEF7FF",
+  border: "#DDEAF5",
+  borderActive: "#A4D1F5",
+  textPrimary: "#0B2540",
+  textSecondary: "#426782",
+  textMuted: "#526D83",
+  teal: "#087E8B",
+  tealLight: "#E4F7FA",
+  tealDark: "#06576C",
+  blue: "#006BD6",
+  blueLight: "#E6F2FF",
+  emerald: "#087B54",
+  emeraldLight: "#E5F7EF",
+  red: "#C72F46",
+  redLight: "#FDEDF0",
+  amber: "#946000",
+  amberLight: "#FFF5DC",
+  surface: "#F6FBFF",
+  surfaceCard: "#FFFFFF",
+  surfaceMuted: "#EDF6FD",
+  inputBorder: "#DDEAF5",
+  textDark: "#0B2540",
+  textDarkSecondary: "#426782",
+  dividerLight: "#DDEAF5",
+  headerBg: "#006BD6",
+  headerText: "#FFFFFF",
+  successBg: "#E5F7EF",
+  navy: "#006BD6",
+  navyDark: "#0053A8",
+  accentBlue: "#007AFF",
+  careEmerald: "#087B54",
+  textBody: "#426782",
+  quickBlue: "#E6F2FF",
+  quickGreen: "#E5F7EF",
+  quickPurple: "#F1EBFF",
+  quickPink: "#FDEDF4",
+  iconBlue: "#006BD6",
+  iconGreen: "#087B54",
+  iconPurple: "#7146B9",
+  iconPink: "#BE3565",
+  primary: "#006BD6",
+  background: "#F6FBFF",
+  text: "#0B2540",
+  primaryText: "#006BD6",
+  onAccent: "#FFFFFF",
+  shadow: "#092D4B",
+  shadowSoft: "rgba(9,45,75,0.08)",
+  modalBackdrop: "rgba(7,30,50,0.45)",
+  glassSurface: "#FFFFFF",
+  glassInput: "#F5FAFF",
+  glassBorder: "#DDEAF5",
+  glassHighlight: "#E6F2FF",
+  inverseMuted: "#E5F2FF",
+  headerOverlayStart: "rgba(0,53,104,0.85)",
+  headerOverlayMid: "rgba(0,83,168,0.6)",
+  headerOverlayEnd: "rgba(0,107,214,0.3)",
+  gradientStart: "#F6FBFF",
+  gradientMid: "#EFF8FF",
+  gradientEnd: "#FFFFFF",
+  actionStart: "#006BD6",
+  actionMid: "#006BD6",
+  actionEnd: "#006BD6",
+  neutralTint: "#EDF2F7",
+  purple: "#7146B9",
+  purpleLight: "#F1EBFF",
+  pink: "#BE3565",
+  pinkLight: "#FDEDF4",
+  transparent: "transparent",
+  white: "#FFFFFF",
+  black: "#000000"
 };
+export type ThemeColors = { [K in keyof typeof minimalClean]: string };
+const darkFuturistic: ThemeColors = {
+  tealFill: "#2158DA", blueFill: "#2158DA", emeraldFill: "#087B54", redFill: "#C72F46", amberFill: "#946000", purpleFill: "#5831D2", pinkFill: "#BE3565", headerAvatarBg: "rgba(97,207,255,0.14)",
+  bg: "#020B18",
+  card: "#071B30",
+  cardElevated: "#0B2841",
+  border: "#153651",
+  borderActive: "#246384",
+  textPrimary: "#EDF8FF",
+  textSecondary: "#B5D3E7",
+  textMuted: "#8DACC3",
+  teal: "#53D7E6",
+  tealLight: "#082B3B",
+  tealDark: "#064057",
+  blue: "#61CFFF",
+  blueLight: "#082A48",
+  emerald: "#56DEAB",
+  emeraldLight: "#073229",
+  red: "#FF8191",
+  redLight: "#3B1427",
+  amber: "#FFD170",
+  amberLight: "#352C17",
+  surface: "#020B18",
+  surfaceCard: "#071B30",
+  surfaceMuted: "#082138",
+  inputBorder: "#153651",
+  textDark: "#EDF8FF",
+  textDarkSecondary: "#B5D3E7",
+  dividerLight: "#153651",
+  headerBg: "#071B30",
+  headerText: "#EDF8FF",
+  successBg: "#073229",
+  navy: "#2158DA",
+  navyDark: "#09254D",
+  accentBlue: "#61CFFF",
+  careEmerald: "#56DEAB",
+  textBody: "#B5D3E7",
+  quickBlue: "#082A48",
+  quickGreen: "#073229",
+  quickPurple: "#20123E",
+  quickPink: "#35142D",
+  iconBlue: "#61CFFF",
+  iconGreen: "#56DEAB",
+  iconPurple: "#C2A1FF",
+  iconPink: "#FF8EC9",
+  primary: "#2158DA",
+  background: "#020B18",
+  text: "#EDF8FF",
+  primaryText: "#61CFFF",
+  onAccent: "#FFFFFF",
+  shadow: "#000000",
+  shadowSoft: "rgba(0,0,0,0.32)",
+  modalBackdrop: "rgba(0,4,13,0.78)",
+  glassSurface: "#071B30",
+  glassInput: "#082138",
+  glassBorder: "#153651",
+  glassHighlight: "#082A48",
+  inverseMuted: "#D1ECFF",
+  headerOverlayStart: "rgba(2,11,24,0.94)",
+  headerOverlayMid: "rgba(7,27,48,0.85)",
+  headerOverlayEnd: "rgba(8,42,72,0.7)",
+  gradientStart: "#020B18",
+  gradientMid: "#031428",
+  gradientEnd: "#041B30",
+  actionStart: "#0753D4",
+  actionMid: "#5831D2",
+  actionEnd: "#8B23BC",
+  neutralTint: "#112B40",
+  purple: "#C2A1FF",
+  purpleLight: "#20123E",
+  pink: "#FF8EC9",
+  pinkLight: "#35142D",
+  transparent: "transparent",
+  white: "#FFFFFF",
+  black: "#000000"
+};
+export const THEMES = {
+  'minimal-clean': { name: 'Minimal Clean (Light)', dark: false, colors: minimalClean },
+  'dark-futuristic': { name: 'Dark Futuristic (Neon)', dark: true, colors: darkFuturistic },
+} as const;
+export type ThemeId = keyof typeof THEMES;
+export function isThemeId(value: unknown): value is ThemeId { return typeof value === 'string' && Object.hasOwn(THEMES, value); }
+/** Default palette for non-rendering consumers; screens use useAppTheme(). */
+export const COLORS: ThemeColors = minimalClean;
 
 export const SPACING = {
   xs: 4,

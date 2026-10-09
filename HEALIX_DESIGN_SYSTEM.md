@@ -25,6 +25,12 @@ Healix is a patient-centric, clinical-grade digital health application. Its desi
 
 ## 2. Color Palette & Token System
 
+### Registered appearance themes (October 2026)
+
+The app supports **Minimal Clean (Light)** (`minimal-clean`) and **Dark Futuristic (Neon)** (`dark-futuristic`), selected under patient Account Settings → Appearance. The preference is saved on the device and applies to the entire mobile app. The light theme is the initial default.
+
+The authoritative palettes are `THEMES` in `mobile/src/theme.ts`. Read the active palette through `useAppTheme()` and create color-dependent styles/maps with `useThemeValue()`. Paper providers use `usePaperTheme()`; shared workflow styles use `useFlowStyles()`. Never capture active colors in a module-level static style sheet. Existing spacing, typography, radii, screen hierarchy, data flows, and navigation remain unchanged. These registered palettes supersede the fixed color values below when a theme is selected; the reference layout standards still apply.
+
 ### Core Brand & Clinical Tokens
 | Token Name | Hex Code | Purpose & Usage |
 |---|---|---|

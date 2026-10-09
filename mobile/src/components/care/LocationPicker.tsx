@@ -1,12 +1,17 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
 import * as Location from 'expo-location';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { hasValidCoordinates } from '../../utils/location';
 interface LocationInfo { address: string; latitude: number; longitude: number }
 interface Props { location: LocationInfo; onChange: (loc: LocationInfo) => void; savedLocation?: LocationInfo }
 export const LocationPicker: React.FC<Props> = ({ location, onChange, savedLocation }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [mode, setMode] = useState<'SAVED' | 'GPS' | 'MANUAL'>('SAVED');
   const [isCapturing, setIsCapturing] = useState(false);
   const [error, setError] = useState('');
@@ -54,7 +59,7 @@ export const LocationPicker: React.FC<Props> = ({ location, onChange, savedLocat
     {!isCapturing && !hasValidCoordinates(location) && <Text style={styles.hint}>Choose a saved location, capture GPS, or enter valid coordinates.</Text>}
   </View>;
 };
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { marginBottom: SPACING.md, gap: SPACING.sm },
   label: { fontSize: TYPOGRAPHY.sizes.sm, fontWeight: TYPOGRAPHY.weights.semibold, color: COLORS.textDark },
   row: { flexDirection: 'row', gap: SPACING.sm },
@@ -62,4 +67,4 @@ const styles = StyleSheet.create({
   active: { backgroundColor: COLORS.quickBlue, borderWidth: 1, borderColor: COLORS.accentBlue },
   input: { minHeight: SPACING.lg * 3, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.inputBorder, borderRadius: RADIUS.md, backgroundColor: COLORS.surfaceCard, color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.md },
   coordinate: { flex: 1 }, error: { color: COLORS.red }, hint: { color: COLORS.textBody, fontSize: TYPOGRAPHY.sizes.sm },
-});
+}));

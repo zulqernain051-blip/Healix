@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -20,11 +23,14 @@ export const AIRiskAssessmentDisplay: React.FC<AIRiskAssessmentDisplayProps> = (
   escalationRequired = false,
   onEscalatePress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const isHigh = riskTier === 'HIGH';
   const isMed = riskTier === 'MEDIUM';
 
-  const tierColor = isHigh ? '#EF4444' : isMed ? '#F59E0B' : '#00E676';
-  const tierBg = isHigh ? 'rgba(239,68,68,0.12)' : isMed ? 'rgba(245,158,11,0.12)' : 'rgba(0,230,118,0.12)';
+  const tierColor = isHigh ? COLORS.red : isMed ? COLORS.amber : COLORS.emerald;
+  const tierBg = isHigh ? COLORS.redLight : isMed ? COLORS.amberLight : COLORS.emeraldLight;
 
   return (
     <View style={styles.card}>
@@ -79,14 +85,14 @@ export const AIRiskAssessmentDisplay: React.FC<AIRiskAssessmentDisplayProps> = (
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   headerRow: {
     flexDirection: 'row',
@@ -103,7 +109,7 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
@@ -123,7 +129,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   scoreLabel: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
     marginRight: 8,
   },
@@ -135,7 +141,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   sectionHeading: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 11,
     fontWeight: '700',
     marginBottom: 4,
@@ -146,29 +152,29 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   bulletDot: {
-    color: '#F59E0B',
+    color: COLORS.amber,
     marginRight: 6,
   },
   bulletCheck: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
     marginRight: 6,
   },
   bulletText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     flex: 1,
   },
   escalateBtn: {
-    backgroundColor: '#EF4444',
+    backgroundColor: COLORS.redFill,
     borderRadius: RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
     marginTop: SPACING.lg,
   },
   escalateBtnText: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },
-});
+}));

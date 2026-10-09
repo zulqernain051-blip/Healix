@@ -1,9 +1,13 @@
-import { COLORS, SPACING, TYPOGRAPHY } from '../../../theme';
+import { useAppTheme } from '../../../theme/ThemeProvider';
+
+import { SPACING, TYPOGRAPHY } from '../../../theme';
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function DoctorTabsLayout() {
+  const { colors: COLORS } = useAppTheme();
+
   return (
     <Tabs
       screenOptions={{
@@ -16,7 +20,7 @@ export default function DoctorTabsLayout() {
           paddingBottom: SPACING.sm,
           paddingTop: SPACING.sm,
         },
-        tabBarActiveTintColor: COLORS.navy,
+        tabBarActiveTintColor: COLORS.primaryText,
         tabBarInactiveTintColor: COLORS.textMuted,
         tabBarLabelStyle: {
           fontSize: TYPOGRAPHY.sizes.xs,

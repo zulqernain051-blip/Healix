@@ -1,16 +1,22 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '../../../store/auth';
 import { useClinicalOutcomes } from '../../../hooks/useHealth';
 
 export default function ClinicalOutcomesScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const { data: outcomes = [], isLoading } = useClinicalOutcomes(user?.patientId || '');
 
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#00E676" />
+        <ActivityIndicator size="large" color={COLORS.emerald} />
       </View>
     );
   }
@@ -79,30 +85,30 @@ export default function ClinicalOutcomesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
     padding: 16,
   },
   center: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: COLORS.textDark,
     marginBottom: 20,
   },
   emptyText: {
-    color: '#A0AEC0',
+    color: COLORS.textBody,
     fontSize: 16,
   },
   card: {
-    backgroundColor: '#1E293B',
+    backgroundColor: COLORS.bg,
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -113,12 +119,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   doctorName: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 18,
     fontWeight: 'bold',
   },
   dateText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 14,
   },
   statusRow: {
@@ -127,25 +133,25 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   statusLabel: {
-    color: '#E2E8F0',
+    color: COLORS.textDark,
     fontSize: 14,
     marginRight: 8,
   },
   statusValue: {
-    color: '#FCD34D',
+    color: COLORS.amber,
     fontWeight: 'bold',
   },
   resolved: {
-    color: '#34D399',
+    color: COLORS.emerald,
   },
   section: {
     marginTop: 8,
-    backgroundColor: '#0F172A',
+    backgroundColor: COLORS.bg,
     padding: 12,
     borderRadius: 8,
   },
   sectionTitle: {
-    color: '#CBD5E1',
+    color: COLORS.textBody,
     fontWeight: 'bold',
     marginBottom: 8,
   },
@@ -153,7 +159,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   itemText: {
-    color: '#F1F5F9',
+    color: COLORS.textDark,
     fontSize: 14,
   },
-});
+}));

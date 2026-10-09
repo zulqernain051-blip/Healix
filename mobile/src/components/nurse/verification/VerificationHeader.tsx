@@ -1,7 +1,8 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
-import { PALETTE } from './constants';
 
 interface VerificationHeaderProps {
   userName: string;
@@ -9,6 +10,9 @@ interface VerificationHeaderProps {
 }
 
 export const VerificationHeader: React.FC<VerificationHeaderProps> = ({ userName, isFullyVerified }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const headerAnim = useRef(new Animated.Value(0)).current;
   const statusAnim = useRef(new Animated.Value(0)).current;
 
@@ -61,8 +65,8 @@ export const VerificationHeader: React.FC<VerificationHeaderProps> = ({ userName
           style={[
             styles.statusBanner,
             {
-              borderColor: isFullyVerified ? PALETTE.emerald : PALETTE.amber,
-              backgroundColor: isFullyVerified ? PALETTE.emerald + '18' : PALETTE.amber + '18',
+              borderColor: isFullyVerified ? COLORS.emerald : COLORS.amber,
+              backgroundColor: isFullyVerified ? COLORS.emerald + '18' : COLORS.amber + '18',
             },
           ]}
         >
@@ -71,7 +75,7 @@ export const VerificationHeader: React.FC<VerificationHeaderProps> = ({ userName
             <Text
               style={[
                 styles.statusTitle,
-                { color: isFullyVerified ? PALETTE.emerald : PALETTE.amber },
+                { color: isFullyVerified ? COLORS.emerald : COLORS.amber },
               ]}
             >
               {isFullyVerified ? 'Fully Verified' : 'Pending / Action Required'}
@@ -88,7 +92,7 @@ export const VerificationHeader: React.FC<VerificationHeaderProps> = ({ userName
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -99,11 +103,11 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 16,
-    backgroundColor: PALETTE.teal + '30',
+    backgroundColor: COLORS.teal + '30',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: PALETTE.teal + '55',
+    borderColor: COLORS.teal + '55',
   },
   headerIcon: {
     fontSize: 24,
@@ -111,12 +115,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: PALETTE.white,
+    color: COLORS.textDark,
     letterSpacing: 0.2,
   },
   headerSub: {
     fontSize: 13,
-    color: PALETTE.muted,
+    color: COLORS.textMuted,
     marginTop: 2,
   },
   statusBanner: {
@@ -142,7 +146,7 @@ const styles = StyleSheet.create({
   },
   statusDesc: {
     fontSize: 13,
-    color: PALETTE.muted,
+    color: COLORS.textMuted,
     lineHeight: 19,
   },
-});
+}));

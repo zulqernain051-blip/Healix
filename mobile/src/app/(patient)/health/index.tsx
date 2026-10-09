@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import {
   View,
@@ -10,12 +12,12 @@ import { Text } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useDashboardSummary } from '../../../hooks/useDashboard';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
-const HEALTH_SECTIONS = [
-  { id: 'adherence', path: '/adherence', icon: '📅', title: 'Care Adherence', desc: 'Track due visits and scheduled medication doses', color: COLORS.navy, bgColor: COLORS.quickBlue },
-  { id: 'doctor-visits', path: '/(patient)/health/home-visits', icon: '🩺', title: 'Doctor Home Visits', desc: 'Request an appointment and follow your doctor visit', color: COLORS.navy, bgColor: COLORS.quickBlue },
-  { id: 'payments', path: '/(patient)/health/payments', icon: '💳', title: 'Payment History', desc: 'View recorded pending and paid care payments', color: COLORS.navy, bgColor: COLORS.quickBlue },
+const createHEALTH_SECTIONS = (COLORS: ThemeColors) => ([
+  { id: 'adherence', path: '/adherence', icon: '📅', title: 'Care Adherence', desc: 'Track due visits and scheduled medication doses', color: COLORS.primaryText, bgColor: COLORS.quickBlue },
+  { id: 'doctor-visits', path: '/(patient)/health/home-visits', icon: '🩺', title: 'Doctor Home Visits', desc: 'Request an appointment and follow your doctor visit', color: COLORS.primaryText, bgColor: COLORS.quickBlue },
+  { id: 'payments', path: '/(patient)/health/payments', icon: '💳', title: 'Payment History', desc: 'View recorded pending and paid care payments', color: COLORS.primaryText, bgColor: COLORS.quickBlue },
   {
     id: 'vitals',
     path: '/(patient)/records/vitals',
@@ -49,8 +51,8 @@ const HEALTH_SECTIONS = [
     icon: '💊',
     title: 'Prescriptions',
     desc: 'Current medications, dosages, and refill schedules',
-    color: '#8B5CF6',
-    bgColor: 'rgba(139, 92, 246, 0.12)',
+    color: COLORS.purple,
+    bgColor: COLORS.purpleLight,
   },
   {
     id: 'caregivers',
@@ -67,12 +69,18 @@ const HEALTH_SECTIONS = [
     icon: '🔁',
     title: 'Recurring Visits',
     desc: 'Schedule automatic repeating home care sessions',
-    color: '#EC4899',
-    bgColor: 'rgba(236, 72, 153, 0.12)',
+    color: COLORS.red,
+    bgColor: COLORS.redLight,
   },
-];
+]);
 
 export default function HealthOverviewScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const HEALTH_SECTIONS = useThemeValue(createHEALTH_SECTIONS);
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
 
@@ -90,7 +98,7 @@ export default function HealthOverviewScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.bg} />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {/* Header */}
@@ -167,7 +175,7 @@ export default function HealthOverviewScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
@@ -304,5 +312,5 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: TYPOGRAPHY.weights.bold,
   },
-});
+}));
 

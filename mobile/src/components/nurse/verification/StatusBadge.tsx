@@ -1,19 +1,22 @@
+import { useAppTheme } from '../../../theme/ThemeProvider';
+
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { DocStatus } from './types';
-import { PALETTE } from './constants';
 
 interface StatusBadgeProps {
   status: DocStatus;
 }
 
 export const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+  const { colors: COLORS } = useAppTheme();
+
   const config: Record<DocStatus, { label: string; bg: string; color: string; icon: string }> = {
-    NOT_SUBMITTED: { label: 'Not Submitted', bg: PALETTE.grey + '22', color: PALETTE.grey, icon: '?' },
-    PENDING: { label: 'Pending', bg: PALETTE.amber + '22', color: PALETTE.amber, icon: '?' },
-    APPROVED: { label: 'Approved', bg: PALETTE.emerald + '22', color: PALETTE.emerald, icon: '?' },
-    REJECTED: { label: 'Rejected', bg: PALETTE.red + '22', color: PALETTE.red, icon: '?' },
+    NOT_SUBMITTED: { label: 'Not Submitted', bg: COLORS.textMuted + '22', color: COLORS.textMuted, icon: '?' },
+    PENDING: { label: 'Pending', bg: COLORS.amber + '22', color: COLORS.amber, icon: '?' },
+    APPROVED: { label: 'Approved', bg: COLORS.emerald + '22', color: COLORS.emerald, icon: '?' },
+    REJECTED: { label: 'Rejected', bg: COLORS.red + '22', color: COLORS.red, icon: '?' },
   };
   const c = config[status];
   return (

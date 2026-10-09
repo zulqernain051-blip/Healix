@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, SafeAreaView, StatusBar } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
@@ -6,20 +9,27 @@ interface LoadingStateProps {
   message?: string;
 }
 
-export const LoadingState: React.FC<LoadingStateProps> = ({ message = 'Loading...' }) => (
+export const LoadingState: React.FC<LoadingStateProps> = ({ message = 'Loading...' }) => {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+
+  const styles = useThemeValue(createStyles);
+  return (
   <SafeAreaView style={styles.safeArea}>
-    <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+    <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#00E676" />
+      <ActivityIndicator size="large" color={COLORS.emerald} />
       <Text style={styles.message}>{message}</Text>
     </View>
   </SafeAreaView>
 );
+};
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
@@ -28,9 +38,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   message: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 14,
     textAlign: 'center',
     marginTop: 12,
   },
-});
+}));

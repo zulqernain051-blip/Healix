@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState } from 'react';
 import { ScrollView, View, StyleSheet } from 'react-native';
 import { Appbar, Button, Card, Text, TextInput, ActivityIndicator } from 'react-native-paper';
@@ -5,9 +7,12 @@ import { useLocalSearchParams } from 'expo-router';
 import { navigate, goBack } from '../../../utils/navigation';
 import { useCaseReview, useConsultationDoctors, useStartCaseReview, useRequestSecondOpinion, useSubmitAiFeedback } from '../../../hooks/useDoctor';
 import { useComplianceMetrics } from '../../../hooks/useClinical';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function CaseReviewScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const review = useCaseReview(id || '');
   const data = review.data;
@@ -30,13 +35,13 @@ export default function CaseReviewScreen() {
   const busy = start.isPending || opinion.isPending || feedback.isPending;
   return <View style={styles.root}><Appbar.Header style={styles.header}><Appbar.BackAction onPress={goBack} color={COLORS.headerText} /><Appbar.Content title="Case Review" color={COLORS.headerText} /></Appbar.Header>
     <ScrollView contentContainerStyle={styles.content}>
-      {review.isLoading && <ActivityIndicator color={COLORS.navy} />}
+      {review.isLoading && <ActivityIndicator color={COLORS.primaryText} />}
       {review.error && <Card style={styles.card}><Card.Content><Text accessibilityRole="alert" style={styles.error}>{(review.error as Error).message}</Text><Button onPress={() => void review.refetch()}>Retry</Button></Card.Content></Card>}
       {error && <Text accessibilityRole="alert" style={styles.error}>{error}</Text>}{message && <Text style={styles.success}>{message}</Text>}
       {data && <>
         <Card style={styles.card}><Card.Content><Text style={styles.title}>{patient?.user.fullName || 'Patient'}</Text><Text style={styles.body}>Risk: {data.case.riskTier} | {data.case.status.replaceAll('_', ' ')}</Text><Text style={styles.body}>Response deadline: {new Date(data.case.slaDeadline).toLocaleString()}</Text>
           {(broadcast || data.case.status === 'ASSIGNED') && <Button mode="contained" disabled={busy} loading={start.isPending} buttonColor={COLORS.navy} onPress={() => void run(() => start.mutateAsync(id), 'Case ready for review.')}>{broadcast ? 'Accept case' : 'Start review'}</Button>}
-          {active ? <Button disabled={busy} textColor={COLORS.navy} onPress={() => navigate(`/(doctor)/action/${id}`)}>Diagnosis, care plan, prescriptions & decision</Button> : !broadcast && <Text style={styles.body}>This case is closed. Clinical actions are unavailable.</Text>}
+          {active ? <Button disabled={busy} textColor={COLORS.primaryText} onPress={() => navigate(`/(doctor)/action/${id}`)}>Diagnosis, care plan, prescriptions & decision</Button> : !broadcast && <Text style={styles.body}>This case is closed. Clinical actions are unavailable.</Text>}
         </Card.Content></Card>
         {patient?.id && <View style={styles.row}><Button onPress={() => navigate('/care-plans', { patientId: patient.id })}>Care plans and revisions</Button><Button onPress={() => navigate('/adherence', { patientId: patient.id })}>Scheduled-dose adherence</Button></View>}
       {compliance.data && <Card style={styles.card}><Card.Content><Text style={styles.title}>Care adherence</Text><Text style={styles.body}>Visits: {compliance.data.visitCompliance == null ? 'No due visits' : `${compliance.data.visitCompliance}%`} | Scheduled doses: {compliance.data.medicationCompliance == null ? 'No scheduled doses' : `${compliance.data.medicationCompliance}%`}</Text><Text style={styles.body}>{compliance.data.complianceFlag}</Text></Card.Content></Card>}
@@ -48,4 +53,4 @@ export default function CaseReviewScreen() {
     </ScrollView>
   </View>;
 }
-const styles = StyleSheet.create({ row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm }, root: { flex: 1, backgroundColor: COLORS.surface }, header: { backgroundColor: COLORS.navy }, content: { padding: SPACING.lg, gap: SPACING.lg, paddingBottom: SPACING.xxxl }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold, color: COLORS.textDark, marginBottom: SPACING.md }, body: { color: COLORS.textBody, fontSize: TYPOGRAPHY.sizes.sm, marginBottom: SPACING.sm }, item: { paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: COLORS.dividerLight, marginBottom: SPACING.md }, error: { color: COLORS.red }, success: { color: COLORS.careEmerald } });
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({ row: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm }, root: { flex: 1, backgroundColor: COLORS.surface }, header: { backgroundColor: COLORS.navy }, content: { padding: SPACING.lg, gap: SPACING.lg, paddingBottom: SPACING.xxxl }, card: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg }, title: { fontSize: TYPOGRAPHY.sizes.lg, fontWeight: TYPOGRAPHY.weights.bold, color: COLORS.textDark, marginBottom: SPACING.md }, body: { color: COLORS.textBody, fontSize: TYPOGRAPHY.sizes.sm, marginBottom: SPACING.sm }, item: { paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: COLORS.dividerLight, marginBottom: SPACING.md }, error: { color: COLORS.red }, success: { color: COLORS.careEmerald } }));

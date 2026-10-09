@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -17,10 +19,15 @@ import { Text, Avatar } from 'react-native-paper';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useConversations, useGetOrCreateThread, useSearchUserByPhone } from '../../../hooks/useMessages';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function MessagesScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const { data: conversations, isLoading, error, refetch } = useConversations();
   const [searchQuery, setSearchQuery] = useState('');
@@ -115,7 +122,7 @@ export default function MessagesScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.surface} />
       <View style={styles.container}>
 
         {/* Header */}
@@ -137,9 +144,9 @@ export default function MessagesScreen() {
 
         {/* Conversation List */}
         <ScrollView contentContainerStyle={styles.listContainer} showsVerticalScrollIndicator={false}>
-        {error && <View><Text accessibilityRole="alert" style={styles.errorText}>{(error as Error).message}</Text><TouchableOpacity onPress={() => void refetch()}><Text style={{ color: COLORS.navy }}>Retry</Text></TouchableOpacity></View>}
+        {error && <View><Text accessibilityRole="alert" style={styles.errorText}>{(error as Error).message}</Text><TouchableOpacity onPress={() => void refetch()}><Text style={{ color: COLORS.primaryText }}>Retry</Text></TouchableOpacity></View>}
           {isLoading ? (
-            <ActivityIndicator color={COLORS.navy} size="large" style={{ marginTop: 40 }} />
+            <ActivityIndicator color={COLORS.primaryText} size="large" style={{ marginTop: 40 }} />
           ) : filteredConversations.length > 0 ? (
             filteredConversations.map((item: any) => (
               <TouchableOpacity
@@ -156,7 +163,7 @@ export default function MessagesScreen() {
                   size={46}
                   label={item.otherParticipant.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
                   style={styles.avatarBg}
-                  color={COLORS.navy}
+                  color={COLORS.primaryText}
                 />
                 <View style={styles.chatInfo}>
                   <View style={styles.nameTimeRow}>
@@ -264,7 +271,7 @@ export default function MessagesScreen() {
                     size={46}
                     label={(user.fullName || user.name || 'U').split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
                     style={styles.avatarBg}
-                    color={COLORS.navy}
+                    color={COLORS.primaryText}
                   />
                   <View style={styles.foundUserInfo}>
                     <Text style={styles.chatName}>{user.fullName || user.name}</Text>
@@ -298,7 +305,7 @@ export default function MessagesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.surface,
@@ -327,7 +334,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   searchIcon: {
     fontSize: 14,
@@ -349,12 +356,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   avatarBg: {
     backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.3)',
+    borderColor: COLORS.emeraldLight,
   },
   chatInfo: {
     marginLeft: SPACING.md,
@@ -380,7 +387,7 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   roleText: {
-    color: COLORS.navy,
+    color: COLORS.primaryText,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -447,7 +454,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(3, 7, 18, 0.8)',
+    backgroundColor: COLORS.bg,
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -457,7 +464,7 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     paddingBottom: 40,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -484,7 +491,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.surfaceMuted,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.3)',
+    borderColor: COLORS.emeraldLight,
     borderRadius: RADIUS.sm,
     color: COLORS.textDark,
     paddingHorizontal: SPACING.md,
@@ -509,7 +516,7 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.3)',
+    borderColor: COLORS.emeraldLight,
   },
   foundUserInfo: {
     flex: 1,
@@ -532,5 +539,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: SPACING.sm,
   },
-});
+}));
 

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useState } from 'react';
 import { appAlert } from '../../common/AppDialogs';
 import { View, StyleSheet, TextInput, Alert, Platform } from 'react-native';
@@ -24,6 +27,9 @@ const FIELDS = [
 type VitalsForm = { [K in typeof FIELDS[number]['key']]: string };
 
 export const VitalsForm: React.FC<VitalsFormProps> = ({ visitId, onSuccess, existingVitals }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const latest = existingVitals?.[0];
   const [form, setForm] = useState<VitalsForm>({
     systolic: latest?.systolic?.toString() || '',
@@ -81,15 +87,15 @@ export const VitalsForm: React.FC<VitalsFormProps> = ({ visitId, onSuccess, exis
               onChangeText={(v) => setForm((prev) => ({ ...prev, [f.key]: v }))}
               keyboardType="numeric"
               placeholder={f.placeholder}
-              placeholderTextColor="#6B8E8A"
+              placeholderTextColor={COLORS.textBody}
             />
             {errors[f.key] && <Text style={styles.errorText}>{errors[f.key]}</Text>}
           </View>
         ))}
         <Button
           mode="contained"
-          buttonColor="#3B82F6"
-          textColor="#FFFFFF"
+          buttonColor={COLORS.primaryText}
+          textColor={COLORS.textDark}
           onPress={handleSubmit}
           loading={submitVitals.isPending}
           disabled={submitVitals.isPending}
@@ -103,16 +109,16 @@ export const VitalsForm: React.FC<VitalsFormProps> = ({ visitId, onSuccess, exis
   );
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: SPACING.lg },
-  title: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', marginVertical: 12 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: SPACING.lg },
+  title: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  divider: { backgroundColor: COLORS.emeraldLight, marginVertical: 12 },
   fieldRow: { marginBottom: 12 },
-  label: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', marginBottom: 4 },
-  unit: { color: '#94A3B8', fontWeight: '400' },
-  input: { backgroundColor: '#051815', color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', padding: 10, borderRadius: RADIUS.md, fontSize: 14 },
-  inputError: { borderColor: '#EF4444' },
-  errorText: { color: '#EF4444', fontSize: 11, marginTop: 2 },
-});
+  label: { color: COLORS.textDark, fontSize: 13, fontWeight: '600', marginBottom: 4 },
+  unit: { color: COLORS.textBody, fontWeight: '400' },
+  input: { backgroundColor: COLORS.bg, color: COLORS.textDark, borderWidth: 1, borderColor: COLORS.emeraldLight, padding: 10, borderRadius: RADIUS.md, fontSize: 14 },
+  inputError: { borderColor: COLORS.red },
+  errorText: { color: COLORS.red, fontSize: 11, marginTop: 2 },
+}));
 
 

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,6 +19,9 @@ export const RescheduleRequestModal: React.FC<RescheduleRequestModalProps> = ({
   onConfirm,
   isLoading = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [scheduledAt, setScheduledAt] = useState('');
 
   const handleSubmit = async () => {
@@ -35,7 +41,7 @@ export const RescheduleRequestModal: React.FC<RescheduleRequestModalProps> = ({
           <TextInput
             style={styles.input}
             placeholder="e.g. 14 May 2025 - 10:00 AM"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={scheduledAt}
             onChangeText={setScheduledAt}
           />
@@ -59,39 +65,39 @@ export const RescheduleRequestModal: React.FC<RescheduleRequestModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: COLORS.modalBackdrop,
     justifyContent: 'center',
     padding: SPACING.lg,
   },
   modalContent: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
     marginBottom: 4,
   },
   sub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginBottom: SPACING.md,
   },
   input: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
     marginBottom: SPACING.lg,
   },
   btnRow: {
@@ -100,19 +106,19 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: COLORS.glassSurface,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
   },
   cancelBtnText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
   },
   confirmBtn: {
     flex: 1,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
@@ -121,8 +127,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   confirmBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 11,
     fontWeight: '700',
   },
-});
+}));

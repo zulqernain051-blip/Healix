@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { SafeAreaView, StyleSheet, View, Text, TouchableOpacity, ScrollView, StatusBar, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
@@ -9,21 +12,26 @@ import { ErrorState } from '../../../components/common/ErrorState';
 import { SPACING, TYPOGRAPHY } from '../../../theme';
 
 export default function PatientDetailScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: patientProfile, isLoading, error } = usePatientProfile(id || '');
 
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+        <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigate('/(nurse)/patients')} style={{ marginRight: 12 }}>
-            <Text style={{ color: '#FFFFFF', fontSize: 24 }}>‹</Text>
+            <Text style={{ color: COLORS.textDark, fontSize: 24 }}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Loading...</Text>
         </View>
         <View style={styles.centered}>
-          <ActivityIndicator color="#00E676" size="large" />
+          <ActivityIndicator color={COLORS.emerald} size="large" />
         </View>
       </SafeAreaView>
     );
@@ -32,10 +40,10 @@ export default function PatientDetailScreen() {
   if (error || !patientProfile) {
     return (
       <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+        <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigate('/(nurse)/patients')} style={{ marginRight: 12 }}>
-            <Text style={{ color: '#FFFFFF', fontSize: 24 }}>‹</Text>
+            <Text style={{ color: COLORS.textDark, fontSize: 24 }}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.title}>Patient Medical Profile</Text>
         </View>
@@ -55,10 +63,10 @@ export default function PatientDetailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigate('/(nurse)/patients')} style={{ marginRight: 12 }}>
-          <Text style={{ color: '#FFFFFF', fontSize: 24 }}>‹</Text>
+          <Text style={{ color: COLORS.textDark, fontSize: 24 }}>‹</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{formattedPatient.patientName}</Text>
       </View>
@@ -69,15 +77,15 @@ export default function PatientDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
   header: {
     padding: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 230, 118, 0.15)',
+    borderBottomColor: COLORS.emeraldLight,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  title: { color: '#FFFFFF', fontSize: TYPOGRAPHY.sizes.lg, fontWeight: '700' },
+  title: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.lg, fontWeight: '700' },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-});
+}));

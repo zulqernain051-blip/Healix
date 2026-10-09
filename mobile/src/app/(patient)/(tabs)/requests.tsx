@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState, useMemo } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar, RefreshControl, ActivityIndicator } from 'react-native';
 import { Text, Button } from 'react-native-paper';
@@ -6,7 +8,7 @@ import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useCareRequests } from '../../../hooks/useCareRequests';
 import { useCaregivers } from '../../../hooks/useHealth';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../../theme';
 
 import { CareTeamRow, CareTeamMember } from '../../../components/patient/CareTeamRow';
 import { CareJourneyCard } from '../../../components/patient/CareJourneyCard';
@@ -14,6 +16,11 @@ import { RequestFilterPills, CareSegment } from '../../../components/patient/Req
 import { CareRequestResponse } from '../../../types/care';
 
 export default function RequestsScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
 
@@ -102,7 +109,7 @@ export default function RequestsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.surface} />
 
       <ScrollView
         style={styles.scrollView}
@@ -112,7 +119,7 @@ export default function RequestsScreen() {
           <RefreshControl
             refreshing={isRefetching}
             onRefresh={onRefresh}
-            tintColor={COLORS.navy}
+            tintColor={COLORS.primaryText}
             colors={[COLORS.navy]}
           />
         }
@@ -128,7 +135,7 @@ export default function RequestsScreen() {
           onAddNursePress={() => navigate('/(patient)/requests/new')}
           onMemberPress={(member) => navigate('/(patient)/requests/new')}
         />
-        <Button mode="outlined" textColor={COLORS.navy} onPress={() => navigate('/(patient)/visits')}>
+        <Button mode="outlined" textColor={COLORS.primaryText} onPress={() => navigate('/(patient)/visits')}>
           My visits and QR codes
         </Button>
 
@@ -143,7 +150,7 @@ export default function RequestsScreen() {
         {/* List Content */}
         {loadingRequests && !isRefetching ? (
           <View style={styles.centerState}>
-            <ActivityIndicator size="large" color={COLORS.navy} />
+            <ActivityIndicator size="large" color={COLORS.primaryText} />
             <Text style={styles.loadingText}>Loading your care requests...</Text>
           </View>
         ) : errorRequests ? (
@@ -154,7 +161,7 @@ export default function RequestsScreen() {
             <Button
               mode="contained"
               buttonColor={COLORS.navy}
-              textColor="#FFFFFF"
+              textColor={COLORS.textDark}
               style={styles.retryBtn}
               onPress={() => refetchRequests()}
             >
@@ -178,7 +185,7 @@ export default function RequestsScreen() {
         ) : (
           <View style={styles.emptyCard}>
             <View style={styles.emptyIconCircle}>
-              <Ionicons name="calendar-outline" size={32} color={COLORS.navy} />
+              <Ionicons name="calendar-outline" size={32} color={COLORS.primaryText} />
             </View>
             <Text style={styles.emptyTitle}>
               {activeSegment === 'UPCOMING' ? 'No care requests yet' : 'No past care history'}
@@ -192,7 +199,7 @@ export default function RequestsScreen() {
               <Button
                 mode="contained"
                 buttonColor={COLORS.navy}
-                textColor="#FFFFFF"
+                textColor={COLORS.textDark}
                 style={styles.requestCareBtn}
                 onPress={() => navigate('/(patient)/requests/new')}
               >
@@ -206,7 +213,7 @@ export default function RequestsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.surface,
@@ -302,4 +309,4 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.round,
     paddingHorizontal: SPACING.md,
   },
-});
+}));

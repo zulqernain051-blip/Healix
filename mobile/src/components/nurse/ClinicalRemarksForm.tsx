@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -9,6 +12,9 @@ interface ClinicalRemarksFormProps {
 }
 
 export const ClinicalRemarksForm: React.FC<ClinicalRemarksFormProps> = ({ onSubmit, isLoading = false }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [remarksText, setRemarksText] = useState('');
   const [confidenceLevel, setConfidenceLevel] = useState<number>(4);
 
@@ -28,7 +34,7 @@ export const ClinicalRemarksForm: React.FC<ClinicalRemarksFormProps> = ({ onSubm
       <TextInput
         style={[styles.input, styles.multilineInput]}
         placeholder="Document patient progress, clinical observations, or physical examination findings..."
-        placeholderTextColor="#6B8E8A"
+        placeholderTextColor={COLORS.textBody}
         value={remarksText}
         onChangeText={setRemarksText}
         multiline
@@ -56,7 +62,7 @@ export const ClinicalRemarksForm: React.FC<ClinicalRemarksFormProps> = ({ onSubm
         disabled={remarksText.trim().length < 10 || isLoading}
       >
         {isLoading ? (
-          <ActivityIndicator size="small" color="#061C19" />
+          <ActivityIndicator size="small" color={COLORS.textMuted} />
         ) : (
           <Text style={styles.submitBtnText}>Submit Remarks & Trigger AI Assessment ✨</Text>
         )}
@@ -65,42 +71,42 @@ export const ClinicalRemarksForm: React.FC<ClinicalRemarksFormProps> = ({ onSubm
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
     marginBottom: 2,
   },
   subText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     lineHeight: 16,
     marginBottom: SPACING.md,
   },
   label: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
     marginBottom: 4,
     marginTop: SPACING.xs,
   },
   input: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
     marginBottom: SPACING.md,
   },
   multilineInput: {
@@ -116,24 +122,24 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderRadius: RADIUS.sm,
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   confPillActive: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   confText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
     fontWeight: '600',
   },
   confTextActive: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '700',
   },
   submitBtn: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     borderRadius: RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
@@ -142,8 +148,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },
-});
+}));

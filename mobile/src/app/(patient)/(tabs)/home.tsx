@@ -1,10 +1,12 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar, RefreshControl } from 'react-native';
 import { navigate } from '../../../utils/navigation';
 import { useAuthStore } from '../../../store/auth';
 import { useDashboardSummary } from '../../../hooks/useDashboard';
 import { usePrescriptions } from '../../../hooks/useHealth';
-import { COLORS, SPACING } from '../../../theme';
+import { SPACING } from '../../../theme';
 import { Button, Text } from 'react-native-paper';
 
 import { DashboardHeader } from '../../../components/patient/DashboardHeader';
@@ -13,6 +15,9 @@ import { QuickActionsGrid } from '../../../components/patient/QuickActionsGrid';
 import { TodaysReminders } from '../../../components/patient/TodaysReminders';
 
 export default function PatientHomeScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
 
@@ -63,7 +68,7 @@ export default function PatientHomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={COLORS.navy}
+            tintColor={COLORS.primaryText}
             colors={[COLORS.navy]}
           />
         }
@@ -71,7 +76,7 @@ export default function PatientHomeScreen() {
         {loadingDash && <Text style={{ color: COLORS.headerText }}>Loading your care summary...</Text>}
         {dashboardError && <><Text style={{ color: COLORS.red }}>{dashboardError.message}</Text><Button onPress={() => void refetchDashboard()}>Retry dashboard</Button></>}
         {/* Scenic Header */}
-        <Button onPress={() => navigate('/(patient)/emergency')}>Track Emergency Transport & Admission</Button>
+        <Button textColor={COLORS.headerText} onPress={() => navigate('/(patient)/emergency')}>Track Emergency Transport & Admission</Button>
         <DashboardHeader
           userName={userName}
           greeting={greeting}
@@ -114,7 +119,7 @@ export default function PatientHomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.navyDark,
@@ -134,4 +139,4 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
     minHeight: 400,
   },
-});
+}));

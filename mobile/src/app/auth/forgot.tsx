@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
 import { TextInput, Button, Card } from 'react-native-paper';
@@ -5,18 +8,12 @@ import { useRouter } from 'expo-router';
 import { navigate } from '../../utils/navigation';
 import { useForgotPassword } from '../../hooks/useAuth';
 
-const COLORS = {
-  bg: '#0A1628',
-  card: '#111D35',
-  border: '#1E2D4A',
-  teal: '#0D9488',
-  emerald: '#10B981',
-  textPrimary: '#F1F5F9',
-  textSecondary: '#94A3B8',
-  textMuted: '#475569'
-};
+
 
 export default function ForgotPasswordScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const forgotMutation = useForgotPassword();
   const isLoading = forgotMutation.isPending;
@@ -80,7 +77,7 @@ export default function ForgotPasswordScreen() {
 
           <Button
             mode="contained"
-            buttonColor={COLORS.teal}
+            buttonColor={COLORS.tealFill} textColor={COLORS.onAccent}
             loading={isLoading}
             disabled={isLoading || emailOrPhone.trim().length === 0}
             onPress={handleSubmit}
@@ -103,7 +100,7 @@ export default function ForgotPasswordScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   content: { padding: 20, justifyContent: 'center', minHeight: '80%' },
   header: { marginBottom: 24, alignItems: 'center' },
@@ -112,4 +109,4 @@ const styles = StyleSheet.create({
   card: { backgroundColor: COLORS.card, borderRadius: 16, borderWidth: 1, borderColor: COLORS.border },
   input: { backgroundColor: COLORS.card, color: COLORS.textPrimary, marginBottom: 16 },
   btn: { borderRadius: 8, paddingVertical: 4 }
-});
+}));

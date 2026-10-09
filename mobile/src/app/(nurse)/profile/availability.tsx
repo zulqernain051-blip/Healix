@@ -1,12 +1,17 @@
+
+
+
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Text, TextInput, Button, Chip, Switch } from 'react-native-paper';
 import { useAuthStore } from '../../../store/auth';
 import { useNurseProfile, useUpdateProfile, useNurseAvailability, useAddAvailability, useDeleteAvailability } from '../../../hooks/useNurse';
-import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../../components/common/WorkflowPage';
 import { navigate } from '../../../utils/navigation';
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 export default function AvailabilityScreen() {
+  const s = useFlowStyles();
+
   const id = useAuthStore(state => state.user?.nurseId) || ''; const q = useNurseAvailability(id); const profile = useNurseProfile(id);
   const add = useAddAvailability(); const remove = useDeleteAvailability(); const update = useUpdateProfile();
   const [dayOfWeek, setDay] = useState(1); const [startTime, setStart] = useState('09:00'); const [endTime, setEnd] = useState('17:00'); const [shiftType, setShift] = useState('DAY'); const [error, setError] = useState('');

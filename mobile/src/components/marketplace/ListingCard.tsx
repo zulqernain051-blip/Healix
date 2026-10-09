@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Card, Text, Chip } from 'react-native-paper';
 import { MarketplaceListing } from '../../types/marketplace';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 interface Props {
   listing: MarketplaceListing;
@@ -11,6 +13,9 @@ interface Props {
 }
 
 export const ListingCard: React.FC<Props> = ({ listing, onPress, style }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const req = listing.careRequest;
 
   return (
@@ -69,7 +74,7 @@ export const ListingCard: React.FC<Props> = ({ listing, onPress, style }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
     backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.md,
@@ -100,7 +105,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   statusText: {
-    color: COLORS.navy,
+    color: COLORS.primaryText,
     fontSize: 10,
     fontWeight: 'bold',
     marginVertical: 0,
@@ -125,9 +130,9 @@ const styles = StyleSheet.create({
     color: COLORS.textBody,
     fontStyle: 'italic',
     marginTop: SPACING.sm,
-    backgroundColor: 'rgba(255,255,255,0.03)',
+    backgroundColor: COLORS.glassSurface,
     padding: SPACING.sm,
     borderRadius: RADIUS.sm,
   },
-  offerState: { ...TYPOGRAPHY.bodySmall, color: COLORS.navy, fontWeight: '700', marginBottom: SPACING.sm },
-});
+  offerState: { ...TYPOGRAPHY.bodySmall, color: COLORS.primaryText, fontWeight: '700', marginBottom: SPACING.sm },
+}));

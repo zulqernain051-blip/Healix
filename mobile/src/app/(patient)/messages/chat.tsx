@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { voiceFileInfo } from '../../../hooks/useVoiceRecorder';
 import { useState, useRef, useEffect } from 'react';
@@ -30,6 +33,11 @@ import { useChatHistory, useSendMessage, useMarkMessagesAsRead, useChatSocket, u
 
 
 export default function WhatsAppStyleChatScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const params = useLocalSearchParams();
   const { user } = useAuthStore();
@@ -155,7 +163,7 @@ export default function WhatsAppStyleChatScreen() {
   
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -170,7 +178,7 @@ export default function WhatsAppStyleChatScreen() {
             size={38}
             label={contactName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
             style={styles.avatarBg}
-            color="#00E676"
+            color={COLORS.emerald}
           />
 
           <View style={styles.headerInfo}>
@@ -233,48 +241,48 @@ export default function WhatsAppStyleChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 230, 118, 0.15)',
+    borderBottomColor: COLORS.emeraldLight,
   },
   backBtn: {
     paddingRight: SPACING.xs,
   },
   backIcon: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 28,
     fontWeight: '300',
   },
   avatarBg: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     marginRight: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   headerInfo: {
     flex: 1,
   },
   headerName: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: 15,
     fontWeight: '700',
   },
   headerStatus: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
   },
   headerActions: {
@@ -285,37 +293,37 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   headerActionIcon: {
     fontSize: 16,
   },
   encryptionNotice: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 230, 118, 0.1)',
+    borderBottomColor: COLORS.emeraldLight,
   },
   encryptionText: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
     textAlign: 'center',
   },
   typingIndicatorContainer: {
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
   },
   typingText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 12,
     fontStyle: 'italic',
   },
-});
+}));
 
 

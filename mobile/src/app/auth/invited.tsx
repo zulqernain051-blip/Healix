@@ -1,9 +1,14 @@
+
+
+
 import { useState } from 'react';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { authApi } from '../../api/auth.api';
 import { navigate } from '../../utils/navigation';
-import { WorkflowPage, flowStyles as s } from '../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../components/common/WorkflowPage';
 export default function InvitedRegistration() {
+  const s = useFlowStyles();
+
  const [fields, setFields] = useState({ invitationToken: '', email: '', phone: '', fullName: '', password: '', cnic: '', professionalId: '' });
  const [busy, setBusy] = useState(false), [error, setError] = useState('');
  const submit = async () => { setBusy(true); setError(''); try { const result: any = await authApi.registerInvited({ ...fields, professionalId: fields.professionalId.trim() || undefined }); if (result.emailVerificationRequired) navigate('/auth/verify-otp', { emailOrPhone: fields.email }); else navigate('/auth/login', { message: 'Account created. You can sign in now.' }); } catch(e: any) { setError(e.message); } finally { setBusy(false); } };

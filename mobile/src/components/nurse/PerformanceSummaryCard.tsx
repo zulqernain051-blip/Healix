@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,6 +19,9 @@ export const PerformanceSummaryCard: React.FC<PerformanceSummaryCardProps> = ({
   avgRating = 4.9,
   onPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.headerRow}>
@@ -48,14 +54,14 @@ export const PerformanceSummaryCard: React.FC<PerformanceSummaryCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   headerRow: {
     flexDirection: 'row',
@@ -64,12 +70,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   linkText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
     fontWeight: '600',
   },
@@ -81,20 +87,20 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
     borderWidth: 2,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.lg,
   },
   scoreNumber: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '800',
   },
   scoreLabel: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 9,
   },
   metricsCol: {
@@ -107,11 +113,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   metricLabel: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
   },
   metricVal: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.xs,
     fontWeight: '700',
   },
@@ -123,4 +129,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginRight: 4,
   },
-});
+}));

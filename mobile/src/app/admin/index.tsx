@@ -1,4 +1,7 @@
 
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
+
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
 import { Card, Divider, Button } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
@@ -7,14 +10,19 @@ import { useAdminStats, useAdminPendingNurses, useAdminPendingDoctors } from '..
 import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminDashboard() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { logout } = useAuthStore();
   const { data: stats } = useAdminStats();
   const { data: pendingNurses = [] } = useAdminPendingNurses();
   const { data: pendingDoctors = [] } = useAdminPendingDoctors();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#061C19' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         {/* Header */}
         <View style={styles.header}>
@@ -131,7 +139,7 @@ export default function AdminDashboard() {
             <Text style={styles.chevron}>›</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={[styles.moduleCard, { borderColor: 'rgba(239, 68, 68, 0.3)' }]} onPress={() => navigate('/admin/emergency')}>
+          <TouchableOpacity style={[styles.moduleCard, { borderColor: COLORS.redLight }]} onPress={() => navigate('/admin/emergency')}>
             <Text style={styles.moduleIcon}>🚨</Text>
             <View style={{ flex: 1, marginLeft: 12 }}>
               <Text style={styles.moduleTitle}>Emergency Center</Text>
@@ -188,29 +196,29 @@ export default function AdminDashboard() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
   content: { padding: SPACING.lg, paddingBottom: 40 },
   header: { marginBottom: 20 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { color: '#FFFFFF', fontSize: 22, fontWeight: '800' },
-  subtitle: { color: '#94A3B8', fontSize: 12, marginTop: 4 },
-  logoutBtn: { backgroundColor: 'rgba(239, 68, 68, 0.15)', paddingHorizontal: 12, paddingVertical: 6, borderRadius: RADIUS.round, borderWidth: 1, borderColor: '#EF4444' },
-  logoutText: { color: '#EF4444', fontSize: 12, fontWeight: '700' },
-  sectionLabel: { color: '#00E676', fontSize: 15, fontWeight: '700', marginBottom: 12, marginTop: 8 },
+  title: { color: COLORS.textDark, fontSize: 22, fontWeight: '800' },
+  subtitle: { color: COLORS.textBody, fontSize: 12, marginTop: 4 },
+  logoutBtn: { backgroundColor: COLORS.redLight, paddingHorizontal: 12, paddingVertical: 6, borderRadius: RADIUS.round, borderWidth: 1, borderColor: COLORS.red },
+  logoutText: { color: COLORS.red, fontSize: 12, fontWeight: '700' },
+  sectionLabel: { color: COLORS.emerald, fontSize: 15, fontWeight: '700', marginBottom: 12, marginTop: 8 },
   statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 20 },
-  statCard: { width: '48%', backgroundColor: '#0A2D28', padding: 14, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
+  statCard: { width: '48%', backgroundColor: COLORS.bg, padding: 14, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight },
   statIcon: { fontSize: 22, marginBottom: 6 },
-  statValue: { color: '#00E676', fontSize: 24, fontWeight: '800' },
-  statLabel: { color: '#94A3B8', fontSize: 11, marginTop: 2 },
+  statValue: { color: COLORS.emerald, fontSize: 24, fontWeight: '800' },
+  statLabel: { color: COLORS.textBody, fontSize: 11, marginTop: 2 },
   moduleGrid: { gap: 12, marginBottom: 20 },
-  moduleCard: { backgroundColor: '#0A2D28', padding: 14, borderRadius: RADIUS.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
+  moduleCard: { backgroundColor: COLORS.bg, padding: 14, borderRadius: RADIUS.lg, flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: COLORS.emeraldLight },
   moduleIcon: { fontSize: 24 },
-  moduleTitle: { color: '#FFFFFF', fontSize: 14, fontWeight: '700' },
-  moduleSub: { color: '#94A3B8', fontSize: 11, marginTop: 2 },
-  chevron: { color: '#6B8E8A', fontSize: 22 },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: 16 },
-  cardTitle: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', marginVertical: 10 },
-  complianceItem: { color: '#00E676', fontSize: 12, fontWeight: '600', marginBottom: 6 },
-});
+  moduleTitle: { color: COLORS.textDark, fontSize: 14, fontWeight: '700' },
+  moduleSub: { color: COLORS.textBody, fontSize: 11, marginTop: 2 },
+  chevron: { color: COLORS.textBody, fontSize: 22 },
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: 16 },
+  cardTitle: { color: COLORS.textDark, fontSize: 15, fontWeight: '700' },
+  divider: { backgroundColor: COLORS.emeraldLight, marginVertical: 10 },
+  complianceItem: { color: COLORS.emerald, fontSize: 12, fontWeight: '600', marginBottom: 6 },
+}));

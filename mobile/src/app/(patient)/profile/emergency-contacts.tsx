@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Linking, Alert } from 'react-native';
@@ -11,6 +14,11 @@ import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
 
 export default function EmergencyContactsScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
@@ -58,7 +66,7 @@ export default function EmergencyContactsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.headerRow}>
@@ -77,7 +85,7 @@ export default function EmergencyContactsScreen() {
                   size={48}
                   label={contact.name ? contact.name.split(' ').map((n: string) => n[0]).join('') : 'EC'}
                   style={styles.avatarBg}
-                  color="#00E676"
+                  color={COLORS.emerald}
                 />
 
                 <View style={styles.contactInfo}>
@@ -138,10 +146,10 @@ export default function EmergencyContactsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
@@ -160,12 +168,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backIcon: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 28,
     fontWeight: '300',
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
@@ -174,35 +182,35 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   contactCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   avatarBg: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.3)',
+    borderColor: COLORS.emeraldLight,
   },
   contactInfo: {
     marginLeft: SPACING.md,
     flex: 1,
   },
   contactName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   contactRelation: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   contactPhone: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
     marginTop: 2,
   },
@@ -210,7 +218,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 6,
@@ -222,7 +230,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+    backgroundColor: COLORS.redLight,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -230,9 +238,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   addContactBtn: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
     borderWidth: 1.5,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
     borderStyle: 'dashed',
     borderRadius: RADIUS.lg,
     paddingVertical: SPACING.md,
@@ -240,7 +248,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   addContactText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
@@ -253,24 +261,24 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
   },
   emptySub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     textAlign: 'center',
     marginTop: 4,
   },
   infoBanner: {
-    backgroundColor: '#0E3630',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
     marginBottom: SPACING.xs,
   },
   infoIcon: {
@@ -278,12 +286,12 @@ const styles = StyleSheet.create({
     marginRight: SPACING.sm,
   },
   infoText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     flex: 1,
     lineHeight: 16,
   },
-});
+}));
 
 
 

@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useCallback, useState } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
@@ -5,9 +7,12 @@ import { useRouter } from 'expo-router';
 import { useMarketplaceListings } from '../../../hooks/useMarketplace';
 import { ListingCard } from '../../../components/marketplace/ListingCard';
 import { MarketplaceListing } from '../../../types/marketplace';
-import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '../../../theme';
+import { SPACING, TYPOGRAPHY, RADIUS } from '../../../theme';
 
 export default function NurseMarketplaceScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const [city,setCity]=useState(''),[service,setService]=useState('');
   const [offerFilter, setOfferFilter] = useState<'ALL' | 'BID' | 'NOT_BID'>('ALL');
@@ -24,7 +29,7 @@ export default function NurseMarketplaceScreen() {
   if (isLoading && !listings) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={COLORS.primary} size="large" />
+        <ActivityIndicator color={COLORS.primaryText} size="large" />
         <Text style={styles.loadingText}>Finding available care requests...</Text>
       </View>
     );
@@ -59,7 +64,7 @@ export default function NurseMarketplaceScreen() {
         <Button 
           mode="outlined" 
           onPress={() => router.push('/(nurse)/marketplace/contracts' as any)}
-          textColor={COLORS.primary}
+          textColor={COLORS.primaryText}
           style={styles.contractsBtn}
         >
           Contracts
@@ -70,7 +75,7 @@ export default function NurseMarketplaceScreen() {
       <TextInput mode="outlined" label="Filter service or required specialty" value={service} onChangeText={setService} />
       <View style={styles.filterRow}>
         {([['ALL', 'All requests'], ['BID', 'My bids'], ['NOT_BID', 'Not bid yet']] as const).map(([value, label]) =>
-          <Button key={value} mode={offerFilter === value ? 'contained' : 'outlined'} buttonColor={offerFilter === value ? COLORS.navy : undefined} textColor={offerFilter === value ? COLORS.headerText : COLORS.navy} onPress={() => setOfferFilter(value)}>{label}</Button>
+          <Button key={value} mode={offerFilter === value ? 'contained' : 'outlined'} buttonColor={offerFilter === value ? COLORS.navy : undefined} textColor={offerFilter === value ? COLORS.headerText : COLORS.primaryText} onPress={() => setOfferFilter(value)}>{label}</Button>
         )}
       </View>
       <FlatList
@@ -93,7 +98,7 @@ export default function NurseMarketplaceScreen() {
           <RefreshControl
             refreshing={isLoading}
             onRefresh={handleRefresh}
-            tintColor={COLORS.primary}
+            tintColor={COLORS.primaryText}
             colors={[COLORS.primary]}
           />
         }
@@ -102,7 +107,7 @@ export default function NurseMarketplaceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm },
   container: {
     flex: 1,
@@ -181,5 +186,5 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
-});
+}));
 

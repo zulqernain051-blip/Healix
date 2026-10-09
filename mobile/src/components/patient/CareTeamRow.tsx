@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 export interface CareTeamMember {
   id: string;
@@ -22,6 +24,9 @@ export const CareTeamRow: React.FC<CareTeamRowProps> = ({
   onAddNursePress,
   onMemberPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>Your care team</Text>
@@ -88,7 +93,7 @@ export const CareTeamRow: React.FC<CareTeamRowProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     marginBottom: SPACING.lg,
   },
@@ -113,7 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.round,
     borderWidth: 1,
     borderColor: COLORS.inputBorder,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 3,
@@ -125,13 +130,13 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     borderWidth: 2,
-    borderColor: 'rgba(16, 185, 129, 0.35)',
+    borderColor: COLORS.emeraldLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.sm,
   },
   avatar: {
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
   },
   avatarLabel: {
     fontSize: 14,
@@ -179,4 +184,4 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
-});
+}));

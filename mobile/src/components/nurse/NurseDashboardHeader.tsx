@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
@@ -20,6 +23,9 @@ export const NurseDashboardHeader: React.FC<NurseDashboardHeaderProps> = ({
   onNotificationPress,
   unreadAlertsCount = 0,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const initials = nurseName
     ? nurseName.split(' ').map(n => n[0]).join('').substring(0, 2)
     : 'RN';
@@ -31,7 +37,7 @@ export const NurseDashboardHeader: React.FC<NurseDashboardHeaderProps> = ({
           {photoUrl ? (
             <Avatar.Image size={48} source={{ uri: photoUrl }} style={styles.avatarBorder} />
           ) : (
-            <Avatar.Text size={48} label={initials} style={styles.avatarBg} color="#00E676" />
+            <Avatar.Text size={48} label={initials} style={styles.avatarBg} color={COLORS.emerald} />
           )}
         </TouchableOpacity>
         <View style={styles.greetingWrap}>
@@ -52,7 +58,7 @@ export const NurseDashboardHeader: React.FC<NurseDashboardHeaderProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -64,24 +70,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatarBg: {
-    backgroundColor: '#0A332C',
+    backgroundColor: COLORS.bg,
     borderWidth: 1.5,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   avatarBorder: {
     borderWidth: 1.5,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   greetingWrap: {
     marginLeft: SPACING.md,
   },
   greetingText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: TYPOGRAPHY.sizes.xs,
     fontWeight: '500',
   },
   nurseNameText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
@@ -89,11 +95,11 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#0E3630',
+    backgroundColor: COLORS.bg,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   bellIcon: {
     fontSize: 18,
@@ -105,6 +111,6 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#EF4444',
+    backgroundColor: COLORS.red,
   },
-});
+}));

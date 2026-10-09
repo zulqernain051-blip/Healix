@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, ImageBackground, Dimensions } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../theme';
+import { SPACING, TYPOGRAPHY } from '../../theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const HEADER_HEIGHT = 260;
@@ -20,6 +22,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   greeting,
   onProfilePress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const initials = userName
     ? userName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
     : 'AH';
@@ -32,7 +37,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         resizeMode="cover"
       >
         <LinearGradient
-          colors={['rgba(6, 41, 75, 0.85)', 'rgba(11, 66, 104, 0.6)', 'rgba(11, 66, 104, 0.3)']}
+          colors={[COLORS.headerOverlayStart, COLORS.headerOverlayMid, COLORS.headerOverlayEnd]}
           style={styles.gradientOverlay}
         >
           <View style={styles.headerContent}>
@@ -50,7 +55,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                 label={initials}
                 style={styles.avatar}
                 labelStyle={styles.avatarLabel}
-                color={COLORS.surfaceCard}
+                color={COLORS.onAccent}
               />
             </TouchableOpacity>
           </View>
@@ -60,7 +65,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   headerContainer: {
     height: HEADER_HEIGHT,
     width: SCREEN_WIDTH,
@@ -87,19 +92,19 @@ const styles = StyleSheet.create({
     paddingRight: SPACING.md,
   },
   greetingText: {
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: COLORS.inverseMuted,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: TYPOGRAPHY.weights.regular,
     marginBottom: 2,
   },
   userNameText: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.xxl,
     fontWeight: TYPOGRAPHY.weights.bold,
     marginBottom: SPACING.xs,
   },
   subtitleText: {
-    color: 'rgba(255, 255, 255, 0.75)',
+    color: COLORS.inverseMuted,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.regular,
     lineHeight: 20,
@@ -108,12 +113,12 @@ const styles = StyleSheet.create({
     marginTop: SPACING.xs,
   },
   avatar: {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: COLORS.headerAvatarBg,
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: COLORS.glassBorder,
   },
   avatarLabel: {
     fontSize: 18,
     fontWeight: '700',
   },
-});
+}));

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text, Avatar } from 'react-native-paper';
@@ -18,10 +21,13 @@ export const AssignedStaffCard: React.FC<AssignedStaffCardProps> = ({
   onChatPress,
   onCallPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Avatar.Icon size={50} icon="account-heart" style={styles.avatar} color="#00E676" />
+        <Avatar.Icon size={50} icon="account-heart" style={styles.avatar} color={COLORS.emerald} />
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.role}>{role}</Text>
@@ -45,13 +51,13 @@ export const AssignedStaffCard: React.FC<AssignedStaffCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   header: {
     flexDirection: 'row',
@@ -59,26 +65,26 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   avatar: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
   },
   info: {
     marginLeft: SPACING.md,
     flex: 1,
   },
   name: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   role: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   ratingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    backgroundColor: COLORS.amberLight,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 8,
@@ -88,7 +94,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   ratingText: {
-    color: '#F59E0B',
+    color: COLORS.amber,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -98,28 +104,28 @@ const styles = StyleSheet.create({
   },
   chatBtn: {
     flex: 1,
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+    backgroundColor: COLORS.emeraldLight,
     paddingVertical: SPACING.sm,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
   },
   chatBtnText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   callBtn: {
     flex: 1,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     paddingVertical: SPACING.sm,
     borderRadius: RADIUS.sm,
     alignItems: 'center',
   },
   callBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
-});
+}));

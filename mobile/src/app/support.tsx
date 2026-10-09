@@ -1,3 +1,6 @@
+
+
+
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Text, TextInput, Button, Checkbox } from 'react-native-paper';
@@ -6,8 +9,10 @@ import { useLocalSearchParams } from 'expo-router';
 import * as Crypto from 'expo-crypto';
 import { useAuthStore } from '../store/auth';
 import { apiClient } from '../api/client';
-import { WorkflowPage, flowStyles as s } from '../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../components/common/WorkflowPage';
 export default function SupportAndOperations() {
+  const s = useFlowStyles();
+
  const actor=useAuthStore(state=>state.user),admin=actor?.role==='ADMIN',patient=actor?.role==='PATIENT',qc=useQueryClient();
  const params=useLocalSearchParams<{paymentId?:string;visitId?:string}>();
  const [page,setPage]=useState(1),[userPage,setUserPage]=useState(1),[busy,setBusy]=useState(false),[error,setError]=useState(''),[message,setMessage]=useState('');

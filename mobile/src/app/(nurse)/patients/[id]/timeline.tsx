@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../../theme';
 // f:/class Data/FYP Project/Proposal/Project/Healix/mobile/src/app/(nurse)/patients/[id]/timeline.tsx
 import React from 'react';
 import { SafeAreaView, StyleSheet, View, Text, FlatList } from 'react-native';
@@ -11,6 +14,9 @@ const timelineData = [
 ];
 
 export default function PatientTimelineScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const renderItem = ({ item }: { item: any }) => (
     <Card style={styles.card}>
       <Card.Content>
@@ -31,12 +37,12 @@ export default function PatientTimelineScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19', padding: 16 },
-  card: { backgroundColor: '#0A2D28', marginBottom: 12 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg, padding: 16 },
+  card: { backgroundColor: COLORS.bg, marginBottom: 12 },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
-  date: { color: '#00E676', fontWeight: '600' },
-  risk: { color: '#F1F5F9' },
-  divider: { backgroundColor: '#1E2D4A', marginVertical: 4 },
-  event: { color: '#F1F5F9' },
-});
+  date: { color: COLORS.emerald, fontWeight: '600' },
+  risk: { color: COLORS.textDark },
+  divider: { backgroundColor: COLORS.bg, marginVertical: 4 },
+  event: { color: COLORS.textDark },
+}));

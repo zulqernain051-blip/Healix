@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Text } from 'react-native-paper';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { TimeWindow } from '../../types/care';
 
 interface Props {
@@ -32,6 +34,9 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
   onTimeWindowChange,
   isRecurring = false,
 }) => {
+  const { colors: COLORS, dark } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
 
@@ -51,12 +56,13 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
   const webInputStyle = {
     padding: '12px',
     borderRadius: '12px',
-    border: `1px solid rgba(255, 255, 255, 0.60)`,
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    border: `1px solid ${COLORS.inputBorder}`,
+    backgroundColor: COLORS.glassSurface,
     color: COLORS.textDark,
     fontSize: '15px',
     width: '100%',
     fontFamily: 'inherit',
+    colorScheme: dark ? 'dark' as const : 'light' as const,
   };
 
   const localDate = (date: Date) => [date.getFullYear(), String(date.getMonth() + 1).padStart(2, '0'), String(date.getDate()).padStart(2, '0')].join('-');
@@ -123,6 +129,8 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
         <>
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
+            isDarkModeEnabled={dark}
+            themeVariant={dark ? 'dark' : 'light'}
             mode="date"
             onConfirm={(d) => {
               onDateChange(d);
@@ -134,6 +142,8 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
 
           <DateTimePickerModal
             isVisible={isTimePickerVisible}
+            isDarkModeEnabled={dark}
+            themeVariant={dark ? 'dark' : 'light'}
             mode="time"
             onConfirm={handleConfirmTime}
             onCancel={() => setTimePickerVisibility(false)}
@@ -144,7 +154,7 @@ export const DateTimePreferencePicker: React.FC<Props> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     marginBottom: SPACING.md,
   },
@@ -161,9 +171,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    backgroundColor: COLORS.glassSurface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.60)',
+    borderColor: COLORS.glassBorder,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
   },
@@ -189,9 +199,9 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: RADIUS.round,
-    backgroundColor: 'rgba(255, 255, 255, 0.40)',
+    backgroundColor: COLORS.glassSurface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.60)',
+    borderColor: COLORS.glassBorder,
   },
   windowPillActive: {
     backgroundColor: COLORS.accentBlue,
@@ -203,7 +213,7 @@ const styles = StyleSheet.create({
     color: COLORS.textDark,
   },
   windowTextActive: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontWeight: '700',
   },
-});
+}));

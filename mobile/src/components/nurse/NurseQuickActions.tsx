@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -20,13 +23,16 @@ export const NurseQuickActions: React.FC<NurseQuickActionsProps> = ({
   onEmergencyPress,
   onScanQRPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const actions = [
-    { label: 'Check-in', icon: '📍', color: 'rgba(0, 230, 118, 0.15)', onPress: onCheckInPress },
-    { label: 'Patients', icon: '👥', color: 'rgba(59, 130, 246, 0.15)', onPress: onPatientsPress },
-    { label: 'Marketplace', icon: '🌐', color: 'rgba(168, 85, 247, 0.15)', onPress: onBidsPress },
-    { label: 'Messages', icon: '💬', color: 'rgba(245, 158, 11, 0.15)', onPress: onMessagesPress },
-    { label: 'Visit triage', icon: '🚨', color: 'rgba(239, 68, 68, 0.15)', onPress: onEmergencyPress },
-    { label: 'Scan QR', icon: '📷', color: 'rgba(20, 184, 166, 0.15)', onPress: onScanQRPress },
+    { label: 'Check-in', icon: '📍', color: COLORS.emeraldLight, onPress: onCheckInPress },
+    { label: 'Patients', icon: '👥', color: COLORS.blueLight, onPress: onPatientsPress },
+    { label: 'Marketplace', icon: '🌐', color: COLORS.purpleLight, onPress: onBidsPress },
+    { label: 'Messages', icon: '💬', color: COLORS.amberLight, onPress: onMessagesPress },
+    { label: 'Visit triage', icon: '🚨', color: COLORS.redLight, onPress: onEmergencyPress },
+    { label: 'Scan QR', icon: '📷', color: COLORS.emeraldLight, onPress: onScanQRPress },
   ];
 
   return (
@@ -51,12 +57,12 @@ export const NurseQuickActions: React.FC<NurseQuickActionsProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { marginBottom: 12 },
   sectionTitle: { display: 'none' },
   actionsRow: { gap: 12, paddingBottom: 8 },
-  actionCard: { backgroundColor: '#FFFFFF', padding: 16, borderRadius: 16, alignItems: 'center', width: 90, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+  actionCard: { backgroundColor: COLORS.surfaceCard, padding: 16, borderRadius: 16, alignItems: 'center', width: 90, borderWidth: 1, borderColor: COLORS.inputBorder, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   iconBg: { width: 44, height: 44, borderRadius: 22, justifyContent: 'center', alignItems: 'center', marginBottom: 10 },
   iconText: { fontSize: 22 },
-  actionLabel: { color: '#1E293B', fontSize: 11, fontWeight: '700', textAlign: 'center' },
-});
+  actionLabel: { color: COLORS.textMuted, fontSize: 11, fontWeight: '700', textAlign: 'center' },
+}));

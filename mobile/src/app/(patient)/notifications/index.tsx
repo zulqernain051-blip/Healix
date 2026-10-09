@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState } from 'react';
 import {
   StyleSheet,
@@ -15,6 +18,11 @@ import { useDashboardSummary } from '../../../hooks/useDashboard';
 import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 export default function NotificationsScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
 
@@ -36,7 +44,7 @@ export default function NotificationsScreen() {
       time: (risk as any).createdAt || (risk as any).assessedAt ? new Date((risk as any).createdAt || (risk as any).assessedAt).toLocaleDateString() : 'Recent',
       unread: !markedRead['risk-notif-1'],
       icon: '🚨',
-      bgColor: risk.riskTier === 'HIGH' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(0, 230, 118, 0.15)',
+      bgColor: risk.riskTier === 'HIGH' ? COLORS.redLight : COLORS.emeraldLight,
       route: '/(patient)/records/risk-history',
     });
   }
@@ -45,23 +53,23 @@ export default function NotificationsScreen() {
     let title = 'Care Visit Update';
     let body = `Request ${req.id.substring(0, 8).toUpperCase()} status is ${req.status}.`;
     let icon = '📋';
-    let bgColor = 'rgba(59, 130, 246, 0.15)';
+    let bgColor = COLORS.blueLight;
 
     if (req.status === 'ASSIGNED') {
       title = 'Staff Assigned to Visit';
       body = `Provider assigned for your  visit on ${req.scheduledAt ? new Date(req.scheduledAt).toLocaleString() : 'TBD'}.`;
       icon = '🩺';
-      bgColor = 'rgba(0, 230, 118, 0.15)';
+      bgColor = COLORS.emeraldLight;
     } else if (req.status === 'IN_PROGRESS') {
       title = 'Care Visit In Progress';
       body = 'Your healthcare provider has arrived and checked in.';
       icon = '🟢';
-      bgColor = 'rgba(245, 158, 11, 0.15)';
+      bgColor = COLORS.amberLight;
     } else if (req.status === 'COMPLETED') {
       title = 'Care Visit Completed';
       body = 'Visit summary and vitals have been saved to your health vault.';
       icon = '✅';
-      bgColor = 'rgba(168, 85, 247, 0.15)';
+      bgColor = COLORS.purpleLight;
     }
 
     dynamicNotifications.push({
@@ -89,7 +97,7 @@ export default function NotificationsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.container}>
         
         {/* Header */}
@@ -164,10 +172,10 @@ export default function NotificationsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
@@ -180,12 +188,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
   markAllReadText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: TYPOGRAPHY.sizes.xs,
     fontWeight: '600',
   },
@@ -198,21 +206,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.md,
     paddingVertical: 6,
     borderRadius: RADIUS.round,
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   filterPillActive: {
-    backgroundColor: '#00E676',
-    borderColor: '#00E676',
+    backgroundColor: COLORS.emerald,
+    borderColor: COLORS.emerald,
   },
   filterText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
     fontWeight: '600',
   },
   filterTextActive: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '700',
   },
   listContainer: {
@@ -220,17 +228,17 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   notificationCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   notificationCardUnread: {
-    borderColor: 'rgba(0, 230, 118, 0.4)',
-    backgroundColor: '#0E3630',
+    borderColor: COLORS.emeraldLight,
+    backgroundColor: COLORS.bg,
   },
   iconBg: {
     width: 42,
@@ -253,18 +261,18 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   notifTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
     flex: 1,
     marginRight: SPACING.xs,
   },
   notifTime: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
   },
   notifBody: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     lineHeight: 15,
   },
@@ -272,7 +280,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
     marginLeft: SPACING.sm,
   },
   emptyState: {
@@ -285,16 +293,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   emptyTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
   },
   emptySub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     textAlign: 'center',
     marginTop: 6,
     lineHeight: 16,
   },
-});
+}));
 

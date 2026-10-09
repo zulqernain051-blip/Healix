@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -12,6 +15,9 @@ export const HighRiskAlertCard: React.FC<HighRiskAlertCardProps> = ({
   message = 'Your last assessment indicates high risk. Please take care.',
   onViewDetails,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <TouchableOpacity
       style={styles.alertCard}
@@ -33,14 +39,14 @@ export const HighRiskAlertCard: React.FC<HighRiskAlertCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   alertCard: {
-    backgroundColor: '#FFF0F2',
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: '#FFCCD2',
+    borderColor: COLORS.amberLight,
   },
   alertHeaderRow: {
     flexDirection: 'row',
@@ -57,17 +63,17 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   alertTitle: {
-    color: '#D32F2F',
+    color: COLORS.red,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
   },
   chevronText: {
-    color: '#D32F2F',
+    color: COLORS.red,
     fontSize: 20,
     fontWeight: '600',
   },
   alertBody: {
-    color: '#5C1D24',
+    color: COLORS.red,
     fontSize: TYPOGRAPHY.sizes.xs,
     lineHeight: 18,
     marginBottom: SPACING.sm,
@@ -77,8 +83,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   alertActionText: {
-    color: '#D32F2F',
+    color: COLORS.red,
     fontSize: TYPOGRAPHY.sizes.xs,
     fontWeight: '700',
   },
-});
+}));

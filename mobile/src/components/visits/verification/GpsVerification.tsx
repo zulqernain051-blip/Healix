@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { View, StyleSheet, Alert, Platform } from 'react-native';
 import { Text, Button, Card, ActivityIndicator } from 'react-native-paper';
@@ -11,6 +14,9 @@ interface GpsVerificationProps {
 }
 
 export const GpsVerification: React.FC<GpsVerificationProps> = ({ visitId, onSuccess }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const verifyGps = useVerifyGps();
 
   const handleVerify = async () => {
@@ -56,13 +62,13 @@ export const GpsVerification: React.FC<GpsVerificationProps> = ({ visitId, onSuc
         </Text>
         {verifyGps.isPending ? (
           <View style={styles.loadingRow}>
-            <ActivityIndicator size="small" color="#00E676" />
+            <ActivityIndicator size="small" color={COLORS.emerald} />
             <Text style={styles.loadingText}>Acquiring location & verifying...</Text>
           </View>
         ) : (
           <Button
             mode="outlined"
-            textColor="#00E676"
+            textColor={COLORS.emerald}
             style={styles.btn}
             onPress={handleVerify}
             labelStyle={{ fontWeight: '700' }}
@@ -75,11 +81,11 @@ export const GpsVerification: React.FC<GpsVerificationProps> = ({ visitId, onSuc
   );
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', marginBottom: SPACING.md },
-  title: { color: '#FFFFFF', fontSize: 16, fontWeight: '700', marginBottom: 6 },
-  description: { color: '#94A3B8', fontSize: 12, marginBottom: 16 },
-  btn: { borderColor: '#00E676', borderRadius: RADIUS.md },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: SPACING.md },
+  title: { color: COLORS.textDark, fontSize: 16, fontWeight: '700', marginBottom: 6 },
+  description: { color: COLORS.textBody, fontSize: 12, marginBottom: 16 },
+  btn: { borderColor: COLORS.emerald, borderRadius: RADIUS.md },
   loadingRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  loadingText: { color: '#94A3B8', fontSize: 13 },
-});
+  loadingText: { color: COLORS.textBody, fontSize: 13 },
+}));

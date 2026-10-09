@@ -1,12 +1,17 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useCallback } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { Text, Card, Chip, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useCareRequests } from '../../../hooks/useCareRequests';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 import { CareRequestResponse } from '../../../types/care';
 
 export default function PatientMarketplaceScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const { data: requests, isLoading, isError, error, refetch } = useCareRequests();
 
@@ -26,7 +31,7 @@ export default function PatientMarketplaceScreen() {
   if (isLoading && !requests) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={COLORS.primary} size="large" />
+        <ActivityIndicator color={COLORS.primaryText} size="large" />
       </View>
     );
   }
@@ -107,7 +112,7 @@ export default function PatientMarketplaceScreen() {
         <Button 
           mode="outlined" 
           onPress={() => router.push('/(patient)/marketplace/contracts' as any)}
-          textColor={COLORS.primary}
+          textColor={COLORS.primaryText}
           style={styles.contractsBtn}
         >
           Contracts
@@ -124,7 +129,7 @@ export default function PatientMarketplaceScreen() {
           <RefreshControl
             refreshing={isLoading}
             onRefresh={handleRefresh}
-            tintColor={COLORS.primary}
+            tintColor={COLORS.primaryText}
             colors={[COLORS.primary]}
           />
         }
@@ -133,7 +138,7 @@ export default function PatientMarketplaceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
@@ -228,7 +233,7 @@ const styles = StyleSheet.create({
     height: 24,
   },
   statusText: {
-    color: COLORS.primary,
+    color: COLORS.primaryText,
     fontSize: 10,
     fontWeight: 'bold',
     marginVertical: 0,
@@ -262,4 +267,4 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm,
     width: '100%',
   },
-});
+}));

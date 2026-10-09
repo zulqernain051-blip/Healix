@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import { Card, Divider, ProgressBar, Chip } from 'react-native-paper';
@@ -5,17 +7,21 @@ import { useAuthStore } from '../../../store/auth';
 import { useNurseScore, useNurseBadges } from '../../../hooks/useNurse';
 import { ErrorState } from '../../../components/common/ErrorState';
 
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
-const BADGE_MAP: Record<string, { label: string; color: string }> = {
+const createBADGE_MAP =  (COLORS: ThemeColors) : Record<string, { label: string; color: string }> => ({
   FIRST_VISIT: { label: '🏅 First Visit Done', color: COLORS.emerald },
   TEN_VISITS: { label: '⭐ 10 Visits milestone', color: COLORS.blue },
   TOP_RATED: { label: '👑 Top Rated Expert', color: COLORS.amber },
-  VERIFIED_SPECIALIST: { label: '🎖 Verified Specialist', color: COLORS.navy },
+  VERIFIED_SPECIALIST: { label: '🎖 Verified Specialist', color: COLORS.primaryText },
   RELIABLE: { label: '🔒 Highly Reliable', color: COLORS.emerald }
-};
+});
 
 export default function NursePerformanceScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const BADGE_MAP = useThemeValue(createBADGE_MAP);
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const nurseId = user?.nurseId || user?.id || '';
 
@@ -31,7 +37,7 @@ export default function NursePerformanceScreen() {
   if (isLoading && !nurseScore) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={COLORS.navy} />
+        <ActivityIndicator size="large" color={COLORS.primaryText} />
         <Text style={styles.loadingText}>Fetching performance metrics...</Text>
       </View>
     );
@@ -75,7 +81,7 @@ export default function NursePerformanceScreen() {
               <Text style={styles.metricLabel}>Skill Rating</Text>
               <Text style={styles.metricVal}>{nurseScore?.skillAssessmentCount ? `${Math.round(score.skillScore)}%` : 'Not assessed'}</Text>
             </View>
-            <ProgressBar progress={score.skillScore / 100} color={COLORS.navy} style={styles.progressBar} />
+            <ProgressBar progress={score.skillScore / 100} color={COLORS.primaryText} style={styles.progressBar} />
           </View>
 
           <View style={styles.metricRow}>
@@ -137,7 +143,7 @@ export default function NursePerformanceScreen() {
                 return (
                   <Chip
                     key={badge.id}
-                    textStyle={{ color: '#FFF', fontSize: 12, fontWeight: '700' }}
+                    textStyle={{ color: COLORS.textDark, fontSize: 12, fontWeight: '700' }}
                     style={[styles.badgeChip, { backgroundColor: badgeInfo.color }]}
                   >
                     {badgeInfo.label}
@@ -152,7 +158,7 @@ export default function NursePerformanceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.surface },
   content: { padding: 20, paddingBottom: 40 },
   header: { marginBottom: 20 },
@@ -189,6 +195,6 @@ const styles = StyleSheet.create({
   badgeContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
   badgeChip: { paddingHorizontal: 6, paddingVertical: 4 },
   emptyText: { color: COLORS.textMuted, fontSize: 13, textAlign: 'center', lineHeight: 18, paddingVertical: 10 }
-});
+}));
 
 

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { useVoicePlayback } from '../../hooks/useVoicePlayback';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
@@ -11,6 +14,9 @@ interface ChatBubbleProps {
 }
 
 export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, isMe }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const resolvedMediaUrl = message.mediaUrl?.startsWith('/') 
     ? `${API_URL.replace('/api/v1', '')}${message.mediaUrl}` 
     : message.mediaUrl;
@@ -91,39 +97,39 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ message, isMe }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   msgRow: { marginBottom: 16, maxWidth: '85%' },
   msgRowLeft: { alignSelf: 'flex-start' },
   msgRowRight: { alignSelf: 'flex-end' },
   bubble: { padding: 12, borderRadius: RADIUS.lg },
-  bubbleThem: { backgroundColor: '#111D35', borderBottomLeftRadius: 4, borderWidth: 1, borderColor: '#1E2D4A' },
-  bubbleMe: { backgroundColor: '#0D9488', borderBottomRightRadius: 4 },
+  bubbleThem: { backgroundColor: COLORS.bg, borderBottomLeftRadius: 4, borderWidth: 1, borderColor: COLORS.inputBorder },
+  bubbleMe: { backgroundColor: COLORS.tealFill, borderBottomRightRadius: 4 },
   msgText: { fontSize: 15, lineHeight: 22 },
-  msgTextThem: { color: '#F1F5F9' },
-  msgTextMe: { color: '#FFF' },
+  msgTextThem: { color: COLORS.textDark },
+  msgTextMe: { color: COLORS.textDark },
   metaRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4, paddingHorizontal: 4 },
-  timeText: { fontSize: 11, color: '#64748B' },
-  statusIcon: { fontSize: 11, color: '#64748B', marginLeft: 4, fontWeight: '700' },
-  statusRead: { color: '#10B981' },
-  imageWrap: { borderRadius: RADIUS.md, overflow: 'hidden', marginBottom: 8, backgroundColor: '#1E2D4A', width: 220, height: 160 },
+  timeText: { fontSize: 11, color: COLORS.textBody },
+  statusIcon: { fontSize: 11, color: COLORS.textBody, marginLeft: 4, fontWeight: '700' },
+  statusRead: { color: COLORS.emerald },
+  imageWrap: { borderRadius: RADIUS.md, overflow: 'hidden', marginBottom: 8, backgroundColor: COLORS.bg, width: 220, height: 160 },
   imageContent: { width: '100%', height: '100%' },
-  videoCard: { width: 240, backgroundColor: 'rgba(0,0,0,0.2)', borderRadius: RADIUS.md, overflow: 'hidden', marginBottom: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
-  videoThumbnailPlaceholder: { height: 120, backgroundColor: '#1E2D4A', alignItems: 'center', justifyContent: 'center' },
-  playIcon: { fontSize: 32, color: '#FFF', opacity: 0.8 },
-  videoMeta: { padding: 8, backgroundColor: 'rgba(0,0,0,0.4)' },
-  videoName: { color: '#FFF', fontSize: 13, fontWeight: '600' },
-  videoSize: { color: '#94A3B8', fontSize: 11, marginTop: 2 },
-  docCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.1)', padding: 10, borderRadius: RADIUS.md, marginBottom: 8, width: 220 },
-  docIconBg: { width: 36, height: 36, borderRadius: RADIUS.sm, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
+  videoCard: { width: 240, backgroundColor: COLORS.modalBackdrop, borderRadius: RADIUS.md, overflow: 'hidden', marginBottom: 8, borderWidth: 1, borderColor: COLORS.glassBorder },
+  videoThumbnailPlaceholder: { height: 120, backgroundColor: COLORS.bg, alignItems: 'center', justifyContent: 'center' },
+  playIcon: { fontSize: 32, color: COLORS.textDark, opacity: 0.8 },
+  videoMeta: { padding: 8, backgroundColor: COLORS.modalBackdrop },
+  videoName: { color: COLORS.textDark, fontSize: 13, fontWeight: '600' },
+  videoSize: { color: COLORS.textBody, fontSize: 11, marginTop: 2 },
+  docCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.glassSurface, padding: 10, borderRadius: RADIUS.md, marginBottom: 8, width: 220 },
+  docIconBg: { width: 36, height: 36, borderRadius: RADIUS.sm, backgroundColor: COLORS.glassSurface, alignItems: 'center', justifyContent: 'center', marginRight: 10 },
   docIcon: { fontSize: 18 },
   docMeta: { flex: 1 },
-  docName: { color: '#FFF', fontSize: 14, fontWeight: '600' },
-  docSize: { color: 'rgba(255,255,255,0.7)', fontSize: 11, marginTop: 2 },
-  audioCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: 8, borderRadius: RADIUS.md, marginBottom: 8, width: 220 },
-  audioPlayBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#0D9488', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
-  audioPlayIcon: { color: '#FFF', fontSize: 16, marginLeft: 2 },
+  docName: { color: COLORS.textDark, fontSize: 14, fontWeight: '600' },
+  docSize: { color: COLORS.inverseMuted, fontSize: 11, marginTop: 2 },
+  audioCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.modalBackdrop, padding: 8, borderRadius: RADIUS.md, marginBottom: 8, width: 220 },
+  audioPlayBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.tealFill, alignItems: 'center', justifyContent: 'center', marginRight: 10 },
+  audioPlayIcon: { color: COLORS.onAccent, fontSize: 16, marginLeft: 2 },
   audioTrack: { flex: 1 },
-  audioProgressBg: { height: 4, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 6 },
-  audioProgressFill: { height: '100%', backgroundColor: '#0D9488', borderRadius: 2 },
-  audioTime: { color: '#FFF', fontSize: 10, fontWeight: '600' },
-});
+  audioProgressBg: { height: 4, backgroundColor: COLORS.glassSurface, borderRadius: 2, marginBottom: 6 },
+  audioProgressFill: { height: '100%', backgroundColor: COLORS.teal, borderRadius: 2 },
+  audioTime: { color: COLORS.textDark, fontSize: 10, fontWeight: '600' },
+}));

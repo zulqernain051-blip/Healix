@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { useVoiceRecorder, voiceFileInfo } from '../../hooks/useVoiceRecorder';
 import { View, TextInput, TouchableOpacity, StyleSheet, Modal, Text } from 'react-native';
@@ -12,6 +15,9 @@ interface ChatInputProps {
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [inputText, setInputText] = useState('');
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [mediaPreview, setMediaPreview] = useState<any>(null);
@@ -29,7 +35,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
   const handleSend = async () => {
     const content = inputText.trim();
     if (sending || (!content && !mediaPreview)) return;
-    
+
     if (onTyping) onTyping(false);
     setSending(true);
     try {
@@ -54,10 +60,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
   const pickImage = async (useCamera: boolean = false) => {
     setShowAttachMenu(false);
     try {
-      const result = useCamera 
+      const result = useCamera
         ? await ImagePicker.launchCameraAsync({ mediaTypes: ImagePicker.MediaTypeOptions.All })
         : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.All });
-      
+
       if (!result.canceled && result.assets && result.assets.length > 0) {
         const asset = result.assets[0];
         setMediaPreview({
@@ -102,7 +108,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
           </Text>
           <Text style={styles.mediaPreviewText} numberOfLines={1}>Attached: {mediaPreview.name}</Text>
           <TouchableOpacity onPress={() => setMediaPreview(null)} style={styles.mediaPreviewClose}>
-            <Text style={{ color: '#EF4444', fontWeight: '700' }}>X </Text>
+            <Text style={{ color: COLORS.red, fontWeight: '700' }}>X </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -110,7 +116,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
       {isRecording ? (
         <View style={styles.inputRow}>
           <TouchableOpacity style={styles.attachBtn} onPress={() => stopRecording(true)}>
-            <Text style={{ color: '#EF4444', fontSize: 20 }}>🗑</Text>
+            <Text style={{ color: COLORS.red, fontSize: 20 }}>🗑</Text>
           </TouchableOpacity>
           <View style={styles.recordingIndicator}>
             <View style={styles.recordingDot} />
@@ -125,20 +131,20 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
           <TouchableOpacity style={styles.attachBtn} onPress={() => setShowAttachMenu(true)} disabled={disabled || busy || sending}>
             <Text style={styles.attachIcon}>+</Text>
           </TouchableOpacity>
-          
+
           <TextInput
             style={styles.textInput}
             placeholder="Type a clinical note..."
-            placeholderTextColor="#64748B"
+            placeholderTextColor={COLORS.textBody}
             value={inputText}
             onChangeText={handleTextChange}
             multiline
             maxLength={500}
             editable={!disabled}
           />
-          
-          <TouchableOpacity 
-            style={[styles.sendBtn, (!inputText.trim() && !mediaPreview) && { backgroundColor: '#1E2D4A' }]} 
+
+          <TouchableOpacity
+            style={[styles.sendBtn, (!inputText.trim() && !mediaPreview) && { backgroundColor: COLORS.bg }]}
             onPress={inputText.trim() || mediaPreview ? handleSend : startRecording}
             disabled={disabled || busy || sending}
           >
@@ -151,31 +157,31 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
         <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={() => setShowAttachMenu(false)}>
           <View style={styles.attachMenu}>
             <Text style={styles.attachMenuTitle}>Secure Clinical Attachment</Text>
-            
+
             <View style={styles.attachGrid}>
               <TouchableOpacity style={styles.attachOption} onPress={() => pickImage(true)}>
-                <View style={[styles.attachOptionIconBg, { backgroundColor: 'rgba(59, 130, 246, 0.1)' }]}>
+                <View style={[styles.attachOptionIconBg, { backgroundColor: COLORS.blueLight }]}>
                   <Text style={styles.attachOptionIcon}>📷</Text>
                 </View>
                 <Text style={styles.attachOptionText}>Camera</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.attachOption} onPress={() => pickImage(false)}>
-                <View style={[styles.attachOptionIconBg, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                <View style={[styles.attachOptionIconBg, { backgroundColor: COLORS.emeraldLight }]}>
                   <Text style={styles.attachOptionIcon}>🖼️</Text>
                 </View>
                 <Text style={styles.attachOptionText}>Gallery</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.attachOption} onPress={() => pickImage(false)}>
-                <View style={[styles.attachOptionIconBg, { backgroundColor: 'rgba(245, 158, 11, 0.1)' }]}>
+                <View style={[styles.attachOptionIconBg, { backgroundColor: COLORS.amberLight }]}>
                   <Text style={styles.attachOptionIcon}>🎥</Text>
                 </View>
                 <Text style={styles.attachOptionText}>Video</Text>
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.attachOption} onPress={() => pickDocument()}>
-                <View style={[styles.attachOptionIconBg, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
+                <View style={[styles.attachOptionIconBg, { backgroundColor: COLORS.purpleLight }]}>
                   <Text style={styles.attachOptionIcon}>📄</Text>
                 </View>
                 <Text style={styles.attachOptionText}>Document</Text>
@@ -188,27 +194,27 @@ export const ChatInput: React.FC<ChatInputProps> = ({ onSend, disabled, onTyping
   );
 };
 
-const styles = StyleSheet.create({
-  inputContainer: { backgroundColor: '#111D35', borderTopWidth: 1, borderTopColor: '#1E2D4A', padding: SPACING.md, paddingBottom: 30 },
-  mediaPreviewBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#1E2D4A', padding: 8, borderRadius: RADIUS.md, marginBottom: SPACING.md },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  inputContainer: { backgroundColor: COLORS.bg, borderTopWidth: 1, borderTopColor: COLORS.inputBorder, padding: SPACING.md, paddingBottom: 30 },
+  mediaPreviewBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.bg, padding: 8, borderRadius: RADIUS.md, marginBottom: SPACING.md },
   mediaPreviewIcon: { fontSize: 16, marginRight: 8 },
-  mediaPreviewText: { color: '#F1F5F9', flex: 1, fontSize: 13, fontWeight: '500' },
+  mediaPreviewText: { color: COLORS.textDark, flex: 1, fontSize: 13, fontWeight: '500' },
   mediaPreviewClose: { padding: 4 },
   inputRow: { flexDirection: 'row', alignItems: 'flex-end' },
-  attachBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#1E2D4A', alignItems: 'center', justifyContent: 'center', marginRight: SPACING.sm },
-  attachIcon: { color: '#0D9488', fontSize: 24, fontWeight: '300', marginTop: -2 },
-  textInput: { flex: 1, backgroundColor: '#1E2D4A', borderRadius: 20, minHeight: 40, maxHeight: 100, color: '#F1F5F9', paddingHorizontal: 16, paddingVertical: 10, fontSize: 15 },
-  sendBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#0D9488', alignItems: 'center', justifyContent: 'center', marginLeft: SPACING.sm },
-  sendIcon: { color: '#FFF', fontSize: 16, marginLeft: 2 },
-  recordingIndicator: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1E2D4A', borderRadius: 20, height: 44 },
-  recordingDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#EF4444', marginRight: 10 },
-  recordingText: { color: '#F1F5F9', fontSize: 15, fontWeight: '600' },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  attachMenu: { backgroundColor: '#111D35', borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, padding: SPACING.lg, paddingBottom: 40 },
-  attachMenuTitle: { color: '#F1F5F9', fontSize: 16, fontWeight: '700', marginBottom: SPACING.lg, textAlign: 'center' },
+  attachBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.bg, alignItems: 'center', justifyContent: 'center', marginRight: SPACING.sm },
+  attachIcon: { color: COLORS.teal, fontSize: 24, fontWeight: '300', marginTop: -2 },
+  textInput: { flex: 1, backgroundColor: COLORS.bg, borderRadius: 20, minHeight: 40, maxHeight: 100, color: COLORS.textDark, paddingHorizontal: 16, paddingVertical: 10, fontSize: 15 },
+  sendBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: COLORS.tealFill, alignItems: 'center', justifyContent: 'center', marginLeft: SPACING.sm },
+  sendIcon: { color: COLORS.onAccent, fontSize: 16, marginLeft: 2 },
+  recordingIndicator: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.bg, borderRadius: 20, height: 44 },
+  recordingDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: COLORS.red, marginRight: 10 },
+  recordingText: { color: COLORS.textDark, fontSize: 15, fontWeight: '600' },
+  modalOverlay: { flex: 1, backgroundColor: COLORS.modalBackdrop, justifyContent: 'flex-end' },
+  attachMenu: { backgroundColor: COLORS.bg, borderTopLeftRadius: RADIUS.xl, borderTopRightRadius: RADIUS.xl, padding: SPACING.lg, paddingBottom: 40 },
+  attachMenuTitle: { color: COLORS.textDark, fontSize: 16, fontWeight: '700', marginBottom: SPACING.lg, textAlign: 'center' },
   attachGrid: { flexDirection: 'row', justifyContent: 'space-around' },
   attachOption: { alignItems: 'center' },
   attachOptionIconBg: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
   attachOptionIcon: { fontSize: 24 },
-  attachOptionText: { color: '#94A3B8', fontSize: 12, fontWeight: '500' },
-});
+  attachOptionText: { color: COLORS.textBody, fontSize: 12, fontWeight: '500' },
+}));

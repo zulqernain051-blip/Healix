@@ -1,13 +1,18 @@
+
+
+
 import { useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '../store/auth';
 import { apiClient } from '../api/client';
-import { WorkflowPage, flowStyles as s } from '../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../components/common/WorkflowPage';
 import { downloadPrivateFile } from '../utils/fileTransfer';
 type Report={role:string;period:{from:string;to:string;timezone:string};metrics:{label:string;value:number|null;unit:string}[];tables:{title:string;rows:Record<string,string|number|null>[]}[];limitations:string[]};
 export default function Analytics() {
+  const s = useFlowStyles();
+
  const [from,setFrom]=useState(''),[to,setTo]=useState(''),[period,setPeriod]=useState(''),[error,setError]=useState(''),[exporting,setExporting]=useState(false);
  const actor=useAuthStore(state=>state.user),admin=actor?.role==='ADMIN';
  const [staffRole,setStaffRole]=useState('NURSE'),[staffPage,setStaffPage]=useState(1),[staffUserId,setStaffUserId]=useState('');

@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../../theme';
 import { useCallback } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -5,9 +7,12 @@ import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../../../store/auth';
 import { useNurseContracts } from '../../../../hooks/useContracts';
 import { ContractCard } from '../../../../components/contracts/ContractCard';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../../../theme';
+import { SPACING, TYPOGRAPHY } from '../../../../theme';
 
 export default function NurseContractsScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const { user } = useAuthStore();
   const nurseId = user?.nurseId;
@@ -25,7 +30,7 @@ export default function NurseContractsScreen() {
   if (isLoading && !contracts) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={COLORS.primary} size="large" />
+        <ActivityIndicator color={COLORS.primaryText} size="large" />
       </View>
     );
   }
@@ -72,7 +77,7 @@ export default function NurseContractsScreen() {
           <RefreshControl
             refreshing={isLoading}
             onRefresh={handleRefresh}
-            tintColor={COLORS.primary}
+            tintColor={COLORS.primaryText}
             colors={[COLORS.primary]}
           />
         }
@@ -81,7 +86,7 @@ export default function NurseContractsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
@@ -144,4 +149,4 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
-});
+}));

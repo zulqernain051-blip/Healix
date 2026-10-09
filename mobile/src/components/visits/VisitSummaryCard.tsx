@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -11,6 +14,9 @@ interface VisitSummaryCardProps {
 }
 
 export const VisitSummaryCard: React.FC<VisitSummaryCardProps> = ({ visit, onPress }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const patientName = visit.request?.patient?.user?.fullName || 'Patient';
   const scheduledAt = visit.request?.scheduledAt
     ? new Date(visit.request.scheduledAt).toLocaleString()
@@ -40,15 +46,15 @@ export const VisitSummaryCard: React.FC<VisitSummaryCardProps> = ({ visit, onPre
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
     padding: SPACING.lg,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: COLORS.inputBorder,
     marginBottom: SPACING.lg,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -56,10 +62,10 @@ const styles = StyleSheet.create({
   },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
   infoCol: { flex: 1, paddingRight: 12 },
-  patientName: { color: '#1E293B', fontSize: 16, fontWeight: '800' },
-  visitType: { color: '#00E676', fontSize: 12, fontWeight: '600', marginTop: 4 },
-  footerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: '#F1F5F9', paddingTop: 12 },
-  metaText: { color: '#64748B', fontSize: 12, fontWeight: '500' },
-  viewLink: { color: '#00E676', fontSize: 13, fontWeight: '700', marginTop: 8 },
-});
+  patientName: { color: COLORS.textMuted, fontSize: 16, fontWeight: '800' },
+  visitType: { color: COLORS.emerald, fontSize: 12, fontWeight: '600', marginTop: 4 },
+  footerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: COLORS.inputBorder, paddingTop: 12 },
+  metaText: { color: COLORS.textBody, fontSize: 12, fontWeight: '500' },
+  viewLink: { color: COLORS.emerald, fontSize: 13, fontWeight: '700', marginTop: 8 },
+}));
 

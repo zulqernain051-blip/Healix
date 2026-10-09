@@ -1,13 +1,18 @@
+import { useAppTheme, useThemeValue, usePaperTheme } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { Stack, usePathname } from 'expo-router';
 import { navigate } from '../../utils/navigation';
-import { Text, Avatar, Provider as PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { Text, Avatar, Provider as PaperProvider } from 'react-native-paper';
 import { useAuthStore } from '../../store/auth';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 
 function DoctorRootLayout() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const { width } = useWindowDimensions();
   const pathname = usePathname();
@@ -91,7 +96,7 @@ function DoctorRootLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   webContainer: { flex: 1, flexDirection: 'row', backgroundColor: COLORS.surface },
   sidebar: { width: 250, backgroundColor: COLORS.navyDark, borderRightWidth: 1, borderRightColor: COLORS.inputBorder, paddingVertical: SPACING.xl, paddingHorizontal: SPACING.md, justifyContent: 'space-between' },
   sidebarHeader: { marginBottom: SPACING.xl, paddingHorizontal: SPACING.sm },
@@ -103,14 +108,17 @@ const styles = StyleSheet.create({
   sidebarProfileName: { color: COLORS.headerText, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: 'bold' },
   sidebarProfileRole: { color: COLORS.headerText, fontSize: 10, marginTop: 2 },
   navMenu: { flex: 1, gap: SPACING.xs },
-  sidebarNavItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, paddingHorizontal: SPACING.md, borderRadius: RADIUS.sm, backgroundColor: 'transparent' },
+  sidebarNavItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, paddingHorizontal: SPACING.md, borderRadius: RADIUS.sm, backgroundColor: COLORS.transparent },
   sidebarNavItemActive: { backgroundColor: COLORS.navy },
   sidebarNavLabel: { color: COLORS.headerText, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '500', marginLeft: SPACING.sm },
   sidebarNavLabelActive: { color: COLORS.headerText, fontWeight: 'bold' },
-  sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.08)', paddingTop: SPACING.md },
+  sidebarFooter: { borderTopWidth: 1, borderTopColor: COLORS.glassBorder, paddingTop: SPACING.md },
   encryptionNotice: { color: COLORS.headerText, fontSize: 11, textAlign: 'center' },
   webContent: { flex: 1, backgroundColor: COLORS.surface },
-});
+}));
 
 
-export default function DoctorLayout() { return <PaperProvider theme={{ ...MD3LightTheme, colors: { ...MD3LightTheme.colors, primary: COLORS.navy } }}><DoctorRootLayout /></PaperProvider>; }
+export default function DoctorLayout() {
+  const { colors: COLORS } = useAppTheme();
+  const paperTheme = usePaperTheme();
+ return <PaperProvider theme={paperTheme}><DoctorRootLayout /></PaperProvider>; }

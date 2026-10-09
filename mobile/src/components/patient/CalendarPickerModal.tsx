@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, Modal } from 'react-native';
 import { Text, Button } from 'react-native-paper';
@@ -16,6 +19,9 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
   selectedDate,
   onSelectDate,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
 
@@ -133,7 +139,7 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
 
           {/* Actions */}
           <View style={styles.actions}>
-            <Button mode="text" textColor="#94A3B8" onPress={onClose}>
+            <Button mode="text" textColor={COLORS.textBody} onPress={onClose}>
               Cancel
             </Button>
           </View>
@@ -143,10 +149,10 @@ export const CalendarPickerModal: React.FC<CalendarPickerModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
+    backgroundColor: COLORS.modalBackdrop,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.lg,
@@ -154,11 +160,11 @@ const styles = StyleSheet.create({
   modalCard: {
     width: '100%',
     maxWidth: 360,
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.3)',
+    borderColor: COLORS.emeraldLight,
   },
   header: {
     flexDirection: 'row',
@@ -170,17 +176,17 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   navText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 22,
     fontWeight: '800',
   },
   monthYearTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 16,
     fontWeight: '800',
   },
@@ -189,13 +195,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 230, 118, 0.15)',
+    borderBottomColor: COLORS.emeraldLight,
     paddingBottom: 8,
   },
   weekDayText: {
     width: '14%',
     textAlign: 'center',
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -216,25 +222,25 @@ const styles = StyleSheet.create({
     marginVertical: 2,
   },
   dayCellSelected: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   dayCellDisabled: {
     opacity: 0.3,
   },
   dayText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 13,
     fontWeight: '600',
   },
   dayTextSelected: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '800',
   },
   dayTextDisabled: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
   },
   actions: {
     marginTop: SPACING.md,
     alignItems: 'flex-end',
   },
-});
+}));

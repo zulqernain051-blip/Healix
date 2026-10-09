@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -15,6 +18,9 @@ interface VisitProgressBarProps {
 }
 
 export const VisitProgressBar: React.FC<VisitProgressBarProps> = ({ steps }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.container}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -57,15 +63,15 @@ export const VisitProgressBar: React.FC<VisitProgressBarProps> = ({ steps }) => 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   scrollContent: {
     alignItems: 'center',
@@ -80,40 +86,40 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: RADIUS.round,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: COLORS.glassSurface,
   },
   completedChip: {
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
+    backgroundColor: COLORS.emeraldLight,
   },
   activeChip: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   stepIcon: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
     marginRight: 4,
     fontWeight: '700',
   },
   stepLabel: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
     fontWeight: '600',
   },
   completedText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontWeight: '700',
   },
   activeText: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '800',
   },
   connector: {
     width: 12,
     height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.glassSurface,
     marginHorizontal: 4,
   },
   completedConnector: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
-});
+}));

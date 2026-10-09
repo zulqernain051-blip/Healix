@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -18,6 +21,9 @@ interface VitalsEntryFormProps {
 }
 
 export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLoading = false }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [systolic, setSystolic] = useState('');
   const [diastolic, setDiastolic] = useState('');
   const [heartRate, setHeartRate] = useState('');
@@ -73,7 +79,7 @@ export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLo
           <TextInput
             style={[styles.input, errors.systolic && styles.inputError]}
             placeholder="e.g. 120"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             keyboardType="numeric"
             value={systolic}
             onChangeText={setSystolic}
@@ -87,7 +93,7 @@ export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLo
           <TextInput
             style={[styles.input, errors.diastolic && styles.inputError]}
             placeholder="e.g. 80"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             keyboardType="numeric"
             value={diastolic}
             onChangeText={setDiastolic}
@@ -101,7 +107,7 @@ export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLo
           <TextInput
             style={[styles.input, errors.heartRate && styles.inputError]}
             placeholder="e.g. 72"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             keyboardType="numeric"
             value={heartRate}
             onChangeText={setHeartRate}
@@ -115,7 +121,7 @@ export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLo
           <TextInput
             style={[styles.input, errors.temperature && styles.inputError]}
             placeholder="e.g. 36.8"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             keyboardType="numeric"
             value={temperature}
             onChangeText={setTemperature}
@@ -129,7 +135,7 @@ export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLo
           <TextInput
             style={[styles.input, errors.spO2 && styles.inputError]}
             placeholder="e.g. 98"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             keyboardType="numeric"
             value={spO2}
             onChangeText={setSpO2}
@@ -143,7 +149,7 @@ export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLo
           <TextInput
             style={styles.input}
             placeholder="Optional e.g. 110"
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             keyboardType="numeric"
             value={bloodSugar}
             onChangeText={setBloodSugar}
@@ -156,23 +162,23 @@ export const VitalsEntryForm: React.FC<VitalsEntryFormProps> = ({ onSubmit, isLo
         onPress={handleSubmit}
         disabled={isLoading}
       >
-        {isLoading ? <ActivityIndicator size="small" color="#061C19" /> : <Text style={styles.submitBtnText}>Save & Log Vitals</Text>}
+        {isLoading ? <ActivityIndicator size="small" color={COLORS.textMuted} /> : <Text style={styles.submitBtnText}>Save & Log Vitals</Text>}
       </TouchableOpacity>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
     marginBottom: SPACING.md,
@@ -187,30 +193,30 @@ const styles = StyleSheet.create({
     width: '47%',
   },
   label: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
     marginBottom: 4,
   },
   input: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   inputError: {
-    borderColor: '#EF4444',
+    borderColor: COLORS.red,
   },
   errText: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: 9,
     marginTop: 2,
   },
   submitBtn: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     borderRadius: RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
@@ -219,8 +225,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },
-});
+}));

@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../../theme';
 import { ContractHistory } from '../../../../components/contracts/ContractHistory';
 import { appAlert, confirmAction } from '../../../../components/common/AppDialogs';
 import React, { useState } from 'react';
@@ -8,9 +10,12 @@ import { navigate } from '../../../../utils/navigation';
 import { useContract, useApproveContract, useRejectContract, useCancelContract } from '../../../../hooks/useContracts';
 import { ContractApprovalPanel } from '../../../../components/contracts/ContractApprovalPanel';
 import { ContractStatusBadge } from '../../../../components/contracts/ContractStatusBadge';
-import { COLORS, SPACING, TYPOGRAPHY, RADIUS } from '../../../../theme';
+import { SPACING, TYPOGRAPHY, RADIUS } from '../../../../theme';
 
 export default function PatientContractDetailScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const contractId = id || '';
   const router = useRouter();
@@ -64,7 +69,7 @@ export default function PatientContractDetailScreen() {
   if (isLoading && !contract) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={COLORS.primary} size="large" />
+        <ActivityIndicator color={COLORS.primaryText} size="large" />
       </View>
     );
   }
@@ -122,7 +127,7 @@ export default function PatientContractDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.bg,
@@ -181,4 +186,4 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.bodySmall,
     color: COLORS.textSecondary,
   },
-});
+}));

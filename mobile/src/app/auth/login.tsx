@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
@@ -15,6 +18,9 @@ import { useAuthStore } from '../../store/auth';
  * redirects unverified users to OTP verification.
  */
 export default function LoginScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const params = useLocalSearchParams<{ message?: string }>();
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -86,8 +92,8 @@ export default function LoginScreen() {
           keyboardType="email-address"
           autoCapitalize="none"
           style={styles.input}
-          outlineColor="#E5E7EB"
-          activeOutlineColor="#0D9488"
+          outlineColor={COLORS.inputBorder}
+          activeOutlineColor={COLORS.teal}
         />
 
         <TextInput
@@ -106,8 +112,8 @@ export default function LoginScreen() {
             />
           }
           style={styles.input}
-          outlineColor="#E5E7EB"
-          activeOutlineColor="#0D9488"
+          outlineColor={COLORS.inputBorder}
+          activeOutlineColor={COLORS.teal}
         />
 
         {error && (
@@ -123,7 +129,7 @@ export default function LoginScreen() {
           disabled={isLoading || !emailOrPhone || !password}
           style={styles.button}
           contentStyle={styles.buttonContent}
-          buttonColor="#0D9488">
+          buttonColor={COLORS.tealFill} textColor={COLORS.onAccent}>
           Sign In
         </Button>
         <GoogleSignInButton onCredential={handleGoogleCredential} onError={setGoogleError} disabled={googleBusy || isLoading} />
@@ -148,7 +154,7 @@ export default function LoginScreen() {
           }}
           style={{ marginTop: 12, alignItems: 'center' }}
         >
-          <Text style={{ color: '#0D9488', fontWeight: '600', fontSize: 13 }}>
+          <Text style={{ color: COLORS.teal, fontWeight: '600', fontSize: 13 }}>
             Forgot Password?
           </Text>
         </TouchableOpacity>
@@ -157,12 +163,12 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.surfaceCard,
   },
   header: {
     alignItems: 'center',
@@ -171,19 +177,19 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 42,
     fontWeight: 'bold',
-    color: '#0D9488',
+    color: COLORS.teal,
     letterSpacing: 1,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: COLORS.textBody,
     marginTop: 4,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: 16,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -192,17 +198,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#111827',
+    color: COLORS.textMuted,
   },
   hint: {
     fontSize: 14,
-    color: '#6B7280',
+    color: COLORS.textBody,
     marginBottom: 24,
     marginTop: 4,
   },
   input: {
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
   },
   button: {
     marginTop: 8,
@@ -221,12 +227,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   footerText: {
-    color: '#6B7280',
+    color: COLORS.textBody,
     fontSize: 14,
   },
   link: {
-    color: '#0D9488',
+    color: COLORS.teal,
     fontWeight: 'bold',
     fontSize: 14,
   },
-});
+}));

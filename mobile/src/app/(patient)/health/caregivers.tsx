@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, StatusBar } from 'react-native';
 import { Text, Card, Avatar, Chip } from 'react-native-paper';
@@ -9,6 +12,11 @@ import { LoadingState } from '../../../components/common/LoadingState';
 import { ErrorState } from '../../../components/common/ErrorState';
 
 export default function CaregiversScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
 
@@ -19,7 +27,7 @@ export default function CaregiversScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         
         {/* Header */}
@@ -36,7 +44,7 @@ export default function CaregiversScreen() {
             subtitle="Delegated clinical access settings"
             subtitleStyle={styles.cardSub}
             left={(props) => (
-              <Avatar.Icon {...props} icon="account-group" color="#FFFFFF" style={{ backgroundColor: '#F59E0B' }} />
+              <Avatar.Icon {...props} icon="account-group" color={COLORS.textDark} style={{ backgroundColor: COLORS.amber }} />
             )}
           />
           <Card.Content>
@@ -64,10 +72,10 @@ export default function CaregiversScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     padding: SPACING.lg,
@@ -84,39 +92,39 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
   subtitle: {
     fontSize: 13,
-    color: '#94A3B8',
+    color: COLORS.textBody,
     marginBottom: SPACING.lg,
   },
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   cardTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontWeight: '700',
     fontSize: 16,
   },
   cardSub: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
   },
   emptyText: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     textAlign: 'center',
     marginVertical: 16,
     fontStyle: 'italic',
   },
   linkItem: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 230, 118, 0.1)',
+    borderBottomColor: COLORS.emeraldLight,
     paddingVertical: 14,
   },
   linkHeader: {
@@ -128,20 +136,20 @@ const styles = StyleSheet.create({
   linkName: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: COLORS.textDark,
   },
   accessChip: {
-    backgroundColor: 'rgba(245, 158, 11, 0.2)',
+    backgroundColor: COLORS.amberLight,
   },
   chipText: {
-    color: '#FDE68A',
+    color: COLORS.amber,
     fontWeight: 'bold',
     fontSize: 11,
   },
   linkDetail: {
     fontSize: 12,
-    color: '#94A3B8',
+    color: COLORS.textBody,
     marginTop: 2,
   },
-});
+}));
 

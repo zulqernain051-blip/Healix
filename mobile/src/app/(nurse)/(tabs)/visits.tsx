@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView, SafeAreaView, RefreshControl, TouchableOpacity, StatusBar } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,6 +19,11 @@ const FILTERS: Array<{ key: string; label: string }> = [
 ];
 
 export default function NurseVisitsScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const nurseId = user?.nurseId || user?.id || '';
   const { data: visits, isLoading, error, refetch } = useNurseVisits(nurseId);
@@ -35,7 +43,7 @@ export default function NurseVisitsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.headerBox}>
         <Text style={styles.headerTitle}>Assigned Visits</Text>
         <Text style={styles.headerSub}>Manage your care schedule</Text>
@@ -44,7 +52,7 @@ export default function NurseVisitsScreen() {
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#00E676" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.emerald} />}
       >
         {/* Filter Pills */}
         <View style={styles.filterRow}>
@@ -95,21 +103,21 @@ export default function NurseVisitsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
   headerBox: { padding: 20, paddingBottom: 24 },
-  headerTitle: { color: '#FFFFFF', fontSize: 24, fontWeight: '800' },
-  headerSub: { color: '#00E676', fontSize: 14, marginTop: 6, fontWeight: '600' },
-  scroll: { flex: 1, backgroundColor: '#F8FAFC', borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
+  headerTitle: { color: COLORS.onAccent, fontSize: 24, fontWeight: '800' },
+  headerSub: { color: COLORS.emerald, fontSize: 14, marginTop: 6, fontWeight: '600' },
+  scroll: { flex: 1, backgroundColor: COLORS.surfaceCard, borderTopLeftRadius: 30, borderTopRightRadius: 30, overflow: 'hidden' },
   scrollContent: { padding: 20, paddingBottom: 40, paddingTop: 24 },
   filterRow: { flexDirection: 'row', gap: 8, marginBottom: 20 },
-  pill: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, backgroundColor: '#E2E8F0' },
-  pillActive: { backgroundColor: '#00E676' },
-  pillText: { fontSize: 12, fontWeight: '600', color: '#64748B' },
-  pillTextActive: { color: '#061C19' },
+  pill: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 20, backgroundColor: COLORS.surfaceCard },
+  pillActive: { backgroundColor: COLORS.emerald },
+  pillText: { fontSize: 12, fontWeight: '600', color: COLORS.textBody },
+  pillTextActive: { color: COLORS.textMuted },
   centered: { flex: 1, alignItems: 'center', paddingTop: 60 },
-  mutedText: { color: '#94A3B8', fontSize: 13, textAlign: 'center', marginTop: 4 },
-  emptyTitle: { color: '#1E293B', fontSize: 18, fontWeight: '700' },
-  errorText: { color: '#EF4444', fontSize: 15, fontWeight: '600' },
-});
+  mutedText: { color: COLORS.textBody, fontSize: 13, textAlign: 'center', marginTop: 4 },
+  emptyTitle: { color: COLORS.textMuted, fontSize: 18, fontWeight: '700' },
+  errorText: { color: COLORS.red, fontSize: 15, fontWeight: '600' },
+}));
 

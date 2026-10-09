@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useLocalSearchParams } from 'expo-router';
 import { hasValidCoordinates } from '../../../utils/location';
@@ -16,7 +18,7 @@ import {
 import { Text, Button } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { goBack, navigate } from '../../../utils/navigation';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 import { RequestTemplateSelector, RequestTemplate } from '../../../components/care/RequestTemplateSelector';
 import { ScheduleTypeSelector } from '../../../components/care/ScheduleTypeSelector';
@@ -29,6 +31,11 @@ import { useAuthStore } from '../../../store/auth';
 import { usePatientProfile } from '../../../hooks/usePatient';
 
 export default function NewCareRequestScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const params = useLocalSearchParams<{ scheduleType?: string }>();
   const createCareRequest = useCreateCareRequest();
   const { user } = useAuthStore();
@@ -152,9 +159,9 @@ export default function NewCareRequestScreen() {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.transparent} translucent />
       <LinearGradient
-        colors={['#A7D8F0', '#B5E3D8', '#D4C5E2', '#E8B4C8', '#A7D8F0']}
+        colors={[COLORS.gradientStart, COLORS.gradientMid, COLORS.gradientEnd, COLORS.gradientEnd, COLORS.gradientEnd]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -191,7 +198,7 @@ export default function NewCareRequestScreen() {
             <TextInput
               style={[styles.glassInput, styles.textArea]}
               placeholder="Describe your medical needs..."
-              placeholderTextColor="rgba(30, 41, 59, 0.45)"
+              placeholderTextColor={COLORS.textMuted}
               value={notes}
               onChangeText={setNotes}
               multiline
@@ -201,7 +208,7 @@ export default function NewCareRequestScreen() {
             <TextInput
               style={styles.glassInput}
               placeholder="e.g. Female Nurse, Wound Care Specialist"
-              placeholderTextColor="rgba(30, 41, 59, 0.45)"
+              placeholderTextColor={COLORS.textMuted}
               value={requirements}
               onChangeText={setRequirements}
             />
@@ -210,7 +217,7 @@ export default function NewCareRequestScreen() {
             <TextInput
               style={styles.glassInput}
               placeholder="45"
-              placeholderTextColor="rgba(30, 41, 59, 0.45)"
+              placeholderTextColor={COLORS.textMuted}
               value={duration}
               onChangeText={setDuration}
               keyboardType="numeric"
@@ -245,7 +252,7 @@ export default function NewCareRequestScreen() {
                       ]}
                       onPress={() => setRecurringFrequency(freq as any)}
                     >
-                      <Text style={{ color: recurringFrequency === freq ? COLORS.navy : COLORS.textBody, fontWeight: '600' }}>{freq}</Text>
+                      <Text style={{ color: recurringFrequency === freq ? COLORS.primaryText : COLORS.textBody, fontWeight: '600' }}>{freq}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -277,7 +284,7 @@ export default function NewCareRequestScreen() {
             disabled={!isFormValid() || createCareRequest.isPending}
           >
             <LinearGradient
-              colors={['#29A9F5', '#8B5CF6', '#D946EF']}
+              colors={[COLORS.actionStart, COLORS.actionMid, COLORS.actionEnd]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.submitGradient}
@@ -295,7 +302,7 @@ export default function NewCareRequestScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   root: {
     flex: 1,
   },
@@ -315,10 +322,10 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: COLORS.glassSurface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: COLORS.glassBorder,
   },
   backBtnText: {
     color: COLORS.textDark,
@@ -335,10 +342,10 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: COLORS.glassSurface,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: COLORS.glassBorder,
   },
   settingsBtnText: {
     color: COLORS.textDark,
@@ -355,14 +362,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   glassCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.30)',
+    backgroundColor: COLORS.glassSurface,
     borderRadius: RADIUS.xl,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.50)',
+    borderColor: COLORS.glassBorder,
     // Shadow for depth
-    shadowColor: 'rgba(0, 0, 0, 0.08)',
+    shadowColor: COLORS.shadowSoft,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 1,
     shadowRadius: 12,
@@ -376,9 +383,9 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   glassInput: {
-    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    backgroundColor: COLORS.glassSurface,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.60)',
+    borderColor: COLORS.glassBorder,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     color: COLORS.textDark,
@@ -406,7 +413,7 @@ const styles = StyleSheet.create({
   submitBtnLabel: {
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     letterSpacing: 0.3,
   },
-});
+}));

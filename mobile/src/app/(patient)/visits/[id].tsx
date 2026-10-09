@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { VisitCompletionPanel } from '../../../components/visits/VisitCompletionPanel';
 import React, { useState } from 'react';
 import { View, ScrollView, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
@@ -12,6 +15,11 @@ import { visitsApi } from '../../../api/visits.api';
 import { SPACING, RADIUS } from '../../../theme';
 
 export default function PatientVisitDetailScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const visitId = id || '';
 
@@ -24,9 +32,9 @@ export default function PatientVisitDetailScreen() {
   if (isLoading && !visit) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+        <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#00E676" />
+          <ActivityIndicator size="large" color={COLORS.emerald} />
           <Text style={styles.loadingText}>Loading visit...</Text>
         </View>
       </SafeAreaView>
@@ -36,10 +44,10 @@ export default function PatientVisitDetailScreen() {
   if (error || !visit) {
     return (
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+        <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
         <View style={styles.centered}>
           <Text style={styles.errorText}>{error ? (error as Error).message : 'Visit not found'}</Text>
-          <Button mode="text" textColor="#00E676" onPress={() => refetch()}>Retry</Button>
+          <Button mode="text" textColor={COLORS.emerald} onPress={() => refetch()}>Retry</Button>
         </View>
       </SafeAreaView>
     );
@@ -49,7 +57,7 @@ export default function PatientVisitDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
 
       <View style={styles.headerRow}>
         <TouchableOpacity onPress={goBack} style={styles.backBtn}>
@@ -62,7 +70,7 @@ export default function PatientVisitDetailScreen() {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
         <VisitInfoCard visit={visit} />
         <VisitCompletionPanel visit={visit} onChanged={refetch} />
-        {!!actionError && <Text style={{ color: '#EF4444' }}>{actionError}</Text>}
+        {!!actionError && <Text style={{ color: COLORS.red }}>{actionError}</Text>}
         {isActive && !visit.patientConfirmed && <><Text style={styles.qrSubtitle}>Confirm only after your assigned nurse arrives. This enables manual verification if QR or GPS cannot be used.</Text><Button mode="contained" loading={confirmArrival.isPending} disabled={confirmArrival.isPending} onPress={async () => { setActionError(''); try { await confirmArrival.mutateAsync(visitId); } catch(e: any) { setActionError(e.message); } }}>Confirm nurse has arrived</Button></>}
         {visit.patientConfirmed && <Text style={styles.summaryItem}>Arrival confirmed</Text>}
         {visit.status === 'COMPLETED' && visit.nurseId && <View style={styles.completedCard}>{visit.review ? <><Text style={styles.completedTitle}>Your feedback: {visit.review.stars}/5</Text><Text style={styles.qrSubtitle}>{visit.review.reviewText}</Text></> : <><Text style={styles.completedTitle}>Rate your nurse</Text><TextInput label="Stars (1–5)" value={stars} onChangeText={setStars} keyboardType="number-pad" /><TextInput label="Review (optional)" value={reviewText} onChangeText={setReview} multiline /><Text style={styles.qrSubtitle}>Would you recommend this nurse?</Text><Switch value={recommend} onValueChange={setRecommend} /><Button mode="contained" loading={reviewing} disabled={reviewing} onPress={() => void review()}>Submit feedback</Button></>}</View>}
@@ -77,16 +85,16 @@ export default function PatientVisitDetailScreen() {
 
             <View style={styles.qrCard}>
               {qrLoading ? (
-                <ActivityIndicator size="large" color="#00E676" />
+                <ActivityIndicator size="large" color={COLORS.emerald} />
               ) : qrData?.token ? (
                 <View style={styles.qrWrapper}>
-                  <QRCode value={qrData.token} size={200} color="#061C19" backgroundColor="#FFFFFF" />
+                  <QRCode value={qrData.token} size={200} color={COLORS.textMuted} backgroundColor={COLORS.surfaceCard} />
                   <Text style={styles.tokenPreview}>{qrData.token.substring(0, 16)}...</Text>
                 </View>
               ) : (
                 <View style={styles.qrError}>
                   <Text style={styles.qrErrorText}>QR code not available</Text>
-                  <Button mode="outlined" textColor="#00E676" style={{ borderColor: '#00E676', marginTop: 8 }} onPress={() => refetchQr()}>
+                  <Button mode="outlined" textColor={COLORS.emerald} style={{ borderColor: COLORS.emerald, marginTop: 8 }} onPress={() => refetchQr()}>
                     Retry
                   </Button>
                 </View>
@@ -95,8 +103,8 @@ export default function PatientVisitDetailScreen() {
 
             <Button
               mode="contained"
-              buttonColor="#00E676"
-              textColor="#061C19"
+              buttonColor={COLORS.emeraldFill}
+              textColor={COLORS.textMuted}
               style={styles.refreshBtn}
               onPress={() => refetchQr()}
               labelStyle={{ fontWeight: '700' }}
@@ -125,29 +133,29 @@ export default function PatientVisitDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: COLORS.bg },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: SPACING.lg },
   backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
-  backIcon: { color: '#FFFFFF', fontSize: 28 },
-  headerTitle: { color: '#FFFFFF', fontSize: 17, fontWeight: '700' },
+  backIcon: { color: COLORS.textDark, fontSize: 28 },
+  headerTitle: { color: COLORS.onAccent, fontSize: 17, fontWeight: '700' },
   scroll: { flex: 1 },
   content: { padding: SPACING.lg, paddingBottom: 40 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#94A3B8', marginTop: 10, fontSize: 14 },
-  errorText: { color: '#EF4444', fontSize: 15, fontWeight: '600', marginBottom: 10 },
+  loadingText: { color: COLORS.textBody, marginTop: 10, fontSize: 14 },
+  errorText: { color: COLORS.red, fontSize: 15, fontWeight: '600', marginBottom: 10 },
   qrSection: { alignItems: 'center', marginBottom: SPACING.xl },
-  qrTitle: { color: '#FFFFFF', fontSize: 20, fontWeight: '800', marginBottom: 8 },
-  qrSubtitle: { color: '#94A3B8', fontSize: 13, textAlign: 'center', marginBottom: 24, lineHeight: 20 },
+  qrTitle: { color: COLORS.textDark, fontSize: 20, fontWeight: '800', marginBottom: 8 },
+  qrSubtitle: { color: COLORS.textBody, fontSize: 13, textAlign: 'center', marginBottom: 24, lineHeight: 20 },
   qrCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
     padding: 24,
     borderRadius: RADIUS.xl,
     alignItems: 'center',
     justifyContent: 'center',
     width: 260,
     minHeight: 280,
-    shadowColor: '#00E676',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.12,
     shadowRadius: 16,
@@ -155,19 +163,19 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   qrWrapper: { alignItems: 'center' },
-  tokenPreview: { color: '#64748B', fontSize: 11, marginTop: 16, fontFamily: 'monospace' },
+  tokenPreview: { color: COLORS.textBody, fontSize: 11, marginTop: 16, fontFamily: 'monospace' },
   qrError: { alignItems: 'center' },
-  qrErrorText: { color: '#94A3B8', fontSize: 13 },
+  qrErrorText: { color: COLORS.textBody, fontSize: 13 },
   refreshBtn: { width: '100%', borderRadius: RADIUS.md },
   completedCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    borderColor: COLORS.emeraldLight,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
   },
-  completedTitle: { color: '#10B981', fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  completedDate: { color: '#94A3B8', fontSize: 12, marginBottom: 12 },
-  summaryItem: { color: '#00E676', fontSize: 13, fontWeight: '600', marginBottom: 4 },
-});
+  completedTitle: { color: COLORS.emerald, fontSize: 18, fontWeight: '700', marginBottom: 8 },
+  completedDate: { color: COLORS.textBody, fontSize: 12, marginBottom: 12 },
+  summaryItem: { color: COLORS.emerald, fontSize: 13, fontWeight: '600', marginBottom: 4 },
+}));

@@ -1,6 +1,8 @@
+import { useAppTheme, useThemeValue } from '../theme/ThemeProvider';
+import type { ThemeColors } from '../theme';
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { COLORS } from '../theme';
+
 
 interface ShimmerLoaderProps {
   style?: StyleProp<ViewStyle>;
@@ -15,6 +17,9 @@ export const ShimmerLoader: React.FC<ShimmerLoaderProps> = ({
   height = 20,
   borderRadius = 6,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const opacity = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -52,8 +57,8 @@ export const ShimmerLoader: React.FC<ShimmerLoaderProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   shimmer: {
     backgroundColor: COLORS.cardElevated,
   },
-});
+}));

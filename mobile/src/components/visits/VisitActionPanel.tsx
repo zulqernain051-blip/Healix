@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Card, Button, Divider } from 'react-native-paper';
@@ -23,6 +26,9 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
   onComplete,
   isCompleting,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   if (visit.status === 'SCHEDULED' || visit.status === 'ACCEPTED') {
     return (
       <Card style={styles.card}>
@@ -34,8 +40,8 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
           </Text>
           <Button
             mode="contained"
-            buttonColor="#00E676"
-            textColor="#061C19"
+            buttonColor={COLORS.emeraldFill}
+            textColor={COLORS.textMuted}
             onPress={onVerify}
             style={styles.actionBtn}
             labelStyle={styles.btnLabel}
@@ -63,8 +69,8 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
           <View style={styles.actionsStack}>
             <Button
               mode="contained"
-              buttonColor={hasVitals ? '#10B981' : '#3B82F6'}
-              textColor="#FFFFFF"
+              buttonColor={hasVitals ? COLORS.emerald : COLORS.primaryText}
+              textColor={COLORS.textDark}
               onPress={onRecordVitals}
               labelStyle={styles.btnLabel}
             >
@@ -72,8 +78,8 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
             </Button>
             <Button
               mode="contained"
-              buttonColor={hasSymptoms ? '#10B981' : '#3B82F6'}
-              textColor="#FFFFFF"
+              buttonColor={hasSymptoms ? COLORS.emerald : COLORS.primaryText}
+              textColor={COLORS.textDark}
               onPress={onRecordSymptoms}
               labelStyle={styles.btnLabel}
             >
@@ -81,8 +87,8 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
             </Button>
             <Button
               mode="contained"
-              buttonColor={hasRemarks ? '#10B981' : '#8B5CF6'}
-              textColor="#FFFFFF"
+              buttonColor={hasRemarks ? COLORS.emerald : COLORS.purple}
+              textColor={COLORS.textDark}
               onPress={onRecordRemarks}
               labelStyle={styles.btnLabel}
             >
@@ -90,8 +96,8 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
             </Button>
             <Button
               mode="contained"
-              buttonColor="#00E676"
-              textColor="#061C19"
+              buttonColor={COLORS.emeraldFill}
+              textColor={COLORS.textMuted}
               onPress={onComplete}
               loading={isCompleting}
               disabled={isCompleting}
@@ -129,14 +135,14 @@ export const VisitActionPanel: React.FC<VisitActionPanelProps> = ({
   return null;
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: SPACING.lg },
-  sectionHeader: { color: '#FFFFFF', fontSize: 15, fontWeight: '700' },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', marginVertical: 12 },
-  description: { color: '#94A3B8', fontSize: 12, marginBottom: 12, lineHeight: 18 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: SPACING.lg },
+  sectionHeader: { color: COLORS.textDark, fontSize: 15, fontWeight: '700' },
+  divider: { backgroundColor: COLORS.emeraldLight, marginVertical: 12 },
+  description: { color: COLORS.textBody, fontSize: 12, marginBottom: 12, lineHeight: 18 },
   actionBtn: { borderRadius: RADIUS.md },
   btnLabel: { fontWeight: '700' },
   actionsStack: { gap: 10 },
-  summaryText: { color: '#00E676', fontSize: 13, fontWeight: '600', marginBottom: 6 },
-  completedAt: { color: '#94A3B8', fontSize: 12, marginTop: 8 },
-});
+  summaryText: { color: COLORS.emerald, fontSize: 13, fontWeight: '600', marginBottom: 6 },
+  completedAt: { color: COLORS.textBody, fontSize: 12, marginTop: 8 },
+}));

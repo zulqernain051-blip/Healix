@@ -1,12 +1,17 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter, useSegments } from 'expo-router';
 import { Text } from 'react-native-paper';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../theme';
+import { SPACING, TYPOGRAPHY } from '../../theme';
 
 type Role = 'patient' | 'nurse';
 
 export function RoleDetailNavigation({ role }: { role: Role }) {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const segments = useSegments() as string[];
   if (segments.includes('(tabs)')) return null;
@@ -27,10 +32,10 @@ export function RoleDetailNavigation({ role }: { role: Role }) {
   </View>;
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   back: { backgroundColor: COLORS.surfaceCard, paddingHorizontal: SPACING.lg, paddingVertical: SPACING.sm, borderTopWidth: 1, borderTopColor: COLORS.inputBorder },
-  backText: { color: COLORS.navy, ...TYPOGRAPHY.bodyMedium, fontWeight: '700' },
+  backText: { color: COLORS.primaryText, ...TYPOGRAPHY.bodyMedium, fontWeight: '700' },
   tabs: { flexDirection: 'row', backgroundColor: COLORS.surfaceCard, borderTopWidth: 1, borderTopColor: COLORS.inputBorder, paddingBottom: SPACING.sm },
   tab: { flex: 1, alignItems: 'center', paddingVertical: SPACING.sm },
-  tabText: { color: COLORS.navy, ...TYPOGRAPHY.bodySmall, fontWeight: '600' },
-});
+  tabText: { color: COLORS.primaryText, ...TYPOGRAPHY.bodySmall, fontWeight: '600' },
+}));

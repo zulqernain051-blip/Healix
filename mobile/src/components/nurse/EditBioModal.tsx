@@ -1,8 +1,10 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState, useEffect } from 'react';
 import { View, StyleSheet, Modal, Alert, ActivityIndicator } from 'react-native';
 import { Text, TextInput, Button } from 'react-native-paper';
 import { useUpdateProfile } from '../../hooks/useNurse';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 interface Props {
   visible: boolean;
@@ -14,6 +16,9 @@ interface Props {
 }
 
 export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExperience, initialPhotoUrl }: Props) {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [bio, setBio] = useState(initialBio);
   const [experience, setExperience] = useState(initialExperience);
   const [formError, setFormError] = useState('');
@@ -67,8 +72,8 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
             multiline
             numberOfLines={4}
             style={styles.input}
-            outlineColor="#E2E8F0"
-            activeOutlineColor="#00E676"
+            outlineColor={COLORS.inputBorder}
+            activeOutlineColor={COLORS.emerald}
           />
 
           <TextInput
@@ -78,8 +83,8 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
             mode="outlined"
             keyboardType="number-pad"
             style={styles.input}
-            outlineColor="#E2E8F0"
-            activeOutlineColor="#00E676"
+            outlineColor={COLORS.inputBorder}
+            activeOutlineColor={COLORS.emerald}
           />
 
           <TextInput
@@ -88,20 +93,20 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
             onChangeText={setPhotoUrl}
             mode="outlined"
             style={styles.input}
-            outlineColor="#E2E8F0"
-            activeOutlineColor="#00E676"
+            outlineColor={COLORS.inputBorder}
+            activeOutlineColor={COLORS.emerald}
           />
 
           {!!formError && <Text style={{ color: COLORS.red }}>{formError}</Text>}
           <View style={styles.modalActions}>
-            <Button mode="text" onPress={onClose} textColor="#64748B">Cancel</Button>
+            <Button mode="text" onPress={onClose} textColor={COLORS.textBody}>Cancel</Button>
             <Button
               mode="contained"
               onPress={handleSaveBio}
-              buttonColor="#00E676"
+              buttonColor={COLORS.emeraldFill} textColor={COLORS.onAccent}
               disabled={savingBio}
             >
-              {savingBio ? <ActivityIndicator color="#FFF" /> : 'Save Changes'}
+              {savingBio ? <ActivityIndicator color={COLORS.textDark} /> : 'Save Changes'}
             </Button>
           </View>
         </View>
@@ -110,10 +115,10 @@ export function EditBioModal({ visible, onClose, nurseId, initialBio, initialExp
   );
 }
 
-const styles = StyleSheet.create({
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: SPACING.md },
-  modalContent: { backgroundColor: '#FFF', borderRadius: RADIUS.lg, padding: SPACING.lg },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  modalOverlay: { flex: 1, backgroundColor: COLORS.modalBackdrop, justifyContent: 'center', padding: SPACING.md },
+  modalContent: { backgroundColor: COLORS.surfaceCard, borderRadius: RADIUS.lg, padding: SPACING.lg },
   modalTitle: { ...TYPOGRAPHY.h3, marginBottom: SPACING.md, color: COLORS.textDark },
-  input: { marginBottom: SPACING.sm, backgroundColor: '#FFF' },
+  input: { marginBottom: SPACING.sm, backgroundColor: COLORS.surfaceCard },
   modalActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: SPACING.md, gap: SPACING.sm },
-});
+}));

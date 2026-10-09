@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView, TouchableOpacity, SafeAreaView, StatusBar, Alert } from 'react-native';
@@ -25,6 +28,11 @@ const TABS = ['Overview', 'Conditions', 'Allergies', 'Medications'] as const;
 type Tab = typeof TABS[number];
 
 export default function MedicalHistoryScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const { user } = useAuthStore();
   const patientId = user?.patientId || '';
@@ -81,7 +89,7 @@ export default function MedicalHistoryScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.headerRow}>
@@ -202,10 +210,10 @@ export default function MedicalHistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#061C19',
+    backgroundColor: COLORS.bg,
   },
   container: {
     flex: 1,
@@ -224,18 +232,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backIcon: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 28,
     fontWeight: '300',
   },
   headerTitle: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: TYPOGRAPHY.sizes.lg,
     fontWeight: '700',
   },
   tabRow: {
     flexDirection: 'row',
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: 4,
     marginBottom: SPACING.lg,
@@ -247,15 +255,15 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm,
   },
   tabPillActive: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   tabText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
   },
   tabTextActive: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '700',
   },
   scrollContent: {
@@ -271,19 +279,19 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   sectionTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   addText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 12,
     fontWeight: '700',
   },
   primaryAddBtn: {
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
     borderWidth: 1.5,
-    borderColor: '#00E676',
+    borderColor: COLORS.emerald,
     borderStyle: 'dashed',
     borderRadius: RADIUS.lg,
     paddingVertical: SPACING.md,
@@ -291,9 +299,9 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   primaryAddBtnText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
-});
+}));
 

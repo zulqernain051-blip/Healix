@@ -1,3 +1,6 @@
+
+
+
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Text, Button, TextInput } from 'react-native-paper';
@@ -6,8 +9,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../store/auth';
 import { apiClient } from '../api/client';
 import { localDateTime } from '../utils/dates';
-import { WorkflowPage, flowStyles as s } from '../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../components/common/WorkflowPage';
 export default function CareAdherence() {
+  const s = useFlowStyles();
+
  const params = useLocalSearchParams<{ patientId?: string }>(); const user = useAuthStore(state => state.user); const patientId = params.patientId || user?.patientId || ''; const qc = useQueryClient();
  const [page, setPage] = useState(1);
  const records = useQuery({ queryKey: ['adherence', patientId, page], queryFn: async () => {

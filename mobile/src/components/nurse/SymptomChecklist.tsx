@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -32,6 +35,9 @@ interface SymptomChecklistProps {
 }
 
 export const SymptomChecklist: React.FC<SymptomChecklistProps> = ({ onSubmit, isLoading = false }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [selectedMap, setSelectedMap] = useState<{ [key: string]: 'MILD' | 'MODERATE' | 'SEVERE' }>({});
 
   const toggleSymptom = (name: string) => {
@@ -120,7 +126,7 @@ export const SymptomChecklist: React.FC<SymptomChecklistProps> = ({ onSubmit, is
         disabled={selectedCount === 0 || isLoading}
       >
         {isLoading ? (
-          <ActivityIndicator size="small" color="#061C19" />
+          <ActivityIndicator size="small" color={COLORS.textMuted} />
         ) : (
           <Text style={styles.submitBtnText}>
             Submit Symptoms ({selectedCount} Selected)
@@ -131,23 +137,23 @@ export const SymptomChecklist: React.FC<SymptomChecklistProps> = ({ onSubmit, is
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
     marginBottom: 2,
   },
   subText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginBottom: SPACING.md,
   },
@@ -161,7 +167,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+    borderBottomColor: COLORS.glassBorder,
   },
   checkboxGroup: {
     flexDirection: 'row',
@@ -173,27 +179,27 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.4)',
+    borderColor: COLORS.emeraldLight,
     marginRight: SPACING.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   checkboxActive: {
-    backgroundColor: '#00E676',
-    borderColor: '#00E676',
+    backgroundColor: COLORS.emerald,
+    borderColor: COLORS.emerald,
   },
   checkMark: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontSize: 12,
     fontWeight: '800',
   },
   symName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     fontWeight: '600',
   },
   sysTag: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 9,
   },
   severityPicker: {
@@ -204,25 +210,25 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   sevChipActive: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emerald,
   },
   sevText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
     fontWeight: '700',
   },
   sevTextActive: {
-    color: '#061C19',
+    color: COLORS.textMuted,
   },
   submitBtn: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     borderRadius: RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
@@ -231,8 +237,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },
-});
+}));

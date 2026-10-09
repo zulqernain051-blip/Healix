@@ -1,14 +1,19 @@
+import { useAppTheme, useThemeValue, usePaperTheme } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, useWindowDimensions, Platform } from 'react-native';
 import { Stack, usePathname } from 'expo-router';
 import { navigate } from '../../utils/navigation';
-import { Text, Avatar, PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { Text, Avatar, PaperProvider } from 'react-native-paper';
 import { useAuthStore } from '../../store/auth';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { RoleDetailNavigation } from '../../components/common/RoleDetailNavigation';
 
 function PatientRootLayout() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const { width } = useWindowDimensions();
   const pathname = usePathname();
@@ -37,7 +42,7 @@ function PatientRootLayout() {
           </View>
 
           <View style={styles.sidebarProfile}>
-            <Avatar.Icon size={40} icon="account" color="#00E676" style={styles.avatarBg} />
+            <Avatar.Icon size={40} icon="account" color={COLORS.emerald} style={styles.avatarBg} />
             <View style={styles.profileTextWrap}>
               <Text style={styles.sidebarProfileName} numberOfLines={1}>{user?.fullName ?? 'Patient'}</Text>
               <Text style={styles.sidebarProfileRole}>Patient account</Text>
@@ -53,7 +58,7 @@ function PatientRootLayout() {
                   style={[styles.sidebarNavItem, isActive && styles.sidebarNavItemActive]}
                   onPress={() => navigate(item.path as any)}
                 >
-                  <Ionicons name={item.icon} size={20} color={isActive ? '#00E676' : '#94A3B8'} style={{ width: 24 }} />
+                  <Ionicons name={item.icon} size={20} color={isActive ? COLORS.emerald : COLORS.textBody} style={{ width: 24 }} />
                   <Text style={[styles.sidebarNavLabel, isActive && styles.sidebarNavLabelActive]}>
                     {item.name}
                   </Text>
@@ -95,26 +100,29 @@ function PatientRootLayout() {
   );
 }
 
-const styles = StyleSheet.create({
-  webContainer: { flex: 1, flexDirection: 'row', backgroundColor: '#031210' },
-  sidebar: { width: 250, backgroundColor: COLORS.navyDark, borderRightWidth: 1, borderRightColor: 'rgba(0, 230, 118, 0.1)', paddingVertical: SPACING.xl, paddingHorizontal: SPACING.md, justifyContent: 'space-between' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  webContainer: { flex: 1, flexDirection: 'row', backgroundColor: COLORS.bg },
+  sidebar: { width: 250, backgroundColor: COLORS.navyDark, borderRightWidth: 1, borderRightColor: COLORS.emeraldLight, paddingVertical: SPACING.xl, paddingHorizontal: SPACING.md, justifyContent: 'space-between' },
   sidebarHeader: { marginBottom: SPACING.xl, paddingHorizontal: SPACING.sm },
   brandTitle: { ...TYPOGRAPHY.h2, color: COLORS.headerText, fontWeight: 'bold', letterSpacing: -0.5 },
   brandSub: { color: COLORS.textSecondary, marginTop: SPACING.xs },
-  sidebarProfile: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, backgroundColor: '#0E3630', borderRadius: RADIUS.md, marginBottom: SPACING.xl, borderWidth: 0.5, borderColor: 'rgba(0, 230, 118, 0.2)' },
-  avatarBg: { backgroundColor: 'rgba(0, 230, 118, 0.15)' },
+  sidebarProfile: { flexDirection: 'row', alignItems: 'center', padding: SPACING.md, backgroundColor: COLORS.bg, borderRadius: RADIUS.md, marginBottom: SPACING.xl, borderWidth: 0.5, borderColor: COLORS.emeraldLight },
+  avatarBg: { backgroundColor: COLORS.emeraldLight },
   profileTextWrap: { marginLeft: SPACING.sm, flex: 1 },
-  sidebarProfileName: { color: '#FFFFFF', fontSize: TYPOGRAPHY.sizes.sm, fontWeight: 'bold' },
-  sidebarProfileRole: { color: '#00E676', fontSize: 10, marginTop: 2 },
+  sidebarProfileName: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: 'bold' },
+  sidebarProfileRole: { color: COLORS.emerald, fontSize: 10, marginTop: 2 },
   navMenu: { flex: 1, gap: SPACING.xs },
-  sidebarNavItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, paddingHorizontal: SPACING.md, borderRadius: RADIUS.sm, backgroundColor: 'transparent' },
-  sidebarNavItemActive: { backgroundColor: 'rgba(0, 230, 118, 0.15)' },
-  sidebarNavLabel: { color: '#94A3B8', fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '500', marginLeft: SPACING.sm },
-  sidebarNavLabelActive: { color: '#00E676', fontWeight: 'bold' },
-  sidebarFooter: { borderTopWidth: 1, borderTopColor: 'rgba(255, 255, 255, 0.08)', paddingTop: SPACING.md },
-  encryptionNotice: { color: '#6B8E8A', fontSize: 11, textAlign: 'center' },
+  sidebarNavItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: SPACING.md, paddingHorizontal: SPACING.md, borderRadius: RADIUS.sm, backgroundColor: COLORS.transparent },
+  sidebarNavItemActive: { backgroundColor: COLORS.emeraldLight },
+  sidebarNavLabel: { color: COLORS.textBody, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '500', marginLeft: SPACING.sm },
+  sidebarNavLabelActive: { color: COLORS.emerald, fontWeight: 'bold' },
+  sidebarFooter: { borderTopWidth: 1, borderTopColor: COLORS.glassBorder, paddingTop: SPACING.md },
+  encryptionNotice: { color: COLORS.textBody, fontSize: 11, textAlign: 'center' },
   webContent: { flex: 1, backgroundColor: COLORS.surface },
-});
+}));
 
 
-export default function PatientLayout() { return <PaperProvider theme={{ ...MD3LightTheme, colors: { ...MD3LightTheme.colors, primary: COLORS.navy } }}><PatientRootLayout /></PaperProvider>; }
+export default function PatientLayout() {
+  const { colors: COLORS } = useAppTheme();
+  const paperTheme = usePaperTheme();
+ return <PaperProvider theme={paperTheme}><PatientRootLayout /></PaperProvider>; }

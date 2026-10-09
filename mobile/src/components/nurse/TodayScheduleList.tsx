@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -18,6 +21,9 @@ interface TodayScheduleListProps {
 }
 
 export const TodayScheduleList: React.FC<TodayScheduleListProps> = ({ schedule, onVisitPress, onViewAllPress }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
@@ -59,7 +65,7 @@ export const TodayScheduleList: React.FC<TodayScheduleListProps> = ({ schedule, 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     marginBottom: SPACING.lg,
   },
@@ -70,12 +76,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   sectionTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   viewAllText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -83,62 +89,62 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   timeCol: {
     width: 70,
   },
   timeText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
     fontWeight: '700',
   },
   divider: {
     width: 1,
     height: '80%',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: COLORS.glassSurface,
     marginHorizontal: SPACING.sm,
   },
   infoCol: {
     flex: 1,
   },
   patientName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
   },
   visitType: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 10,
     marginTop: 2,
   },
   statusBadge: {
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: RADIUS.round,
   },
   statusText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 10,
     fontWeight: '700',
   },
   emptyCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   emptyText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 12,
   },
-});
+}));

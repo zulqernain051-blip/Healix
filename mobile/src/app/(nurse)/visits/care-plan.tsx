@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { SafeAreaView, StyleSheet, View, Text, ActivityIndicator, ScrollView } from 'react-native';
 import { Card, Divider } from 'react-native-paper';
@@ -7,6 +10,9 @@ import { ErrorState } from '../../../components/common/ErrorState';
 import { EmptyState } from '../../../components/common/EmptyState';
 
 export default function CarePlanScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { patientId } = useLocalSearchParams<{ patientId: string }>();
   const { data: carePlans, isLoading, error } = useCarePlans(patientId || '');
 
@@ -14,7 +20,7 @@ export default function CarePlanScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator color="#00E676" size="large" />
+          <ActivityIndicator color={COLORS.emerald} size="large" />
           <Text style={styles.loadingText}>Loading care plan...</Text>
         </View>
       </SafeAreaView>
@@ -75,18 +81,18 @@ export default function CarePlanScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19', padding: 16 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg, padding: 16 },
   header: { marginBottom: 16 },
-  title: { color: '#00E676', fontSize: 22, fontWeight: '700' },
-  planTitle: { color: '#FFFFFF', fontSize: 18, fontWeight: '700', marginBottom: 4 },
-  planDesc: { color: '#94A3B8', fontSize: 14, marginBottom: 12 },
-  card: { backgroundColor: '#0A2D28', marginBottom: 16 },
-  sectionHeader: { color: '#00E676', marginTop: 12, marginBottom: 4, fontWeight: '600' },
-  divider: { backgroundColor: '#1E2D4A', marginBottom: 8 },
-  item: { color: '#F1F5F9', marginLeft: 8, marginBottom: 4 },
+  title: { color: COLORS.emerald, fontSize: 22, fontWeight: '700' },
+  planTitle: { color: COLORS.textDark, fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  planDesc: { color: COLORS.textBody, fontSize: 14, marginBottom: 12 },
+  card: { backgroundColor: COLORS.bg, marginBottom: 16 },
+  sectionHeader: { color: COLORS.emerald, marginTop: 12, marginBottom: 4, fontWeight: '600' },
+  divider: { backgroundColor: COLORS.bg, marginBottom: 8 },
+  item: { color: COLORS.textDark, marginLeft: 8, marginBottom: 4 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#94A3B8', marginTop: 10, fontSize: 14 },
-});
+  loadingText: { color: COLORS.textBody, marginTop: 10, fontSize: 14 },
+}));
 
 

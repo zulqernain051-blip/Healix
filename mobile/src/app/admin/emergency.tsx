@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState } from 'react';
 import { navigate } from '../../utils/navigation';
 import { View, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator, TouchableOpacity } from 'react-native';
@@ -11,11 +13,14 @@ import {
   useAssignEmergencyParamedic,
   useAdminDoctors
 } from '../../hooks/useAdmin';
-import { COLORS, SPACING, RADIUS } from '../../theme';
+import { SPACING, RADIUS } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AdminEmergency } from '../../types/admin';
 
 export default function AdminEmergencyCenter() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
 
   // Active emergencies automatically refetch every 5000ms
@@ -76,11 +81,11 @@ export default function AdminEmergencyCenter() {
       <View style={styles.dispatchSection}>
         <View style={styles.dispatchHeader}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <MaterialCommunityIcons name="ambulance" size={18} color={COLORS.navy} />
+            <MaterialCommunityIcons name="ambulance" size={18} color={COLORS.primaryText} />
             <Text style={styles.dispatchTitle}>Ambulance Dispatch</Text>
           </View>
           <Chip
-            textStyle={{ fontSize: 11, fontWeight: '700', color: '#FFF' }}
+            textStyle={{ fontSize: 11, fontWeight: '700', color: COLORS.textDark }}
             style={{
               backgroundColor:
                 dispatch.status === 'COMPLETED'
@@ -161,7 +166,7 @@ export default function AdminEmergencyCenter() {
         <View style={styles.centerContainer}>
           <MaterialCommunityIcons name="alert-circle-outline" size={48} color={COLORS.red} />
           <Text style={styles.errorText}>Error loading emergencies. Check connection.</Text>
-          <Button mode="outlined" textColor={COLORS.navy} onPress={() => refetch()} style={{ marginTop: 12 }}>
+          <Button mode="outlined" textColor={COLORS.primaryText} onPress={() => refetch()} style={{ marginTop: 12 }}>
             Retry
           </Button>
         </View>
@@ -206,13 +211,13 @@ export default function AdminEmergencyCenter() {
               </View>
               <View style={{ flexDirection: 'row', gap: 6 }}>
                 <Chip
-                  textStyle={{ fontSize: 10, fontWeight: '700', color: '#FFF' }}
+                  textStyle={{ fontSize: 10, fontWeight: '700', color: COLORS.textDark }}
                   style={{ backgroundColor: isCritical ? COLORS.red : COLORS.amber }}
                 >
                   {em.severity || 'CRITICAL'}
                 </Chip>
                 <Chip
-                  textStyle={{ fontSize: 10, fontWeight: '700', color: '#FFF' }}
+                  textStyle={{ fontSize: 10, fontWeight: '700', color: COLORS.textDark }}
                   style={{ backgroundColor: em.status === 'RESOLVED' ? COLORS.careEmerald : COLORS.navy }}
                 >
                   {em.status}
@@ -269,7 +274,7 @@ export default function AdminEmergencyCenter() {
                 <Button
                   mode="contained"
                   buttonColor={COLORS.navy}
-                  textColor="#FFF"
+                  textColor={COLORS.textDark}
                   icon="doctor"
                   onPress={() => setSelectedEmergencyId(em.id)}
                   style={styles.actionBtn}
@@ -282,8 +287,8 @@ export default function AdminEmergencyCenter() {
               {em.activeDispatch && !em.activeDispatch.paramedic && (
                 <Button
                   mode="contained"
-                  buttonColor={COLORS.blue}
-                  textColor="#FFF"
+                  buttonColor={COLORS.blueFill}
+                  textColor={COLORS.textDark}
                   icon="account-plus"
                   onPress={() => setSelectedDispatchId(em.activeDispatch?.id || null)}
                   style={styles.actionBtn}
@@ -328,10 +333,10 @@ export default function AdminEmergencyCenter() {
   return (
     <SafeAreaView style={styles.container}>
       <Appbar.Header style={{ backgroundColor: COLORS.navyDark }}>
-        <Appbar.BackAction onPress={() => router.back()} color="#FFF" />
+        <Appbar.BackAction onPress={() => router.back()} color={COLORS.textDark} />
         <Appbar.Action icon="ambulance" color={COLORS.headerText} onPress={() => navigate('/admin/ambulances')} />
-        <Appbar.Content title="Emergency Center" titleStyle={{ color: '#FFF', fontWeight: 'bold' }} />
-        <Appbar.Action icon="refresh" color="#FFF" onPress={() => refetch()} />
+        <Appbar.Content title="Emergency Center" titleStyle={{ color: COLORS.textDark, fontWeight: 'bold' }} />
+        <Appbar.Action icon="refresh" color={COLORS.textDark} onPress={() => refetch()} />
       </Appbar.Header>
 
       <View style={styles.liveIndicator}>
@@ -370,7 +375,7 @@ export default function AdminEmergencyCenter() {
               activeOpacity={0.8}
               onPress={() => setDoctorDropdownOpen(prev => !prev)}
             >
-              <MaterialCommunityIcons name="doctor" size={20} color={COLORS.navy} style={{ marginRight: 8 }} />
+              <MaterialCommunityIcons name="doctor" size={20} color={COLORS.primaryText} style={{ marginRight: 8 }} />
               <View style={{ flex: 1 }}>
                 <Text
                   style={[
@@ -385,7 +390,7 @@ export default function AdminEmergencyCenter() {
               <MaterialCommunityIcons
                 name={doctorDropdownOpen ? 'chevron-up' : 'chevron-down'}
                 size={22}
-                color={COLORS.navy}
+                color={COLORS.primaryText}
               />
             </TouchableOpacity>
 
@@ -395,7 +400,7 @@ export default function AdminEmergencyCenter() {
                 <ScrollView style={{ maxHeight: 180 }} nestedScrollEnabled keyboardShouldPersistTaps="handled">
                   {isLoadingDoctors ? (
                     <View style={{ padding: 14, alignItems: 'center' }}>
-                      <ActivityIndicator size="small" color={COLORS.navy} />
+                      <ActivityIndicator size="small" color={COLORS.primaryText} />
                       <Text style={{ color: COLORS.textSecondary, fontSize: 12, marginTop: 4 }}>Loading doctors...</Text>
                     </View>
                   ) : registeredDoctors.length === 0 ? (
@@ -419,7 +424,7 @@ export default function AdminEmergencyCenter() {
                           }}
                         >
                           <View style={{ flex: 1 }}>
-                            <Text style={[styles.doctorItemName, isSelected && { color: COLORS.navy, fontWeight: '700' }]}>
+                            <Text style={[styles.doctorItemName, isSelected && { color: COLORS.primaryText, fontWeight: '700' }]}>
                               {docName}
                             </Text>
                             <Text style={styles.doctorItemSub} numberOfLines={1}>
@@ -480,7 +485,7 @@ export default function AdminEmergencyCenter() {
             </Button>
             <Button
               onPress={handleAssignDoctor}
-              textColor={COLORS.navy}
+              textColor={COLORS.primaryText}
               loading={assignDoctorMutation.isPending}
               disabled={!doctorId.trim() || assignDoctorMutation.isPending}
             >
@@ -559,16 +564,16 @@ export default function AdminEmergencyCenter() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.surface },
   liveIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 8,
-    backgroundColor: 'rgba(239, 68, 68, 0.08)',
+    backgroundColor: COLORS.redLight,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(239, 68, 68, 0.2)'
+    borderBottomColor: COLORS.redLight
   },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: COLORS.red, marginRight: 8 },
   liveText: { color: COLORS.red, fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
@@ -600,7 +605,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: COLORS.redLight,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: RADIUS.sm,
@@ -619,11 +624,11 @@ const styles = StyleSheet.create({
   infoValue: { color: COLORS.textDark, fontSize: 13, fontWeight: '500' },
   dispatchSection: {
     marginTop: 10,
-    backgroundColor: 'rgba(11, 66, 104, 0.04)',
+    backgroundColor: COLORS.headerOverlayMid,
     padding: 10,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: 'rgba(11, 66, 104, 0.12)'
+    borderColor: COLORS.headerOverlayMid
   },
   dispatchHeader: {
     flexDirection: 'row',
@@ -631,7 +636,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8
   },
-  dispatchTitle: { color: COLORS.navy, fontSize: 14, fontWeight: '700' },
+  dispatchTitle: { color: COLORS.primaryText, fontSize: 14, fontWeight: '700' },
   dispatchDetailsGrid: { gap: 6 },
   detailRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   detailText: { color: COLORS.textBody, fontSize: 12 },
@@ -669,7 +674,7 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.sm,
     marginTop: 4,
     overflow: 'hidden',
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -684,7 +689,7 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.dividerLight,
   },
   dropdownItemSelected: {
-    backgroundColor: 'rgba(11, 66, 104, 0.08)',
+    backgroundColor: COLORS.headerOverlayMid,
   },
   doctorItemName: {
     color: COLORS.textDark,
@@ -696,4 +701,4 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 2,
   },
-});
+}));

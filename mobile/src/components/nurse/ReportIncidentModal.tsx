@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, Modal, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,6 +19,9 @@ export const ReportIncidentModal: React.FC<ReportIncidentModalProps> = ({
   onSubmit,
   isLoading = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [incidentType, setIncidentType] = useState('PATIENT_DETERIORATION');
   const [description, setDescription] = useState('');
 
@@ -56,7 +62,7 @@ export const ReportIncidentModal: React.FC<ReportIncidentModalProps> = ({
           <TextInput
             style={[styles.input, styles.multilineInput]}
             placeholder="Describe what occurred and any immediate care given..."
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={description}
             onChangeText={setDescription}
             multiline
@@ -74,7 +80,7 @@ export const ReportIncidentModal: React.FC<ReportIncidentModalProps> = ({
               disabled={!description.trim() || isLoading}
             >
               {isLoading ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
+                <ActivityIndicator size="small" color={COLORS.textDark} />
               ) : (
                 <Text style={styles.submitBtnText}>Submit Report</Text>
               )}
@@ -86,34 +92,34 @@ export const ReportIncidentModal: React.FC<ReportIncidentModalProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    backgroundColor: COLORS.modalBackdrop,
     justifyContent: 'center',
     padding: SPACING.lg,
   },
   modalContent: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.xl,
     borderWidth: 1,
-    borderColor: '#EF4444',
+    borderColor: COLORS.red,
   },
   title: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: '700',
     marginBottom: 4,
   },
   subText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     lineHeight: 16,
     marginBottom: SPACING.md,
   },
   label: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
     marginBottom: 4,
@@ -124,33 +130,33 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   typePill: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: RADIUS.sm,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   typePillActive: {
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
-    borderColor: '#EF4444',
+    backgroundColor: COLORS.redLight,
+    borderColor: COLORS.red,
   },
   typeText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
   },
   typeTextActive: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontWeight: '700',
   },
   input: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
     marginBottom: SPACING.lg,
   },
   multilineInput: {
@@ -162,19 +168,19 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: COLORS.glassSurface,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
   },
   cancelBtnText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     fontWeight: '600',
   },
   submitBtn: {
     flex: 1,
-    backgroundColor: '#EF4444',
+    backgroundColor: COLORS.redFill,
     paddingVertical: SPACING.md,
     borderRadius: RADIUS.md,
     alignItems: 'center',
@@ -183,8 +189,8 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitBtnText: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: 11,
     fontWeight: '700',
   },
-});
+}));

@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, TouchableOpacity, Animated, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -37,6 +40,9 @@ export const RiskHistoryCard: React.FC<RiskHistoryCardProps> = ({
   notes: singleNotes,
   onEntryPress,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Severe pulse animation
@@ -57,10 +63,10 @@ export const RiskHistoryCard: React.FC<RiskHistoryCardProps> = ({
 
   const getTierColor = (tier: string = 'LOW') => {
     switch (tier.toUpperCase()) {
-      case 'CRITICAL': return '#DC2626';
-      case 'HIGH': return '#EF4444';
-      case 'MEDIUM': return '#F59E0B';
-      default: return '#10B981';
+      case 'CRITICAL': return COLORS.red;
+      case 'HIGH': return COLORS.red;
+      case 'MEDIUM': return COLORS.amber;
+      default: return COLORS.emerald;
     }
   };
 
@@ -144,13 +150,13 @@ export const RiskHistoryCard: React.FC<RiskHistoryCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { marginVertical: SPACING.sm },
   header: { marginBottom: SPACING.md },
-  headerTitle: { color: '#F1F5F9', fontSize: TYPOGRAPHY.sizes.md, fontWeight: '700' },
-  headerSub: { color: '#94A3B8', fontSize: 11 },
+  headerTitle: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.md, fontWeight: '700' },
+  headerSub: { color: COLORS.textBody, fontSize: 11 },
   card: {
-    backgroundColor: '#111D35',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
@@ -160,14 +166,14 @@ const styles = StyleSheet.create({
   dot: { width: 10, height: 10, borderRadius: 5, marginTop: 4, marginRight: SPACING.sm },
   content: { flex: 1 },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  date: { color: '#F1F5F9', fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '700' },
+  date: { color: COLORS.textDark, fontSize: TYPOGRAPHY.sizes.sm, fontWeight: '700' },
   badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.round, borderWidth: 1 },
   badgeText: { fontSize: 10, fontWeight: '800' },
   scoreRow: { marginTop: 8 },
-  scoreLabel: { color: '#94A3B8', fontSize: 11, fontWeight: '600', marginBottom: 4 },
-  barTrack: { height: 6, backgroundColor: '#1E2D4A', borderRadius: 3, overflow: 'hidden' },
+  scoreLabel: { color: COLORS.textBody, fontSize: 11, fontWeight: '600', marginBottom: 4 },
+  barTrack: { height: 6, backgroundColor: COLORS.bg, borderRadius: 3, overflow: 'hidden' },
   barFill: { height: '100%', borderRadius: 3 },
-  triggeredText: { color: '#0D9488', fontSize: 11, fontStyle: 'italic', marginTop: 6 },
-  notesBox: { marginTop: 8, paddingTop: 8, borderTopWidth: 0.5, borderTopColor: '#1E2D4A' },
-  notesText: { color: '#CBD5E1', fontSize: 12, lineHeight: 18 },
-});
+  triggeredText: { color: COLORS.teal, fontSize: 11, fontStyle: 'italic', marginTop: 6 },
+  notesBox: { marginTop: 8, paddingTop: 8, borderTopWidth: 0.5, borderTopColor: COLORS.inputBorder },
+  notesText: { color: COLORS.textBody, fontSize: 12, lineHeight: 18 },
+}));

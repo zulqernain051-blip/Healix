@@ -1,14 +1,19 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import { Avatar, Card, Button, Text } from 'react-native-paper';
 import { navigate } from '../../utils/navigation';
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../theme';
 
 /**
  * Role Selection Screen.
  * Guides the user to register under one of the three core system roles.
  */
 export default function RoleSelectScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   
 
   const handleSelectRole = (role: 'PATIENT' | 'NURSE') => {
@@ -24,7 +29,7 @@ export default function RoleSelectScreen() {
         <Card.Title
           title="Patient"
           subtitle="Book visits, view prescriptions & track vitals"
-          left={(props) => <Avatar.Icon {...props} icon="account" color="#0D9488" style={{ backgroundColor: 'transparent' }} />}
+          left={(props) => <Avatar.Icon {...props} icon="account" color={COLORS.teal} style={{ backgroundColor: COLORS.transparent }} />}
         />
       </Card>
 
@@ -32,14 +37,14 @@ export default function RoleSelectScreen() {
         <Card.Title
           title="Nurse Practitioner"
           subtitle="Provide home care visits & earn professional scores"
-          left={(props) => <Avatar.Icon {...props} icon="medical-bag" color="#0D9488" style={{ backgroundColor: 'transparent' }} />}
+          left={(props) => <Avatar.Icon {...props} icon="medical-bag" color={COLORS.teal} style={{ backgroundColor: COLORS.transparent }} />}
         />
       </Card>
 
       <Button
         mode="text"
         onPress={() => navigate('/auth/login')}
-        textColor="#6B7280"
+        textColor={COLORS.textBody}
         style={styles.backButton}>
         Back to Sign In
       </Button>
@@ -47,7 +52,7 @@ export default function RoleSelectScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -75,4 +80,4 @@ const styles = StyleSheet.create({
   backButton: {
     marginTop: 16,
   },
-});
+}));

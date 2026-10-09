@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, TextInput, ActivityIndicator } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,6 +19,9 @@ export const PatientIdentityVerifyCard: React.FC<PatientIdentityVerifyCardProps>
   onVerifyManual,
   isVerified = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [activeTab, setActiveTab] = useState<'QR' | 'GPS' | 'MANUAL'>('QR');
   const [qrInput, setQrInput] = useState('');
   const [manualReason, setManualReason] = useState('');
@@ -95,7 +101,7 @@ export const PatientIdentityVerifyCard: React.FC<PatientIdentityVerifyCardProps>
               <TextInput
                 style={styles.input}
                 placeholder="Scan or enter Patient QR Token"
-                placeholderTextColor="#6B8E8A"
+                placeholderTextColor={COLORS.textBody}
                 value={qrInput}
                 onChangeText={setQrInput}
               />
@@ -104,7 +110,7 @@ export const PatientIdentityVerifyCard: React.FC<PatientIdentityVerifyCardProps>
                 onPress={handleQRSubmit}
                 disabled={!qrInput.trim() || loading}
               >
-                {loading ? <ActivityIndicator size="small" color="#061C19" /> : <Text style={styles.submitBtnText}>Verify QR Code</Text>}
+                {loading ? <ActivityIndicator size="small" color={COLORS.textMuted} /> : <Text style={styles.submitBtnText}>Verify QR Code</Text>}
               </TouchableOpacity>
             </View>
           )}
@@ -113,7 +119,7 @@ export const PatientIdentityVerifyCard: React.FC<PatientIdentityVerifyCardProps>
             <View style={styles.formGroup}>
               <Text style={styles.subText}>Confirms your device GPS coordinates within 150m of patient home address.</Text>
               <TouchableOpacity style={[styles.submitBtn, loading && styles.disabledBtn]} onPress={handleGPSCheck} disabled={loading}>
-                {loading ? <ActivityIndicator size="small" color="#061C19" /> : <Text style={styles.submitBtnText}>Check GPS Range</Text>}
+                {loading ? <ActivityIndicator size="small" color={COLORS.textMuted} /> : <Text style={styles.submitBtnText}>Check GPS Range</Text>}
               </TouchableOpacity>
             </View>
           )}
@@ -123,7 +129,7 @@ export const PatientIdentityVerifyCard: React.FC<PatientIdentityVerifyCardProps>
               <TextInput
                 style={[styles.input, styles.multilineInput]}
                 placeholder="Reason for manual check-in (min 10 characters)..."
-                placeholderTextColor="#6B8E8A"
+                placeholderTextColor={COLORS.textBody}
                 value={manualReason}
                 onChangeText={setManualReason}
                 multiline
@@ -134,7 +140,7 @@ export const PatientIdentityVerifyCard: React.FC<PatientIdentityVerifyCardProps>
                 onPress={handleManualSubmit}
                 disabled={manualReason.trim().length < 10 || loading}
               >
-                {loading ? <ActivityIndicator size="small" color="#061C19" /> : <Text style={styles.submitBtnText}>Submit Manual Override</Text>}
+                {loading ? <ActivityIndicator size="small" color={COLORS.textMuted} /> : <Text style={styles.submitBtnText}>Submit Manual Override</Text>}
               </TouchableOpacity>
             </View>
           )}
@@ -150,24 +156,24 @@ export const PatientIdentityVerifyCard: React.FC<PatientIdentityVerifyCardProps>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
     marginBottom: SPACING.md,
   },
   verifiedBanner: {
-    backgroundColor: 'rgba(0, 230, 118, 0.15)',
-    borderColor: '#00E676',
+    backgroundColor: COLORS.emeraldLight,
+    borderColor: COLORS.emerald,
     borderWidth: 1,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
@@ -176,13 +182,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   verifiedIcon: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 16,
     fontWeight: '800',
     marginRight: 6,
   },
   verifiedText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -196,44 +202,44 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderRadius: RADIUS.sm,
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   tabBtnActive: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
   },
   tabText: {
-    color: '#94A3B8',
+    color: COLORS.onAccent,
     fontSize: 10,
     fontWeight: '600',
   },
   tabTextActive: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontWeight: '700',
   },
   formGroup: {
     gap: SPACING.sm,
   },
   subText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginBottom: 4,
   },
   input: {
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.md,
     padding: SPACING.md,
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 12,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
   },
   multilineInput: {
     textAlignVertical: 'top',
   },
   submitBtn: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     borderRadius: RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
@@ -242,7 +248,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitBtnText: {
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -253,19 +259,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   successMsg: {
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
   },
   errorMsg: {
-    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+    backgroundColor: COLORS.redLight,
   },
   successText: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
     fontWeight: '600',
   },
   errorText: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: 11,
     fontWeight: '600',
   },
-});
+}));

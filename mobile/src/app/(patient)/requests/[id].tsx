@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useState } from 'react';
 import {
@@ -15,7 +17,7 @@ import { Text, Button, Avatar, Divider } from 'react-native-paper';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { navigate, goBack } from '../../../utils/navigation';
-import { SPACING, RADIUS, TYPOGRAPHY, COLORS } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 import { RequestTrackingStepper } from '../../../components/patient/RequestTrackingStepper';
 import { CancelRequestModal } from '../../../components/patient/CancelRequestModal';
@@ -26,35 +28,44 @@ import {
   useRescheduleCareRequest,
 } from '../../../hooks/useCareRequests';
 
-const getRiskTierColor = (tier?: string) => {
+const createGetRiskTierColor = (COLORS: ThemeColors) => ((tier?: string) => {
   switch (tier?.toUpperCase()) {
     case 'CRITICAL':
     case 'HIGH':
-      return '#DC2626';
+      return COLORS.red;
     case 'MEDIUM':
-      return '#D97706';
+      return COLORS.amber;
     case 'LOW':
-      return '#059669';
+      return COLORS.emerald;
     default:
       return COLORS.textBody;
   }
-};
+});
 
-const getRiskTierBg = (tier?: string) => {
+const createGetRiskTierBg = (COLORS: ThemeColors) => ((tier?: string) => {
   switch (tier?.toUpperCase()) {
     case 'CRITICAL':
     case 'HIGH':
-      return 'rgba(239, 68, 68, 0.12)';
+      return COLORS.redLight;
     case 'MEDIUM':
-      return 'rgba(245, 158, 11, 0.12)';
+      return COLORS.amberLight;
     case 'LOW':
-      return 'rgba(16, 185, 129, 0.12)';
+      return COLORS.emeraldLight;
     default:
-      return 'rgba(100, 116, 139, 0.1)';
+      return COLORS.textBody;
   }
-};
+});
 
 export default function RequestDetailsScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const getRiskTierBg = useThemeValue(createGetRiskTierBg);
+
+  const getRiskTierColor = useThemeValue(createGetRiskTierColor);
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams();
   const router = useRouter();
 
@@ -69,7 +80,7 @@ export default function RequestDetailsScreen() {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" color={COLORS.navy} />
+          <ActivityIndicator size="large" color={COLORS.primaryText} />
           <Text style={styles.loadingText}>Loading care request...</Text>
         </View>
       </SafeAreaView>
@@ -81,7 +92,7 @@ export default function RequestDetailsScreen() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.headerRow}>
           <TouchableOpacity style={styles.backBtn} onPress={() => goBack()}>
-            <Ionicons name="chevron-back" size={24} color={COLORS.navy} />
+            <Ionicons name="chevron-back" size={24} color={COLORS.primaryText} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Request Details</Text>
           <View style={{ width: 40 }} />
@@ -89,7 +100,7 @@ export default function RequestDetailsScreen() {
         <View style={styles.centerContainer}>
           <MaterialCommunityIcons name="alert-circle-outline" size={48} color={COLORS.red} />
           <Text style={styles.errorText}>Failed to load request details.</Text>
-          <Button mode="outlined" textColor={COLORS.navy} onPress={() => refetch()} style={{ marginTop: 12 }}>
+          <Button mode="outlined" textColor={COLORS.primaryText} onPress={() => refetch()} style={{ marginTop: 12 }}>
             Retry
           </Button>
         </View>
@@ -194,12 +205,12 @@ export default function RequestDetailsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor={COLORS.surface} />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.surface} />
       
       {/* Header */}
       <View style={styles.headerRow}>
         <TouchableOpacity style={styles.backBtn} onPress={() => goBack()}>
-          <Ionicons name="chevron-back" size={24} color={COLORS.navy} />
+          <Ionicons name="chevron-back" size={24} color={COLORS.primaryText} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Request Details</Text>
         <View style={{ width: 40 }} />
@@ -223,10 +234,10 @@ export default function RequestDetailsScreen() {
                 {
                   backgroundColor:
                     request.status === 'COMPLETED'
-                      ? 'rgba(16, 185, 129, 0.15)'
+                      ? COLORS.emeraldLight
                       : request.status === 'OPEN'
-                      ? 'rgba(245, 158, 11, 0.15)'
-                      : 'rgba(11, 66, 104, 0.12)',
+                      ? COLORS.amberLight
+                      : COLORS.headerOverlayMid,
                 },
               ]}
             >
@@ -238,8 +249,8 @@ export default function RequestDetailsScreen() {
                       request.status === 'COMPLETED'
                         ? COLORS.careEmerald
                         : request.status === 'OPEN'
-                        ? '#D97706'
-                        : COLORS.navy,
+                        ? COLORS.amber
+                        : COLORS.primaryText,
                   },
                 ]}
               >
@@ -251,7 +262,7 @@ export default function RequestDetailsScreen() {
           <Divider style={styles.divider} />
 
           <View style={styles.metaRow}>
-            <MaterialCommunityIcons name="calendar-clock" size={18} color={COLORS.navy} style={{ marginRight: 8 }} />
+            <MaterialCommunityIcons name="calendar-clock" size={18} color={COLORS.primaryText} style={{ marginRight: 8 }} />
             <Text style={styles.metaText}>
               {request.preferredDate
                 ? new Date(request.preferredDate).toLocaleDateString(undefined, {
@@ -356,7 +367,7 @@ export default function RequestDetailsScreen() {
             {latestAssessment && (
               <View style={styles.assessmentNotesBox}>
                 <View style={styles.assessmentNotesHeader}>
-                  <MaterialCommunityIcons name="brain" size={16} color={COLORS.navy} style={{ marginRight: 6 }} />
+                  <MaterialCommunityIcons name="brain" size={16} color={COLORS.primaryText} style={{ marginRight: 6 }} />
                   <Text style={styles.assessmentNotesTitle}>AI Clinical Assessment & Risk Analysis</Text>
                 </View>
                 <Text style={styles.assessmentNotesText}>
@@ -366,7 +377,7 @@ export default function RequestDetailsScreen() {
 
                 {doctorSupervisor && (
                   <View style={styles.doctorSupervisionRow}>
-                    <MaterialCommunityIcons name="doctor" size={16} color={COLORS.navy} style={{ marginRight: 6 }} />
+                    <MaterialCommunityIcons name="doctor" size={16} color={COLORS.primaryText} style={{ marginRight: 6 }} />
                     <Text style={styles.doctorSupervisionText}>
                       Clinical Reviewer: <Text style={{ fontWeight: '700' }}>Dr. {doctorSupervisor}</Text>
                     </Text>
@@ -380,7 +391,7 @@ export default function RequestDetailsScreen() {
             {/* Submitted Vitals Grid (When the nurse submits the vitals) */}
             <View style={styles.vitalsSectionHeader}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <MaterialCommunityIcons name="heart-pulse" size={18} color={COLORS.navy} style={{ marginRight: 6 }} />
+                <MaterialCommunityIcons name="heart-pulse" size={18} color={COLORS.primaryText} style={{ marginRight: 6 }} />
                 <Text style={styles.vitalsSectionTitle}>Recorded Patient Vitals</Text>
               </View>
               {latestVitals && (
@@ -438,7 +449,7 @@ export default function RequestDetailsScreen() {
               </View>
             ) : (
               <View style={styles.vitalsPendingBanner}>
-                <MaterialCommunityIcons name="clipboard-pulse-outline" size={20} color={COLORS.navy} style={{ marginRight: 8 }} />
+                <MaterialCommunityIcons name="clipboard-pulse-outline" size={20} color={COLORS.primaryText} style={{ marginRight: 8 }} />
                 <Text style={styles.vitalsPendingText}>
                   Vitals will be recorded live by the nurse during the home visit.
                 </Text>
@@ -451,7 +462,7 @@ export default function RequestDetailsScreen() {
               activeOpacity={0.85}
               onPress={() => navigate(`/(patient)/visits/${visit.id}`)}
             >
-              <MaterialCommunityIcons name="qrcode-scan" size={18} color="#FFFFFF" style={{ marginRight: 8 }} />
+              <MaterialCommunityIcons name="qrcode-scan" size={18} color={COLORS.textDark} style={{ marginRight: 8 }} />
               <Text style={styles.visitCheckInButtonText}>Show Visit QR Code & Details</Text>
             </TouchableOpacity>
           </View>
@@ -480,7 +491,7 @@ export default function RequestDetailsScreen() {
               <Button
                 mode="contained"
                 buttonColor={COLORS.navy}
-                textColor="#FFFFFF"
+                textColor={COLORS.textDark}
                 style={styles.actionBtn}
                 onPress={() => setShowRescheduleModal(true)}
               >
@@ -509,7 +520,7 @@ export default function RequestDetailsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: COLORS.surface,
@@ -567,7 +578,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.inputBorder,
     marginBottom: SPACING.md,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 6,
@@ -623,7 +634,7 @@ const styles = StyleSheet.create({
   orderNotesLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: COLORS.navy,
+    color: COLORS.primaryText,
     marginBottom: 2,
   },
   orderNotesText: {
@@ -639,9 +650,9 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     borderWidth: 1.5,
-    borderColor: 'rgba(41, 169, 245, 0.25)',
+    borderColor: COLORS.blueLight,
     marginBottom: SPACING.md,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -661,12 +672,12 @@ const styles = StyleSheet.create({
   },
   avatarRing: {
     borderWidth: 2,
-    borderColor: 'rgba(16, 185, 129, 0.35)',
+    borderColor: COLORS.emeraldLight,
     borderRadius: RADIUS.round,
     padding: 2,
   },
   avatarTeal: {
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    backgroundColor: COLORS.emeraldLight,
   },
   avatarLabelTeal: {
     fontSize: 15,
@@ -703,7 +714,7 @@ const styles = StyleSheet.create({
   scorePill: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    backgroundColor: 'rgba(11, 66, 104, 0.08)',
+    backgroundColor: COLORS.headerOverlayMid,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: RADIUS.round,
@@ -712,7 +723,7 @@ const styles = StyleSheet.create({
   scoreNumberText: {
     fontSize: 13,
     fontWeight: '800',
-    color: COLORS.navy,
+    color: COLORS.primaryText,
   },
   scoreLabelText: {
     fontSize: 10,
@@ -737,12 +748,12 @@ const styles = StyleSheet.create({
 
   /* Assessment Notes */
   assessmentNotesBox: {
-    backgroundColor: 'rgba(41, 169, 245, 0.05)',
+    backgroundColor: COLORS.blueLight,
     padding: 12,
     borderRadius: RADIUS.md,
     marginTop: 12,
     borderWidth: 1,
-    borderColor: 'rgba(41, 169, 245, 0.15)',
+    borderColor: COLORS.blueLight,
   },
   assessmentNotesHeader: {
     flexDirection: 'row',
@@ -752,7 +763,7 @@ const styles = StyleSheet.create({
   assessmentNotesTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: COLORS.navy,
+    color: COLORS.primaryText,
   },
   assessmentNotesText: {
     fontSize: 12,
@@ -765,7 +776,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingTop: 6,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(41, 169, 245, 0.15)',
+    borderTopColor: COLORS.blueLight,
   },
   doctorSupervisionText: {
     fontSize: 11,
@@ -848,7 +859,7 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   visitCheckInButtonText: {
-    color: '#FFFFFF',
+    color: COLORS.onAccent,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -879,4 +890,4 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: RADIUS.md,
   },
-});
+}));

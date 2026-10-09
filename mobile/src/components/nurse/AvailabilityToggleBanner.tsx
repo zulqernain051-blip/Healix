@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, Switch } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -14,6 +17,9 @@ export const AvailabilityToggleBanner: React.FC<AvailabilityToggleBannerProps> =
   onToggle,
   isLoading = false,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={[styles.banner, available ? styles.availableBg : styles.unavailableBg]}>
       <View style={styles.textWrap}>
@@ -34,14 +40,14 @@ export const AvailabilityToggleBanner: React.FC<AvailabilityToggleBannerProps> =
         value={available}
         onValueChange={onToggle}
         disabled={isLoading}
-        trackColor={{ false: '#0E3630', true: 'rgba(0, 230, 118, 0.4)' }}
-        thumbColor={available ? '#00E676' : '#F59E0B'}
+        trackColor={{ false: COLORS.textMuted, true: COLORS.emeraldLight }}
+        thumbColor={available ? COLORS.emerald : COLORS.amber}
       />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   banner: {
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
@@ -52,12 +58,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   availableBg: {
-    backgroundColor: 'rgba(0, 230, 118, 0.12)',
-    borderColor: 'rgba(0, 230, 118, 0.3)',
+    backgroundColor: COLORS.emeraldLight,
+    borderColor: COLORS.emeraldLight,
   },
   unavailableBg: {
-    backgroundColor: 'rgba(245, 158, 11, 0.12)',
-    borderColor: 'rgba(245, 158, 11, 0.3)',
+    backgroundColor: COLORS.amberLight,
+    borderColor: COLORS.amberLight,
   },
   textWrap: {
     flex: 1,
@@ -77,14 +83,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   availableTitle: {
-    color: '#00E676',
+    color: COLORS.emerald,
   },
   unavailableTitle: {
-    color: '#F59E0B',
+    color: COLORS.amber,
   },
   subText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     lineHeight: 16,
   },
-});
+}));

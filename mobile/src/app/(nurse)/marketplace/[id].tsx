@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import React from 'react';
 import { View, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
@@ -14,9 +16,12 @@ import { ListingCard } from '../../../components/marketplace/ListingCard';
 import { OfferForm } from '../../../components/marketplace/OfferForm';
 import { OfferCard } from '../../../components/marketplace/OfferCard';
 import { SubmitOfferDto } from '../../../types/marketplace';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../../theme';
+import { SPACING, TYPOGRAPHY } from '../../../theme';
 
 export default function NurseListingDetailScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const listingId = id || '';
   const router = useRouter();
@@ -32,7 +37,7 @@ export default function NurseListingDetailScreen() {
   if (isLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={COLORS.navy} size="large" />
+        <ActivityIndicator color={COLORS.primaryText} size="large" />
       </View>
     );
   }
@@ -100,7 +105,7 @@ export default function NurseListingDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.surface,
@@ -131,4 +136,4 @@ const styles = StyleSheet.create({
     ...TYPOGRAPHY.h3,
     color: COLORS.red,
   },
-});
+}));

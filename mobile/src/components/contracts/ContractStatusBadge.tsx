@@ -1,3 +1,6 @@
+
+import { useAppTheme } from '../../theme/ThemeProvider';
+
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Chip } from 'react-native-paper';
@@ -9,23 +12,25 @@ interface Props {
 }
 
 export const ContractStatusBadge: React.FC<Props> = ({ status, style }) => {
+  const { colors: COLORS } = useAppTheme();
+
   const getStatusConfig = () => {
     switch (status) {
       case 'DRAFT':
-        return { label: 'Draft', bg: 'rgba(107, 114, 128, 0.15)', color: '#9CA3AF' };
+        return { label: 'Draft', bg: COLORS.bg, color: COLORS.textBody };
       case 'PENDING_APPROVAL':
-        return { label: 'Pending Approval', bg: 'rgba(245, 158, 11, 0.15)', color: '#F59E0B' };
+        return { label: 'Pending Approval', bg: COLORS.amberLight, color: COLORS.amber };
       case 'ACTIVE':
-        return { label: 'Active', bg: 'rgba(16, 185, 129, 0.15)', color: '#10B981' };
+        return { label: 'Active', bg: COLORS.emeraldLight, color: COLORS.emerald };
       case 'COMPLETED':
-        return { label: 'Completed', bg: 'rgba(59, 130, 246, 0.15)', color: '#3B82F6' };
+        return { label: 'Completed', bg: COLORS.blueLight, color: COLORS.primaryText };
       case 'CANCELLED':
       case 'REJECTED':
-        return { label: status === 'REJECTED' ? 'Rejected' : 'Cancelled', bg: 'rgba(239, 68, 68, 0.15)', color: '#EF4444' };
+        return { label: status === 'REJECTED' ? 'Rejected' : 'Cancelled', bg: COLORS.redLight, color: COLORS.red };
       case 'EXPIRED':
-        return { label: 'Expired', bg: 'rgba(107, 114, 128, 0.15)', color: '#9CA3AF' };
+        return { label: 'Expired', bg: COLORS.bg, color: COLORS.textBody };
       default:
-        return { label: status, bg: 'rgba(107, 114, 128, 0.1)', color: '#6B7280' };
+        return { label: status, bg: COLORS.bg, color: COLORS.textBody };
     }
   };
 

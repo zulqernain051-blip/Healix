@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert } from '../../../components/common/AppDialogs';
 import { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert, ActivityIndicator, SafeAreaView, StatusBar, Platform } from 'react-native';
@@ -10,6 +13,11 @@ import { usePerformRiskAssessment } from '../../../hooks/useClinical';
 import { SPACING, RADIUS } from '../../../theme';
 
 export default function NurseRiskAssessScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const { visitId, patientId } = useLocalSearchParams();
   const { mutateAsync: performRiskAssessment, data: riskAssessment, isPending: isLoading } = usePerformRiskAssessment();
@@ -45,14 +53,14 @@ export default function NurseRiskAssessScreen() {
   const scoreVal = riskAssessment?.fusedScore ? Math.round(riskAssessment.fusedScore) : 0;
 
   const getTierColor = (tier: string) => {
-    if (tier === 'HIGH') return '#EF4444';
-    if (tier === 'MEDIUM') return '#F59E0B';
-    return '#00E676';
+    if (tier === 'HIGH') return COLORS.red;
+    if (tier === 'MEDIUM') return COLORS.amber;
+    return COLORS.emerald;
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#061C19' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <Text style={styles.title}>🧠 6.1 AI Risk Assessment & Care Plan</Text>
@@ -82,8 +90,8 @@ export default function NurseRiskAssessScreen() {
                 ]}
                 theme={{
                   colors: {
-                    secondaryContainer: '#00E676',
-                    onSecondaryContainer: '#061C19'
+                    secondaryContainer: COLORS.emerald,
+                    onSecondaryContainer: COLORS.textMuted
                   }
                 }}
                 style={{ marginBottom: 20 }}
@@ -91,8 +99,8 @@ export default function NurseRiskAssessScreen() {
 
               <Button
                 mode="contained"
-                buttonColor="#00E676"
-                textColor="#061C19"
+                buttonColor={COLORS.emeraldFill}
+                textColor={COLORS.textMuted}
                 style={styles.actionBtn}
                 onPress={handlePerformAssessment}
                 disabled={isLoading}
@@ -131,9 +139,9 @@ export default function NurseRiskAssessScreen() {
                 <Text style={styles.sectionHeader}>📋 Factors Considered</Text>
                 <Divider style={styles.divider} />
                 <View style={styles.factorsRow}>
-                  <Chip style={styles.factorChip} textStyle={{ color: '#00E676', fontSize: 11 }}>✓ Vitals Normal</Chip>
-                  <Chip style={styles.factorChip} textStyle={{ color: '#F59E0B', fontSize: 11 }}>⚠️ Mild Symptoms</Chip>
-                  <Chip style={styles.factorChip} textStyle={{ color: '#00E676', fontSize: 11 }}>🟢 No Critical History</Chip>
+                  <Chip style={styles.factorChip} textStyle={{ color: COLORS.emerald, fontSize: 11 }}>✓ Vitals Normal</Chip>
+                  <Chip style={styles.factorChip} textStyle={{ color: COLORS.amber, fontSize: 11 }}>⚠️ Mild Symptoms</Chip>
+                  <Chip style={styles.factorChip} textStyle={{ color: COLORS.emerald, fontSize: 11 }}>🟢 No Critical History</Chip>
                 </View>
               </Card.Content>
             </Card>
@@ -156,8 +164,8 @@ export default function NurseRiskAssessScreen() {
 
                 <Button
                   mode="contained"
-                  buttonColor="#00E676"
-                  textColor="#061C19"
+                  buttonColor={COLORS.emeraldFill}
+                  textColor={COLORS.textMuted}
                   style={[styles.actionBtn, { marginTop: 14 }]}
                   onPress={() => router.replace({ pathname: '/(nurse)/visits/[id]', params: { id: visitId as string } } as any)}
                   labelStyle={{ fontWeight: '800' }}
@@ -179,7 +187,7 @@ export default function NurseRiskAssessScreen() {
 
         {isLoading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#00E676" />
+            <ActivityIndicator size="large" color={COLORS.emerald} />
           </View>
         )}
       </ScrollView>
@@ -187,32 +195,32 @@ export default function NurseRiskAssessScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
   content: { padding: SPACING.lg, paddingBottom: 40 },
   header: { marginBottom: 16 },
-  title: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
-  subtitle: { color: '#94A3B8', fontSize: 12, marginTop: 4, lineHeight: 16 },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: 16 },
-  sectionHeader: { color: '#FFFFFF', fontSize: 15, fontWeight: '700', marginBottom: 6 },
-  explanationText: { color: '#94A3B8', fontSize: 12, lineHeight: 16 },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', marginVertical: 10 },
-  confidenceLabel: { color: '#FFFFFF', fontSize: 13, fontWeight: '700', marginBottom: 8 },
+  title: { color: COLORS.textDark, fontSize: 20, fontWeight: '800' },
+  subtitle: { color: COLORS.textBody, fontSize: 12, marginTop: 4, lineHeight: 16 },
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: 16 },
+  sectionHeader: { color: COLORS.textDark, fontSize: 15, fontWeight: '700', marginBottom: 6 },
+  explanationText: { color: COLORS.textBody, fontSize: 12, lineHeight: 16 },
+  divider: { backgroundColor: COLORS.emeraldLight, marginVertical: 10 },
+  confidenceLabel: { color: COLORS.textDark, fontSize: 13, fontWeight: '700', marginBottom: 8 },
   actionBtn: { borderRadius: RADIUS.md, paddingVertical: 4 },
-  resultTitle: { color: '#94A3B8', fontSize: 13, fontWeight: '700', marginBottom: 10 },
+  resultTitle: { color: COLORS.textBody, fontSize: 13, fontWeight: '700', marginBottom: 10 },
   badgeContainer: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: RADIUS.round, marginBottom: 16 },
-  badgeText: { color: '#061C19', fontSize: 16, fontWeight: '900', letterSpacing: 1 },
-  gaugeCircle: { width: 90, height: 90, borderRadius: 45, borderWidth: 3, borderColor: '#00E676', justifyContent: 'center', alignItems: 'center', backgroundColor: '#051815', marginVertical: 10 },
-  gaugeVal: { color: '#FFFFFF', fontSize: 28, fontWeight: '800' },
-  gaugeMax: { color: '#94A3B8', fontSize: 10 },
-  timedOutText: { color: '#94A3B8', fontSize: 11, marginTop: 6 },
+  badgeText: { color: COLORS.textMuted, fontSize: 16, fontWeight: '900', letterSpacing: 1 },
+  gaugeCircle: { width: 90, height: 90, borderRadius: 45, borderWidth: 3, borderColor: COLORS.emerald, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.bg, marginVertical: 10 },
+  gaugeVal: { color: COLORS.textDark, fontSize: 28, fontWeight: '800' },
+  gaugeMax: { color: COLORS.textBody, fontSize: 10 },
+  timedOutText: { color: COLORS.textBody, fontSize: 11, marginTop: 6 },
   factorsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  factorChip: { backgroundColor: 'rgba(0, 230, 118, 0.1)' },
-  planItem: { color: '#FFFFFF', fontSize: 13, fontWeight: '600', marginBottom: 8 },
-  escalationBox: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#051815', padding: 10, borderRadius: RADIUS.md, marginTop: 10, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
-  escalationLabel: { color: '#94A3B8', fontSize: 12 },
-  escalationVal: { color: '#00E676', fontSize: 12, fontWeight: '800' },
-  loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(6,28,25,0.8)', justifyContent: 'center', alignItems: 'center' }
-});
+  factorChip: { backgroundColor: COLORS.emeraldLight },
+  planItem: { color: COLORS.textDark, fontSize: 13, fontWeight: '600', marginBottom: 8 },
+  escalationBox: { flexDirection: 'row', justifyContent: 'space-between', backgroundColor: COLORS.bg, padding: 10, borderRadius: RADIUS.md, marginTop: 10, borderWidth: 1, borderColor: COLORS.emeraldLight },
+  escalationLabel: { color: COLORS.textBody, fontSize: 12 },
+  escalationVal: { color: COLORS.emerald, fontSize: 12, fontWeight: '800' },
+  loadingOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: COLORS.bg, justifyContent: 'center', alignItems: 'center' }
+}));
 
 

@@ -1,3 +1,6 @@
+
+import { useAppTheme } from '../../theme/ThemeProvider';
+
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { Chip } from 'react-native-paper';
@@ -9,18 +12,20 @@ interface Props {
 }
 
 export const OfferStatusBadge: React.FC<Props> = ({ status, style }) => {
+  const { colors: COLORS } = useAppTheme();
+
   const getStatusConfig = () => {
     switch (status) {
       case 'PENDING':
-        return { label: 'Pending', bg: 'rgba(245, 158, 11, 0.15)', color: '#F59E0B' };
+        return { label: 'Pending', bg: COLORS.amberLight, color: COLORS.amber };
       case 'ACCEPTED':
-        return { label: 'Accepted', bg: 'rgba(16, 185, 129, 0.15)', color: '#10B981' };
+        return { label: 'Accepted', bg: COLORS.emeraldLight, color: COLORS.emerald };
       case 'REJECTED':
-        return { label: 'Rejected', bg: 'rgba(239, 68, 68, 0.15)', color: '#EF4444' };
+        return { label: 'Rejected', bg: COLORS.redLight, color: COLORS.red };
       case 'EXPIRED':
-        return { label: 'Expired', bg: 'rgba(107, 114, 128, 0.15)', color: '#9CA3AF' };
+        return { label: 'Expired', bg: COLORS.bg, color: COLORS.textBody };
       default:
-        return { label: status, bg: 'rgba(107, 114, 128, 0.1)', color: '#6B7280' };
+        return { label: status, bg: COLORS.bg, color: COLORS.textBody };
     }
   };
 

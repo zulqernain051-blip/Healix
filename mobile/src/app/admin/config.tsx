@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, ActivityIndicator, SafeAreaView, StatusBar, TextInput } from 'react-native';
 import { Card, Button } from 'react-native-paper';
@@ -6,6 +9,11 @@ import { useAdminConfig, useUpdateAdminConfig } from '../../hooks/useAdmin';
 import { SPACING, RADIUS } from '../../theme';
 
 export default function AdminConfig() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { data: configs = [], isLoading } = useAdminConfig();
   const { mutateAsync: updateConfig } = useUpdateAdminConfig();
 
@@ -38,8 +46,8 @@ export default function AdminConfig() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#061C19' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#061C19" />
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bg }}>
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.bg} />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigate('/admin')} style={styles.backBtn}>
@@ -52,7 +60,7 @@ export default function AdminConfig() {
         <Text style={styles.sectionLabel}>Active System Parameters</Text>
         
         {isLoading ? (
-          <ActivityIndicator color="#00E676" size="large" style={{ marginTop: 20 }} />
+          <ActivityIndicator color={COLORS.emerald} size="large" style={{ marginTop: 20 }} />
         ) : (
           defaultConfigs.map((cfg) => (
             <Card key={cfg.key} style={styles.card}>
@@ -68,12 +76,12 @@ export default function AdminConfig() {
                     value={editState[cfg.key] || ''}
                     onChangeText={(text) => setEditState(prev => ({ ...prev, [cfg.key]: text }))}
                     placeholder="Enter value"
-                    placeholderTextColor="#6B8E8A"
+                    placeholderTextColor={COLORS.textBody}
                   />
                   <Button
                     mode="contained"
-                    buttonColor="#00E676"
-                    textColor="#061C19"
+                    buttonColor={COLORS.emeraldFill}
+                    textColor={COLORS.textMuted}
                     onPress={() => handleSave(cfg.key)}
                     style={styles.saveBtn}
                     labelStyle={{ fontWeight: '700', fontSize: 12 }}
@@ -90,20 +98,20 @@ export default function AdminConfig() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
   content: { padding: SPACING.lg, paddingBottom: 40 },
   header: { marginBottom: 20 },
   backBtn: { marginBottom: 8 },
-  backText: { color: '#00E676', fontSize: 13, fontWeight: '700' },
-  title: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
-  subtitle: { color: '#94A3B8', fontSize: 12, marginTop: 4 },
-  sectionLabel: { color: '#00E676', fontSize: 15, fontWeight: '700', marginBottom: 12, marginTop: 12 },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: 12 },
+  backText: { color: COLORS.emerald, fontSize: 13, fontWeight: '700' },
+  title: { color: COLORS.textDark, fontSize: 20, fontWeight: '800' },
+  subtitle: { color: COLORS.textBody, fontSize: 12, marginTop: 4 },
+  sectionLabel: { color: COLORS.emerald, fontSize: 15, fontWeight: '700', marginBottom: 12, marginTop: 12 },
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: 12 },
   configHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  configKey: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
-  configDesc: { color: '#94A3B8', fontSize: 11, marginTop: 4, marginBottom: 12 },
+  configKey: { color: COLORS.textDark, fontSize: 13, fontWeight: '700' },
+  configDesc: { color: COLORS.textBody, fontSize: 11, marginTop: 4, marginBottom: 12 },
   editRow: { flexDirection: 'row', gap: 10, alignItems: 'center' },
-  input: { flex: 1, backgroundColor: '#061C19', color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.md, fontSize: 13 },
+  input: { flex: 1, backgroundColor: COLORS.bg, color: COLORS.textDark, borderWidth: 1, borderColor: COLORS.emeraldLight, paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.md, fontSize: 13 },
   saveBtn: { borderRadius: RADIUS.md, justifyContent: 'center' }
-});
+}));

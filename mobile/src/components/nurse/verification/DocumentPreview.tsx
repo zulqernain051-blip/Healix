@@ -1,8 +1,10 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { CheckItem, DocStatus } from './types';
-import { PALETTE } from './constants';
 import { StatusBadge } from './StatusBadge';
 
 interface DocCardProps {
@@ -14,6 +16,9 @@ interface DocCardProps {
 }
 
 export const DocumentPreview: React.FC<DocCardProps> = ({ item, status, rejectionReason, onSubmit, index }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(24)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -83,15 +88,15 @@ export const DocumentPreview: React.FC<DocCardProps> = ({ item, status, rejectio
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   docCardWrapper: {
     marginBottom: 12,
   },
   docCard: {
-    backgroundColor: PALETTE.card,
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: PALETTE.border,
+    borderColor: COLORS.inputBorder,
   },
   docCardContent: {
     flexDirection: 'row',
@@ -111,11 +116,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: PALETTE.surface,
+    backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: PALETTE.border,
+    borderColor: COLORS.inputBorder,
   },
   docIcon: {
     fontSize: 18,
@@ -127,30 +132,30 @@ const styles = StyleSheet.create({
   docLabel: {
     fontSize: 15,
     fontWeight: '600',
-    color: PALETTE.white,
+    color: COLORS.textDark,
   },
   rejectionText: {
     fontSize: 12,
-    color: PALETTE.red,
+    color: COLORS.red,
     marginTop: 2,
     lineHeight: 17,
   },
   submitBtn: {
-    backgroundColor: PALETTE.teal,
+    backgroundColor: COLORS.tealFill,
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: PALETTE.teal,
+    shadowColor: COLORS.teal,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.35,
     shadowRadius: 6,
     elevation: 4,
   },
   submitBtnText: {
-    color: '#fff',
+    color: COLORS.onAccent,
     fontSize: 13,
     fontWeight: '700',
   },
-});
+}));

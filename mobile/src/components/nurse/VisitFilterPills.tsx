@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -10,6 +13,9 @@ interface VisitFilterPillsProps {
 }
 
 export const VisitFilterPills: React.FC<VisitFilterPillsProps> = ({ activeFilter, onFilterChange, filters }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.container}>
       {filters.map(filter => (
@@ -27,10 +33,10 @@ export const VisitFilterPills: React.FC<VisitFilterPillsProps> = ({ activeFilter
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flexDirection: 'row', backgroundColor: '#F1F5F9', borderRadius: 12, padding: 4, marginBottom: 24, flexWrap: 'wrap', gap: 4 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flexDirection: 'row', backgroundColor: COLORS.surfaceCard, borderRadius: 12, padding: 4, marginBottom: 24, flexWrap: 'wrap', gap: 4 },
   pill: { flex: 1, minWidth: 60, paddingVertical: 8, alignItems: 'center', borderRadius: 8 },
-  pillActive: { backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 1 },
-  text: { color: '#64748B', fontSize: 13, fontWeight: '600' },
-  textActive: { color: '#00E676', fontWeight: '800' },
-});
+  pillActive: { backgroundColor: COLORS.surfaceCard, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 1 },
+  text: { color: COLORS.textBody, fontSize: 13, fontWeight: '600' },
+  textActive: { color: COLORS.emerald, fontWeight: '800' },
+}));

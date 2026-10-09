@@ -1,29 +1,33 @@
+import { useAppTheme } from '../../../theme/ThemeProvider';
+
 import React from 'react';
 import { Platform } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../../theme';
+
 
 export default function PatientTabsLayout() {
+  const { colors: COLORS } = useAppTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
+          backgroundColor: COLORS.surfaceCard,
           borderTopWidth: 1,
           borderTopColor: COLORS.inputBorder,
           height: Platform.OS === 'ios' ? 85 : 65,
           paddingBottom: Platform.OS === 'ios' ? 28 : 8,
           paddingTop: 6,
           elevation: 8,
-          shadowColor: '#000',
+          shadowColor: COLORS.shadow,
           shadowOffset: { width: 0, height: -2 },
           shadowOpacity: 0.05,
           shadowRadius: 8,
         },
-        tabBarActiveTintColor: COLORS.navy,
-        tabBarInactiveTintColor: '#94A3B8',
+        tabBarActiveTintColor: COLORS.primaryText,
+        tabBarInactiveTintColor: COLORS.textBody,
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',

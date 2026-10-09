@@ -1,4 +1,6 @@
-import { COLORS } from '../../theme';
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
+
 import { useState } from 'react';
 import { View, StyleSheet, TextInput, Alert, Platform } from 'react-native';
 import { Button, Text, Card } from 'react-native-paper';
@@ -6,6 +8,9 @@ import { useSubmitDiagnosis } from '../../hooks/useDoctor';
 
 
 export function DiagnosisForm({ caseId, onComplete, onCancel }: { caseId: string, onComplete: () => void, onCancel: () => void }) {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { mutateAsync: submitDiagnosis, isPending } = useSubmitDiagnosis();
   const [code, setCode] = useState('');
   const [description, setDescription] = useState('');
@@ -47,10 +52,10 @@ export function DiagnosisForm({ caseId, onComplete, onCancel }: { caseId: string
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: { backgroundColor: COLORS.surfaceCard, borderColor: COLORS.inputBorder, borderWidth: 1, marginBottom: 16 },
   title: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
   label: { color: COLORS.textBody, marginBottom: 6, fontSize: 14 },
   input: { backgroundColor: COLORS.surface, color: COLORS.textDark, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: COLORS.inputBorder, marginBottom: 16 },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 8 }
-});
+}));

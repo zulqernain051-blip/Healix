@@ -1,7 +1,9 @@
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
-import { COLORS, RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
+import { RADIUS, SPACING, TYPOGRAPHY } from '../../theme';
 
 export type CareSegment = 'UPCOMING' | 'PAST';
 
@@ -18,6 +20,9 @@ export const RequestFilterPills: React.FC<RequestFilterPillsProps> = ({
   upcomingCount = 0,
   pastCount = 0,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   return (
     <View style={styles.segmentedContainer}>
       {/* Upcoming Tab */}
@@ -45,10 +50,10 @@ export const RequestFilterPills: React.FC<RequestFilterPillsProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   segmentedContainer: {
     flexDirection: 'row',
-    backgroundColor: '#E2E8F0', // subtle slate track
+    backgroundColor: COLORS.surfaceCard, // subtle slate track
     borderRadius: RADIUS.round,
     padding: 4,
     marginBottom: SPACING.lg,
@@ -59,11 +64,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: RADIUS.round,
-    backgroundColor: 'transparent',
+    backgroundColor: COLORS.transparent,
   },
   segmentActive: {
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
+    backgroundColor: COLORS.surfaceCard,
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 4,
@@ -79,4 +84,4 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: TYPOGRAPHY.weights.bold,
   },
-});
+}));

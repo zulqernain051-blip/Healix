@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { useRef, useEffect } from 'react';
 import {
   View,
@@ -18,9 +20,14 @@ import { apiClient } from '../../../api/client';
 
 import { ChatBubble } from '../../../components/chat/ChatBubble';
 import { ChatInput } from '../../../components/chat/ChatInput';
-import { COLORS, SPACING } from '../../../theme';
+import { SPACING } from '../../../theme';
 
 export default function DoctorChatScreen() {
+  const { dark: isDarkTheme } = useAppTheme();
+
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
   const params = useLocalSearchParams();
   const scrollViewRef = useRef<ScrollView>(null);
@@ -109,7 +116,7 @@ export default function DoctorChatScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.surface} />
+      <StatusBar barStyle={isDarkTheme ? 'light-content' : 'dark-content'} backgroundColor={COLORS.surface} />
       <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {/* Header */}
         <View style={styles.header}>
@@ -121,7 +128,7 @@ export default function DoctorChatScreen() {
             size={38}
             label={contactName.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
             style={styles.avatarBg}
-            color={COLORS.navy}
+            color={COLORS.primaryText}
           />
 
           <View style={styles.headerInfo}>
@@ -130,8 +137,8 @@ export default function DoctorChatScreen() {
           </View>
 
           <View style={styles.headerActions}>
-            <TouchableOpacity onPress={handleRequestEmergency} style={[styles.headerActionBtn, { backgroundColor: '#ef4444' }]}>
-              <Text style={[styles.headerActionIcon, { color: '#fff' }]}>🚨</Text>
+            <TouchableOpacity onPress={handleRequestEmergency} style={[styles.headerActionBtn, { backgroundColor: COLORS.red }]}>
+              <Text style={[styles.headerActionIcon, { color: COLORS.textDark }]}>🚨</Text>
             </TouchableOpacity>
             </View>
         </View>
@@ -171,26 +178,26 @@ export default function DoctorChatScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#0A1628' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: COLORS.bg },
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: '#1E2D4A' },
+  header: { flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.surface, paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: COLORS.inputBorder },
   backBtn: { padding: 8, marginRight: 8, marginLeft: -8 },
-  backIcon: { color: COLORS.navy, fontSize: 32, lineHeight: 32, marginTop: -4 },
-  avatarBg: { backgroundColor: '#E2E8F0', marginRight: 12 },
+  backIcon: { color: COLORS.primaryText, fontSize: 32, lineHeight: 32, marginTop: -4 },
+  avatarBg: { backgroundColor: COLORS.surfaceCard, marginRight: 12 },
   headerInfo: { flex: 1 },
   headerName: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
   headerStatus: { color: COLORS.textBody, fontSize: 12, marginTop: 2 },
   headerActions: { flexDirection: 'row', gap: 8 },
-  headerActionBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#111D35', alignItems: 'center', justifyContent: 'center' },
+  headerActionBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.bg, alignItems: 'center', justifyContent: 'center' },
   headerActionIcon: { fontSize: 16 },
-  encryptionNotice: { backgroundColor: '#1E2D4A', padding: 8, alignItems: 'center' },
+  encryptionNotice: { backgroundColor: COLORS.bg, padding: 8, alignItems: 'center' },
   encryptionText: { color: COLORS.textBody, fontSize: 11, fontWeight: '600' },
-  messagesList: { flex: 1, backgroundColor: '#0A1628' },
+  messagesList: { flex: 1, backgroundColor: COLORS.bg },
   messagesContent: { padding: SPACING.md, paddingBottom: 20 },
-  emptyText: { color: '#64748B', textAlign: 'center', marginTop: 40, fontSize: 14 },
-  typingIndicatorContainer: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, backgroundColor: '#0A1628' },
-  typingText: { color: COLORS.navy, fontSize: 12, fontStyle: 'italic' },
-});
+  emptyText: { color: COLORS.textBody, textAlign: 'center', marginTop: 40, fontSize: 14 },
+  typingIndicatorContainer: { paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, backgroundColor: COLORS.bg },
+  typingText: { color: COLORS.primaryText, fontSize: 12, fontStyle: 'italic' },
+}));
 
 

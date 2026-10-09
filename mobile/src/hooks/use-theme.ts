@@ -3,12 +3,9 @@
  * https://docs.expo.dev/guides/color-schemes/
  */
 
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useAppTheme } from '@/theme/ThemeProvider';
 
 export function useTheme() {
-  const scheme = useColorScheme();
-  const theme = scheme === 'unspecified' ? 'light' : scheme;
-
-  return Colors[theme];
+  const { colors } = useAppTheme();
+  return { text: colors.textDark, background: colors.surface, backgroundElement: colors.surfaceCard, backgroundSelected: colors.surfaceMuted, textSecondary: colors.textBody };
 }

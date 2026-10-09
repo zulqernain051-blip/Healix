@@ -1,4 +1,6 @@
-import { COLORS } from '../../theme';
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
+
 import { useState } from 'react';
 import { View, StyleSheet, TextInput, Alert, TouchableOpacity, Platform } from 'react-native';
 import { Button, Text, Card } from 'react-native-paper';
@@ -6,6 +8,9 @@ import { useSubmitPrescription } from '../../hooks/useDoctor';
 
 
 export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: string, onComplete: () => void, onCancel: () => void }) {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { mutateAsync: submitPrescription, isPending } = useSubmitPrescription();
   const [instructions, setInstructions] = useState('');
   const [items, setItems] = useState([{ medicationName: '', dosage: '', frequency: '', durationDays: '7' }]);
@@ -95,7 +100,7 @@ export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: str
           </View>
         ))}
 
-        <Button mode="text" onPress={addItem} textColor={COLORS.navy} style={{ alignSelf: 'flex-start' }}>+ Add Medication</Button>
+        <Button mode="text" onPress={addItem} textColor={COLORS.primaryText} style={{ alignSelf: 'flex-start' }}>+ Add Medication</Button>
 
         <Text style={[styles.label, { marginTop: 16 }]}>General Instructions (Optional)</Text>
         <TextInput style={[styles.input, { height: 60, textAlignVertical: 'top' }]} placeholder="Take after meals..." placeholderTextColor={COLORS.textMuted} multiline value={instructions} onChangeText={setInstructions} />
@@ -109,7 +114,7 @@ export function PrescriptionForm({ caseId, onComplete, onCancel }: { caseId: str
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   card: { backgroundColor: COLORS.surfaceCard, borderColor: COLORS.inputBorder, borderWidth: 1, marginBottom: 16 },
   title: { color: COLORS.textDark, fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
   label: { color: COLORS.textBody, marginBottom: 6, fontSize: 14 },
@@ -118,4 +123,4 @@ const styles = StyleSheet.create({
   itemBlock: { backgroundColor: COLORS.surface, padding: 12, borderRadius: 8, marginBottom: 12, borderWidth: 1, borderColor: COLORS.inputBorder },
   itemTitle: { color: COLORS.textDark, fontSize: 14, fontWeight: '600', marginBottom: 8 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
-});
+}));

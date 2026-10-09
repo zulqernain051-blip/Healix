@@ -1,11 +1,16 @@
+
+
+
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 import { useAuthStore } from '../../../store/auth';
 import { usePrescriptions } from '../../../hooks/useHealth';
-import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../../components/common/WorkflowPage';
 import { downloadPrivateFile } from '../../../utils/fileTransfer';
 export default function PrescriptionsScreen() {
+  const s = useFlowStyles();
+
   const patientId = useAuthStore(state => state.user?.patientId) || '';
   const query = usePrescriptions(patientId);
   const [busy, setBusy] = useState(''); const [error, setError] = useState('');

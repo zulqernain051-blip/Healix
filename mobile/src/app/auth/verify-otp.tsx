@@ -1,4 +1,6 @@
-import { COLORS } from '../../theme';
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
+
 import { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { TextInput, Button, Text, HelperText } from 'react-native-paper';
@@ -12,6 +14,9 @@ import { ApiError } from '../../types/api';
  * Accepts a 6-digit verification code and registers activation status.
  */
 export default function VerifyOtpScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const params = useLocalSearchParams();
   const emailOrPhone = (params.emailOrPhone as string) || '';
 
@@ -51,8 +56,8 @@ export default function VerifyOtpScreen() {
           }}
           mode="outlined"
           style={styles.input}
-          outlineColor="#E5E7EB"
-          activeOutlineColor="#0D9488"
+          outlineColor={COLORS.inputBorder}
+          activeOutlineColor={COLORS.teal}
         />
 
         {error && (
@@ -68,17 +73,17 @@ export default function VerifyOtpScreen() {
           disabled={isLoading || !/^\d{6}$/.test(code) || !emailOrPhone}
           style={styles.button}
           contentStyle={styles.buttonContent}
-          buttonColor="#0D9488">
+          buttonColor={COLORS.tealFill} textColor={COLORS.onAccent}>
           Verify Code
         </Button>
 
-        <Button mode="text" textColor={COLORS.navy} loading={resend.isPending} disabled={resend.isPending || !emailOrPhone} onPress={() => resend.mutate({ emailOrPhone })}>Resend code</Button>
+        <Button mode="text" textColor={COLORS.primaryText} loading={resend.isPending} disabled={resend.isPending || !emailOrPhone} onPress={() => resend.mutate({ emailOrPhone })}>Resend code</Button>
         {resend.isSuccess && <Text>New verification code sent.</Text>}
         {resend.error && <HelperText type="error">{resend.error.message}</HelperText>}
         <Button
           mode="text"
           onPress={() => navigate('/auth/login')}
-          textColor="#6B7280"
+          textColor={COLORS.textBody}
           style={styles.backButton}>
           Back to Login
         </Button>
@@ -87,32 +92,32 @@ export default function VerifyOtpScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.surfaceCard,
   },
   header: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#111827',
+    color: COLORS.textMuted,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
+    color: COLORS.textBody,
     textAlign: 'center',
     marginBottom: 32,
     marginTop: 6,
     paddingHorizontal: 8,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
     borderRadius: 16,
     padding: 24,
-    shadowColor: '#000',
+    shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 12,
@@ -120,7 +125,7 @@ const styles = StyleSheet.create({
   },
   input: {
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.surfaceCard,
     textAlign: 'center',
     fontSize: 20,
     letterSpacing: 4,
@@ -140,4 +145,4 @@ const styles = StyleSheet.create({
   backButton: {
     marginTop: 16,
   },
-});
+}));

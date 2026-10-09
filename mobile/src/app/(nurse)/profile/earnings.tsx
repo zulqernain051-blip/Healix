@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import {
   View,
@@ -10,7 +12,7 @@ import { useAuthStore } from '../../../store/auth';
 import { useNurseEarnings } from '../../../hooks/useNurse';
 import { ErrorState } from '../../../components/common/ErrorState';
 
-import { COLORS, SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
+import { SPACING, RADIUS, TYPOGRAPHY } from '../../../theme';
 
 function formatCurrency(amount: number): string {
   return `PKR ${amount.toLocaleString('en-PK', { minimumFractionDigits: 2 })}`;
@@ -23,6 +25,9 @@ function formatDate(dateStr: string): string {
 }
 
 export default function NurseEarningsScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { user } = useAuthStore();
   const nurseId = user?.nurseId || user?.id || '';
   const { data: earnings, isLoading, error, refetch } = useNurseEarnings(nurseId);
@@ -34,7 +39,7 @@ export default function NurseEarningsScreen() {
   if (isLoading && !earnings) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color={COLORS.navy} />
+        <ActivityIndicator size="large" color={COLORS.primaryText} />
         <Text style={styles.loadingText}>Loading Earnings...</Text>
       </View>
     );
@@ -90,8 +95,8 @@ export default function NurseEarningsScreen() {
               <Text style={styles.paymentDate}>{formatDate(payment.createdAt)}</Text>
             </View>
             <View style={[styles.paymentBadge, {
-              backgroundColor: payment.status === 'PAID' ? '#064E3B' :
-                payment.status === 'PENDING' ? '#78350F' : '#3B1515'
+              backgroundColor: payment.status === 'PAID' ? COLORS.emerald :
+                payment.status === 'PENDING' ? COLORS.red : COLORS.bg
             }]}>
               <Text style={[styles.paymentBadgeText, {
                 color: payment.status === 'PAID' ? COLORS.emerald :
@@ -107,7 +112,7 @@ export default function NurseEarningsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.surface },
   content: { padding: 20, paddingBottom: 40 },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface, gap: 12 },
@@ -116,7 +121,7 @@ const styles = StyleSheet.create({
   title: { color: COLORS.textDark, fontSize: 22, fontWeight: '700' },
   subtitle: { color: COLORS.textBody, fontSize: 13, marginTop: 4 },
   totalCard: {
-    backgroundColor: '#0D2137', borderRadius: 18, padding: 24, marginBottom: 24,
+    backgroundColor: COLORS.bg, borderRadius: 18, padding: 24, marginBottom: 24,
     borderWidth: 1, borderColor: COLORS.navy + '44'
   },
   totalLabel: { color: COLORS.textBody, fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
@@ -125,7 +130,7 @@ const styles = StyleSheet.create({
   totalRow: { flexDirection: 'row' },
   totalStat: { flex: 1, alignItems: 'center' },
   totalStatBorder: { borderLeftWidth: 1, borderRightWidth: 1, borderColor: COLORS.inputBorder },
-  totalStatNumber: { color: COLORS.navy, fontSize: 18, fontWeight: '700' },
+  totalStatNumber: { color: COLORS.primaryText, fontSize: 18, fontWeight: '700' },
   totalStatLabel: { color: COLORS.textMuted, fontSize: 11, marginTop: 4 },
   sectionTitle: { color: COLORS.textBody, fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 12 },
   emptyCard: {
@@ -145,6 +150,6 @@ const styles = StyleSheet.create({
   paymentDate: { color: COLORS.textMuted, fontSize: 12, marginTop: 3 },
   paymentBadge: { borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4 },
   paymentBadgeText: { fontSize: 11, fontWeight: '700' }
-});
+}));
 
 

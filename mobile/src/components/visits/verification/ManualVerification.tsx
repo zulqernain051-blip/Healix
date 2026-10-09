@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useState } from 'react';
 import { StyleSheet, TextInput, Alert, Platform } from 'react-native';
 import { Text, Button, Card } from 'react-native-paper';
@@ -11,6 +14,9 @@ interface ManualVerificationProps {
 }
 
 export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId, onSuccess }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const [reason, setReason] = useState('');
   const [error, setError] = useState('');
   const verifyManual = useVerifyManual();
@@ -51,7 +57,7 @@ export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId,
         <TextInput
           style={styles.input}
           placeholder="Reason QR/GPS could not be used..."
-          placeholderTextColor="#6B8E8A"
+          placeholderTextColor={COLORS.textBody}
           value={reason}
           onChangeText={setReason}
           multiline
@@ -60,8 +66,8 @@ export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId,
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
         <Button
           mode="contained"
-          buttonColor="#F59E0B"
-          textColor="#061C19"
+          buttonColor={COLORS.amberFill}
+          textColor={COLORS.textMuted}
           onPress={handleSubmit}
           loading={verifyManual.isPending}
           disabled={verifyManual.isPending}
@@ -75,15 +81,15 @@ export const ManualVerification: React.FC<ManualVerificationProps> = ({ visitId,
   );
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: '#F59E0B', marginBottom: SPACING.md },
-  title: { color: '#F59E0B', fontSize: 16, fontWeight: '700', marginBottom: 6 },
-  description: { color: '#94A3B8', fontSize: 12, marginBottom: 12 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.amber, marginBottom: SPACING.md },
+  title: { color: COLORS.amber, fontSize: 16, fontWeight: '700', marginBottom: 6 },
+  description: { color: COLORS.textBody, fontSize: 12, marginBottom: 12 },
   input: {
-    backgroundColor: '#051815',
-    color: '#FFFFFF',
+    backgroundColor: COLORS.bg,
+    color: COLORS.textDark,
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderColor: COLORS.amberLight,
     padding: 12,
     borderRadius: RADIUS.md,
     fontSize: 13,
@@ -91,6 +97,6 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
     marginBottom: 8,
   },
-  errorText: { color: '#EF4444', fontSize: 12, marginBottom: 8 },
+  errorText: { color: COLORS.red, fontSize: 12, marginBottom: 8 },
   btn: { borderRadius: RADIUS.md },
-});
+}));

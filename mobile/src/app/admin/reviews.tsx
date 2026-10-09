@@ -1,4 +1,7 @@
 
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
+
 import { View, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
 import { Text, Card, Chip, Appbar, Button } from 'react-native-paper';
 import { useRouter } from 'expo-router';
@@ -7,6 +10,9 @@ import { SPACING, RADIUS } from '../../theme';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export default function AdminModeration() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const router = useRouter();
 
   const { data: reviews, isLoading } = useAdminReviews();
@@ -17,9 +23,9 @@ export default function AdminModeration() {
   };
 
   const renderContent = () => {
-    if (isLoading) return <ActivityIndicator color="#00E676" style={{ marginTop: 20 }} />;
+    if (isLoading) return <ActivityIndicator color={COLORS.emerald} style={{ marginTop: 20 }} />;
     if (!reviews?.length) return <Text style={styles.emptyText}>No reviews found</Text>;
-    
+
     return reviews.map(rev => {
       const isHidden = rev.status === 'HIDDEN' || (rev as any).flagged;
       const rating = rev.rating ?? (rev as any).stars ?? 5;
@@ -32,25 +38,25 @@ export default function AdminModeration() {
           <Card.Content>
             <View style={styles.row}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <MaterialCommunityIcons name="star" size={16} color="#F59E0B" />
+                <MaterialCommunityIcons name="star" size={16} color={COLORS.amber} />
                 <Text style={styles.ratingText}>{rating}/5</Text>
               </View>
-              <Chip 
-                textStyle={{ fontSize: 10, color: '#FFF' }} 
-                style={{ backgroundColor: isHidden ? '#EF4444' : '#00E676' }}
+              <Chip
+                textStyle={{ fontSize: 10, color: COLORS.textDark }}
+                style={{ backgroundColor: isHidden ? COLORS.red : COLORS.emerald }}
               >
                 {isHidden ? 'HIDDEN' : (rev.status || 'APPROVED')}
               </Chip>
             </View>
             <Text style={styles.cardSub}>Reviewer ID: {reviewerId} | Target ID: {targetId}</Text>
             <Text style={styles.comment}>"{comment}"</Text>
-            
+
             {!isHidden ? (
               <View style={styles.actionRow}>
-                <Button 
-                  mode="contained" 
-                  style={{ backgroundColor: 'rgba(239, 68, 68, 0.2)' }}
-                  labelStyle={{ color: '#EF4444' }}
+                <Button
+                  mode="contained"
+                  style={{ backgroundColor: COLORS.redLight }}
+                  labelStyle={{ color: COLORS.red }}
                   onPress={() => handleModerate(rev.id, 'HIDDEN')}
                 >
                   Hide (Flag)
@@ -58,10 +64,10 @@ export default function AdminModeration() {
               </View>
             ) : (
               <View style={styles.actionRow}>
-                <Button 
-                  mode="contained" 
-                  style={{ backgroundColor: 'rgba(0, 230, 118, 0.2)', marginRight: 10 }}
-                  labelStyle={{ color: '#00E676' }}
+                <Button
+                  mode="contained"
+                  style={{ backgroundColor: COLORS.emeraldLight, marginRight: 10 }}
+                  labelStyle={{ color: COLORS.emerald }}
                   onPress={() => handleModerate(rev.id, 'APPROVED')}
                 >
                   Approve (Unflag)
@@ -76,11 +82,11 @@ export default function AdminModeration() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Appbar.Header style={{ backgroundColor: '#061C19' }}>
-        <Appbar.BackAction onPress={() => router.back()} color="#FFF" />
-        <Appbar.Content title="Review Moderation" titleStyle={{ color: '#FFF' }} />
+      <Appbar.Header style={{ backgroundColor: COLORS.bg }}>
+        <Appbar.BackAction onPress={() => router.back()} color={COLORS.textDark} />
+        <Appbar.Content title="Review Moderation" titleStyle={{ color: COLORS.textDark }} />
       </Appbar.Header>
-      
+
       <ScrollView contentContainerStyle={styles.content}>
         {renderContent()}
       </ScrollView>
@@ -88,14 +94,14 @@ export default function AdminModeration() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#061C19' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  container: { flex: 1, backgroundColor: COLORS.bg },
   content: { padding: SPACING.md, gap: 12, paddingBottom: 40 },
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)' },
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  ratingText: { color: '#F59E0B', fontSize: 14, fontWeight: '700', marginLeft: 4 },
-  cardSub: { color: '#94A3B8', fontSize: 12, marginBottom: 8 },
-  comment: { color: '#FFF', fontSize: 14, fontStyle: 'italic', marginBottom: 12 },
+  ratingText: { color: COLORS.amber, fontSize: 14, fontWeight: '700', marginLeft: 4 },
+  cardSub: { color: COLORS.textBody, fontSize: 12, marginBottom: 8 },
+  comment: { color: COLORS.textDark, fontSize: 14, fontStyle: 'italic', marginBottom: 12 },
   actionRow: { flexDirection: 'row', justifyContent: 'flex-start' },
-  emptyText: { color: '#94A3B8', textAlign: 'center', marginTop: 40, fontSize: 16 },
-});
+  emptyText: { color: COLORS.textBody, textAlign: 'center', marginTop: 40, fontSize: 16 },
+}));

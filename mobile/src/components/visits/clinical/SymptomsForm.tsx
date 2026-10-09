@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React, { useState } from 'react';
 import { appAlert } from '../../common/AppDialogs';
 import { View, StyleSheet, TextInput, Alert, TouchableOpacity, Platform } from 'react-native';
@@ -19,15 +22,19 @@ interface SymptomEntry {
 }
 
 const SEVERITY_OPTIONS: SymptomSeverity[] = ['MILD', 'MODERATE', 'SEVERE'];
-const SEVERITY_COLORS: Record<SymptomSeverity, string> = {
-  MILD: '#F59E0B',
-  MODERATE: '#F97316',
-  SEVERE: '#EF4444',
-};
+const createSEVERITY_COLORS =  (COLORS: ThemeColors) : Record<SymptomSeverity, string> => ({
+  MILD: COLORS.amber,
+  MODERATE: COLORS.red,
+  SEVERE: COLORS.red,
+});
 
 const emptySymptom = (): SymptomEntry => ({ symptomName: '', severity: 'MILD', notes: '' });
 
 export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, existingSymptoms }) => {
+  const { colors: COLORS } = useAppTheme();
+  const SEVERITY_COLORS = useThemeValue(createSEVERITY_COLORS);
+  const styles = useThemeValue(createStyles);
+
   const [symptoms, setSymptoms] = useState<SymptomEntry[]>(
     existingSymptoms && existingSymptoms.length > 0
       ? existingSymptoms.map((s) => ({ symptomName: s.symptomName, severity: s.severity, notes: s.notes || '' }))
@@ -91,7 +98,7 @@ export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, 
             <TextInput
               style={styles.input}
               placeholder="Symptom name (e.g., Headache)"
-              placeholderTextColor="#6B8E8A"
+              placeholderTextColor={COLORS.textBody}
               value={symptom.symptomName}
               onChangeText={(v) => updateSymptom(idx, { symptomName: v })}
             />
@@ -109,20 +116,20 @@ export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, 
             <TextInput
               style={[styles.input, { minHeight: 40 }]}
               placeholder="Notes (optional)"
-              placeholderTextColor="#6B8E8A"
+              placeholderTextColor={COLORS.textBody}
               value={symptom.notes}
               onChangeText={(v) => updateSymptom(idx, { notes: v })}
             />
           </View>
         ))}
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        <Button mode="text" textColor="#00E676" onPress={addSymptom} labelStyle={{ fontWeight: '600' }}>
+        <Button mode="text" textColor={COLORS.emerald} onPress={addSymptom} labelStyle={{ fontWeight: '600' }}>
           + Add Another Symptom
         </Button>
         <Button
           mode="contained"
-          buttonColor="#10B981"
-          textColor="#FFFFFF"
+          buttonColor={COLORS.emeraldFill}
+          textColor={COLORS.textDark}
           onPress={handleSubmit}
           loading={submitSymptoms.isPending}
           disabled={submitSymptoms.isPending}
@@ -136,18 +143,18 @@ export const SymptomsForm: React.FC<SymptomsFormProps> = ({ visitId, onSuccess, 
   );
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#0A2D28', borderRadius: RADIUS.lg, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.15)', marginBottom: SPACING.lg },
-  title: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  divider: { backgroundColor: 'rgba(0, 230, 118, 0.1)', marginVertical: 12 },
-  symptomBlock: { marginBottom: 16, padding: 12, backgroundColor: '#051815', borderRadius: RADIUS.md, borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.1)' },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.bg, borderRadius: RADIUS.lg, borderWidth: 1, borderColor: COLORS.emeraldLight, marginBottom: SPACING.lg },
+  title: { color: COLORS.textDark, fontSize: 16, fontWeight: '700' },
+  divider: { backgroundColor: COLORS.emeraldLight, marginVertical: 12 },
+  symptomBlock: { marginBottom: 16, padding: 12, backgroundColor: COLORS.bg, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.emeraldLight },
   symptomHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  symptomLabel: { color: '#00E676', fontSize: 12, fontWeight: '700' },
-  removeBtn: { color: '#EF4444', fontSize: 12, fontWeight: '600' },
-  input: { backgroundColor: '#0A2D28', color: '#FFFFFF', borderWidth: 1, borderColor: 'rgba(0, 230, 118, 0.2)', padding: 10, borderRadius: RADIUS.sm, fontSize: 13, marginBottom: 8 },
+  symptomLabel: { color: COLORS.emerald, fontSize: 12, fontWeight: '700' },
+  removeBtn: { color: COLORS.red, fontSize: 12, fontWeight: '600' },
+  input: { backgroundColor: COLORS.bg, color: COLORS.textDark, borderWidth: 1, borderColor: COLORS.emeraldLight, padding: 10, borderRadius: RADIUS.sm, fontSize: 13, marginBottom: 8 },
   severityRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
-  severityBtn: { flex: 1, paddingVertical: 6, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: '#333', alignItems: 'center' },
-  severityText: { fontSize: 11, fontWeight: '700', color: '#94A3B8' },
-  errorText: { color: '#EF4444', fontSize: 12, marginBottom: 8 },
-});
+  severityBtn: { flex: 1, paddingVertical: 6, borderRadius: RADIUS.sm, borderWidth: 1, borderColor: COLORS.inputBorder, alignItems: 'center' },
+  severityText: { fontSize: 11, fontWeight: '700', color: COLORS.textBody },
+  errorText: { color: COLORS.red, fontSize: 12, marginBottom: 8 },
+}));
 

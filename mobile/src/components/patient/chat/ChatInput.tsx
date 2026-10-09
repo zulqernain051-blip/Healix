@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import React from 'react';
 import { useVoiceRecorder } from '../../../hooks/useVoiceRecorder';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
@@ -23,6 +26,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onAttachPress,
   onSendAudio,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { isRecording, recordingDuration, busy, startRecording, stopRecording } = useVoiceRecorder(async (uri, durationMs) => { await onSendAudio?.(uri, durationMs); });
 
   const formatDuration = (ms: number) => {
@@ -54,7 +60,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
       {isRecording ? (
         <View style={styles.inputBar}>
           <TouchableOpacity style={styles.attachBtn} onPress={() => stopRecording(true)}>
-            <Text style={{ color: '#EF4444', fontSize: 22 }}>🗑</Text>
+            <Text style={{ color: COLORS.red, fontSize: 22 }}>🗑</Text>
           </TouchableOpacity>
           <View style={styles.recordingIndicator}>
             <View style={styles.recordingDot} />
@@ -73,7 +79,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <TextInput
             style={styles.textInput}
             placeholder="Type a message..."
-            placeholderTextColor="#6B8E8A"
+            placeholderTextColor={COLORS.textBody}
             value={inputText}
             onChangeText={setInputText}
             multiline
@@ -92,30 +98,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   previewBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0E3630',
+    backgroundColor: COLORS.bg,
     paddingHorizontal: SPACING.md,
     paddingVertical: 8,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 230, 118, 0.3)',
+    borderTopColor: COLORS.emeraldLight,
   },
   previewIcon: {
     fontSize: 20,
   },
   previewTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 13,
     fontWeight: '700',
   },
   previewSub: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
   },
   previewCancel: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: 18,
     fontWeight: '700',
     paddingHorizontal: 8,
@@ -124,9 +130,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: SPACING.sm,
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(0, 230, 118, 0.15)',
+    borderTopColor: COLORS.emeraldLight,
   },
   attachBtn: {
     padding: SPACING.sm,
@@ -136,8 +142,8 @@ const styles = StyleSheet.create({
   },
   textInput: {
     flex: 1,
-    backgroundColor: '#051815',
-    color: '#FFFFFF',
+    backgroundColor: COLORS.bg,
+    color: COLORS.textDark,
     borderRadius: RADIUS.round,
     paddingHorizontal: SPACING.md,
     paddingVertical: Platform.OS === 'ios' ? 10 : 6,
@@ -149,16 +155,16 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     justifyContent: 'center',
     alignItems: 'center',
   },
   sendBtnDisabled: {
-    backgroundColor: '#6B8E8A',
+    backgroundColor: COLORS.surfaceMuted,
   },
   sendIcon: {
     fontSize: 18,
-    color: '#061C19',
+    color: COLORS.onAccent,
     fontWeight: '900',
   },
   recordingIndicator: {
@@ -166,7 +172,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#051815',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.round,
     paddingVertical: Platform.OS === 'ios' ? 10 : 6,
     marginHorizontal: SPACING.xs,
@@ -175,12 +181,12 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#EF4444',
+    backgroundColor: COLORS.red,
     marginRight: 10,
   },
   recordingText: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 14,
     fontWeight: '600',
   },
-});
+}));

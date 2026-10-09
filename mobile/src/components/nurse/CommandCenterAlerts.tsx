@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -18,6 +21,9 @@ interface CommandCenterAlertsProps {
 }
 
 export const CommandCenterAlerts: React.FC<CommandCenterAlertsProps> = ({ alerts, onAlertPress }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   if (!alerts || alerts.length === 0) return null;
 
   return (
@@ -71,12 +77,12 @@ export const CommandCenterAlerts: React.FC<CommandCenterAlertsProps> = ({ alerts
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: {
     marginBottom: SPACING.lg,
   },
   sectionTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
     marginBottom: SPACING.sm,
@@ -85,19 +91,19 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   alertCard: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderRadius: RADIUS.lg,
     padding: SPACING.md,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.2)',
+    borderColor: COLORS.emeraldLight,
   },
   highRiskCard: {
-    backgroundColor: '#1E1214',
-    borderColor: '#EF4444',
+    backgroundColor: COLORS.bg,
+    borderColor: COLORS.red,
   },
   escalationCard: {
-    backgroundColor: '#1E180E',
-    borderColor: '#F59E0B',
+    backgroundColor: COLORS.bg,
+    borderColor: COLORS.amber,
   },
   topRow: {
     flexDirection: 'row',
@@ -116,26 +122,26 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#00E676',
+    color: COLORS.emerald,
   },
   highRiskText: {
-    color: '#EF4444',
+    color: COLORS.red,
   },
   escalationText: {
-    color: '#F59E0B',
+    color: COLORS.amber,
   },
   timeAgo: {
-    color: '#6B8E8A',
+    color: COLORS.textBody,
     fontSize: 10,
   },
   patientName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: TYPOGRAPHY.sizes.sm,
     fontWeight: '700',
     marginTop: 2,
   },
   messageText: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
     lineHeight: 16,
@@ -144,8 +150,8 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   actionLink: {
-    color: '#00E676',
+    color: COLORS.emerald,
     fontSize: 11,
     fontWeight: '700',
   },
-});
+}));

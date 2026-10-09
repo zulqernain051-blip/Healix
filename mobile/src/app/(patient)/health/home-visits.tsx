@@ -1,3 +1,6 @@
+
+
+
 import { localDateTime } from '../../../utils/dates';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -5,8 +8,10 @@ import { Text, Button, TextInput, RadioButton } from 'react-native-paper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '../../../store/auth';
 import { apiClient } from '../../../api/client';
-import { WorkflowPage, flowStyles as s } from '../../../components/common/WorkflowPage';
+import { WorkflowPage, useFlowStyles } from '../../../components/common/WorkflowPage';
 export default function DoctorVisitsScreen() {
+  const s = useFlowStyles();
+
   const id = useAuthStore(state => state.user?.patientId) || ''; const qc = useQueryClient();
   const visits = useQuery({ queryKey: ['patient', id, 'home-visits'], queryFn: () => apiClient.get<any[]>(`/patients/${id}/home-visits`), enabled: !!id, refetchInterval: 10000 });
   const doctors = useQuery({ queryKey: ['patient', id, 'home-visit-doctors'], queryFn: () => apiClient.get<any[]>(`/patients/${id}/home-visits/doctors`), enabled: !!id });

@@ -1,3 +1,5 @@
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { appAlert, confirmAction } from '../../../components/common/AppDialogs';
 import React from 'react';
 import { View, StyleSheet, ActivityIndicator, ScrollView, Alert } from 'react-native';
@@ -7,7 +9,7 @@ import { useListingOffers, useSelectOffer, useRejectOffer, useFavoriteNurses, us
 import { useAuthStore } from '../../../store/auth';
 import { marketplaceApi } from '../../../api/marketplace.api';
 import { OfferCard } from '../../../components/marketplace/OfferCard';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../../theme';
+import { SPACING, TYPOGRAPHY } from '../../../theme';
 
 /**
  * Patient Marketplace — Offer Review Screen
@@ -19,6 +21,9 @@ import { COLORS, SPACING, TYPOGRAPHY } from '../../../theme';
  * Full UI implementation coming in Phase 10C Step 8.
  */
 export default function ListingOffersScreen() {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const listingId = id || '';
   const router = useRouter();
@@ -57,7 +62,7 @@ export default function ListingOffersScreen() {
   if (isLoading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={COLORS.navy} size="large" />
+        <ActivityIndicator color={COLORS.primaryText} size="large" />
         <Text style={styles.loadingText}>Loading offers...</Text>
       </View>
     );
@@ -110,17 +115,17 @@ export default function ListingOffersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.surface },
   content: { padding: SPACING.lg },
   centered: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.surface, padding: SPACING.xl },
   title: { ...TYPOGRAPHY.h2, color: COLORS.textDark, marginBottom: SPACING.xs },
   subtitle: { ...TYPOGRAPHY.bodyMedium, color: COLORS.textBody, marginBottom: SPACING.lg },
-  nurseHeading: { ...TYPOGRAPHY.h3, color: COLORS.navy, marginBottom: SPACING.sm, marginTop: SPACING.md },
+  nurseHeading: { ...TYPOGRAPHY.h3, color: COLORS.primaryText, marginBottom: SPACING.sm, marginTop: SPACING.md },
   loadingText: { ...TYPOGRAPHY.bodyMedium, color: COLORS.textBody, marginTop: SPACING.md },
-  errorText: { ...TYPOGRAPHY.h3, color: '#EF4444', marginBottom: SPACING.xs },
+  errorText: { ...TYPOGRAPHY.h3, color: COLORS.red, marginBottom: SPACING.xs },
   errorDetail: { ...TYPOGRAPHY.bodySmall, color: COLORS.textBody },
   emptyIcon: { fontSize: 48, marginBottom: SPACING.md },
   emptyText: { ...TYPOGRAPHY.h3, color: COLORS.textDark, marginBottom: SPACING.xs },
   emptySubtext: { ...TYPOGRAPHY.bodySmall, color: COLORS.textBody, textAlign: 'center' },
-});
+}));

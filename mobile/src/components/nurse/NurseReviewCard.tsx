@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../theme/ThemeProvider';
+import type { ThemeColors } from '../../theme';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -16,6 +19,9 @@ export const NurseReviewCard: React.FC<NurseReviewCardProps> = ({
   comment,
   reviewedAt,
 }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const stars = Array(5).fill(0).map((_, i) => i < rating ? '⭐' : '☆');
 
   return (
@@ -32,11 +38,11 @@ export const NurseReviewCard: React.FC<NurseReviewCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#FFFFFF', padding: 16, borderRadius: 16, borderWidth: 1, borderColor: '#E2E8F0', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
+  card: { backgroundColor: COLORS.surfaceCard, padding: 16, borderRadius: 16, borderWidth: 1, borderColor: COLORS.inputBorder, shadowColor: COLORS.shadow, shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
-  patientName: { color: '#1E293B', fontSize: 14, fontWeight: '700' },
-  date: { color: '#64748B', fontSize: 11, marginTop: 2 },
-  stars: { color: '#F59E0B', fontSize: 12 },
-  comment: { color: '#475569', fontSize: 13, lineHeight: 20, marginTop: 4 },
-});
+  patientName: { color: COLORS.textMuted, fontSize: 14, fontWeight: '700' },
+  date: { color: COLORS.textBody, fontSize: 11, marginTop: 2 },
+  stars: { color: COLORS.amber, fontSize: 12 },
+  comment: { color: COLORS.textMuted, fontSize: 13, lineHeight: 20, marginTop: 4 },
+}));

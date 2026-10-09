@@ -1,3 +1,6 @@
+
+import { useAppTheme, useThemeValue } from '../../../theme/ThemeProvider';
+import type { ThemeColors } from '../../../theme';
 import { forwardRef } from 'react';
 import { useVoicePlayback } from '../../../hooks/useVoicePlayback';
 import { View, ScrollView, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
@@ -11,6 +14,9 @@ interface MessageListProps {
 import { API_URL } from '../../../api/client';
 
 const PatientAudioBubble = ({ uri, isMe, durationMs }: { uri: string; isMe: boolean; durationMs?: number }) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
+
   const { isPlaying, position, duration, togglePlayback } = useVoicePlayback(uri, durationMs);
 
   const formatTime = (ms: number) => {
@@ -22,14 +28,14 @@ const PatientAudioBubble = ({ uri, isMe, durationMs }: { uri: string; isMe: bool
 
   return (
     <View style={styles.audioCard}>
-      <TouchableOpacity style={[styles.audioPlayBtn, isMe && { backgroundColor: '#051815' }]} onPress={togglePlayback}>
-        <Text style={[styles.audioPlayIcon, isMe && { color: '#00E676' }]}>{isPlaying ? '⏸' : '▶'}</Text>
+      <TouchableOpacity style={[styles.audioPlayBtn, isMe && { backgroundColor: COLORS.bg }]} onPress={togglePlayback}>
+        <Text style={[styles.audioPlayIcon, isMe && { color: COLORS.emerald }]}>{isPlaying ? '⏸' : '▶'}</Text>
       </TouchableOpacity>
       <View style={styles.audioTrack}>
         <View style={styles.audioProgressBg}>
-          <View style={[styles.audioProgressFill, { width: duration > 0 ? `${(position / duration) * 100}%` : '0%' }, isMe && { backgroundColor: '#051815' }]} />
+          <View style={[styles.audioProgressFill, { width: duration > 0 ? `${(position / duration) * 100}%` : '0%' }, isMe && { backgroundColor: COLORS.bg }]} />
         </View>
-        <Text style={[styles.audioTime, isMe && { color: '#051815' }]}>
+        <Text style={[styles.audioTime, isMe && { color: COLORS.textMuted }]}>
           {formatTime(position)} / {formatTime(duration)}
         </Text>
       </View>
@@ -38,6 +44,8 @@ const PatientAudioBubble = ({ uri, isMe, durationMs }: { uri: string; isMe: bool
 };
 
 export const MessageList = forwardRef<ScrollView, MessageListProps>(({ messages }, ref) => {
+  const { colors: COLORS } = useAppTheme();
+  const styles = useThemeValue(createStyles);
   return (
     <ScrollView
       ref={ref}
@@ -104,11 +112,11 @@ export const MessageList = forwardRef<ScrollView, MessageListProps>(({ messages 
 
               {/* TIMESTAMP & TICKS */}
               <View style={styles.timeRow}>
-                <Text style={[styles.msgTime, isMe ? { color: 'rgba(255,255,255,0.6)' } : { color: '#6B8E8A' }]}>
+                <Text style={[styles.msgTime, isMe ? { color: COLORS.inverseMuted } : { color: COLORS.textBody }]}>
                   {msg.time}
                 </Text>
                 {isMe && (
-                  <Text style={[styles.ticks, msg.status === 'read' && { color: '#061C19' }]}>
+                  <Text style={[styles.ticks, msg.status === 'read' && { color: COLORS.textMuted }]}>
                     {msg.status === 'sent' ? ' ✓' : ' ✓✓'}
                   </Text>
                 )}
@@ -121,7 +129,7 @@ export const MessageList = forwardRef<ScrollView, MessageListProps>(({ messages 
   );
 });
 
-const styles = StyleSheet.create({
+const createStyles = (COLORS: ThemeColors) => (StyleSheet.create({
   messagesList: {
     flex: 1,
   },
@@ -146,13 +154,13 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
   },
   bubbleThem: {
-    backgroundColor: '#0A2D28',
+    backgroundColor: COLORS.bg,
     borderWidth: 1,
-    borderColor: 'rgba(0, 230, 118, 0.15)',
+    borderColor: COLORS.emeraldLight,
     borderTopLeftRadius: 4,
   },
   bubbleMe: {
-    backgroundColor: '#00E676',
+    backgroundColor: COLORS.emeraldFill,
     borderTopRightRadius: 4,
   },
   msgText: {
@@ -160,10 +168,10 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
   msgTextThem: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
   },
   msgTextMe: {
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '500',
   },
   imageWrap: {
@@ -178,7 +186,7 @@ const styles = StyleSheet.create({
   videoCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: COLORS.modalBackdrop,
     borderRadius: RADIUS.md,
     padding: 8,
     marginBottom: 6,
@@ -187,12 +195,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#EF4444',
+    backgroundColor: COLORS.red,
     justifyContent: 'center',
     alignItems: 'center',
   },
   playIcon: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 16,
     fontWeight: '800',
     marginLeft: 2,
@@ -202,19 +210,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   videoName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 13,
     fontWeight: '700',
   },
   videoSize: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   docCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: COLORS.modalBackdrop,
     borderRadius: RADIUS.md,
     padding: 8,
     marginBottom: 6,
@@ -223,7 +231,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 8,
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.emerald,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -232,19 +240,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   docName: {
-    color: '#FFFFFF',
+    color: COLORS.textDark,
     fontSize: 13,
     fontWeight: '700',
   },
   docSize: {
-    color: '#94A3B8',
+    color: COLORS.textBody,
     fontSize: 11,
     marginTop: 2,
   },
   audioCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: COLORS.modalBackdrop,
     borderRadius: RADIUS.md,
     padding: 8,
     marginBottom: 6,
@@ -254,13 +262,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.emeraldFill,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
   },
   audioPlayIcon: {
-    color: '#FFF',
+    color: COLORS.onAccent,
     fontSize: 16,
     marginLeft: 2,
   },
@@ -269,17 +277,17 @@ const styles = StyleSheet.create({
   },
   audioProgressBg: {
     height: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: COLORS.glassSurface,
     borderRadius: 2,
     marginBottom: 6,
   },
   audioProgressFill: {
     height: '100%',
-    backgroundColor: '#10B981',
+    backgroundColor: COLORS.emerald,
     borderRadius: 2,
   },
   audioTime: {
-    color: '#FFF',
+    color: COLORS.textDark,
     fontSize: 10,
     fontWeight: '600',
   },
@@ -294,7 +302,7 @@ const styles = StyleSheet.create({
   },
   ticks: {
     fontSize: 10,
-    color: '#061C19',
+    color: COLORS.textMuted,
     fontWeight: '800',
   },
-});
+}));
